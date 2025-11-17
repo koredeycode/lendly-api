@@ -1,0 +1,38 @@
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { ProfileUseCase } from '../application/profile.usecase';
+import { GoogleLoginUseCase } from '../application/google-login.usecase';
+import { LoginUseCase } from '../application/login.usecase';
+import { SignupUseCase } from '../application/signup.usecase';
+import { AuthRepository } from '../domain/auth.repository';
+import { DrizzleAuthRepository } from '../infrastructure/auth.repository.drizzle';
+import { JwtStrategy } from '../infrastructure/jwt.strategy';
+import { AuthController } from './auth.controller';
+import { JwtAuthGuard } from './jwt-auth.guard';
+
+@Module({
+  imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '15m' },
+      // signOptions: { expiresIn: process.env.ACCESS_EXPIRES_IN! || '15m' },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [
+    LoginUseCase,
+    GoogleLoginUseCase,
+    SignupUseCase,
+    ProfileUseCase,
+    {
+      provide: AuthRepository,
+      useClass: DrizzleAuthRepository,
+    },
+    JwtAuthGuard,
+    JwtStrategy,
+  ],
+  exports: [AuthRepository, JwtAuthGuard],
+})
+export class AuthModule {}

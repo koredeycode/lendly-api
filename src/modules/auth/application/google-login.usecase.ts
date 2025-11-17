@@ -1,0 +1,42 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { v4 as uuidv4 } from 'uuid';
+import { AuthRepository } from '../domain/auth.repository';
+import { GoogleUserDTO } from './dto/google-user.dto';
+
+@Injectable()
+export class GoogleLoginUseCase {
+  constructor(
+    private readonly authRepo: AuthRepository,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async execute(googleUser: GoogleUserDTO) {
+    if (!googleUser) throw new UnauthorizedException();
+
+    let user = await this.authRepo.findByEmail(googleUser.email);
+
+    if (!user) {
+      user = await this.authRepo.createGoogleUser({
+        id: uuidv4(),
+        email: googleUser.email,
+        name: googleUser.name,
+        avatarUrl: googleUser.avatarUrl ?? undefined,
+        oauthProvider: 'google',
+        oauthId: googleUser.googleId,
+      });
+    }
+
+    const payload = { sub: user.id, email: user.email };
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET!,
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET!,
+    });
+
+    return { accessToken, refreshToken, user };
+  }
+}
