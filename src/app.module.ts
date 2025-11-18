@@ -9,8 +9,16 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 import { AuthModule } from './modules/auth/presentation/auth.module';
+import { HealthController } from './modules/health/presentation/health.controller';
+import { HealthModule } from './modules/health/presentation/health.module';
+import { ItemController } from './modules/item/presentation/item.controller';
+import { ItemModule } from './modules/item/presentation/item.module';
 import { JobsModule } from './modules/jobs/presentation/job.module';
 import { QueueMonitorModule } from './modules/queue-monitor/queue-monitor.module';
+import { TransactionController } from './modules/transaction/presentation/transaction.controller';
+import { TransactionModule } from './modules/transaction/presentation/transaction.module';
+import { UserController } from './modules/user/presentation/user.controller';
+import { UserModule } from './modules/user/presentation/user.module';
 
 @Module({
   imports: [
@@ -36,8 +44,18 @@ import { QueueMonitorModule } from './modules/queue-monitor/queue-monitor.module
     AuthModule,
     JobsModule,
     QueueMonitorModule,
+    UserModule,
+    ItemModule,
+    TransactionModule,
+    HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+    UserController,
+    ItemController,
+    TransactionController,
+    HealthController,
+  ],
   providers: [
     AppService,
     {
