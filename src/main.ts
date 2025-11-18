@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { QueueMonitorService } from './modules/queue-monitor/queue-monitor.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,10 @@ async function bootstrap() {
       transform: true, // auto-transform payload to DTO instance
     }),
   );
+
+  const queueMonitor = app.get(QueueMonitorService);
+  queueMonitor.setApp(app);
+
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Lendly API')

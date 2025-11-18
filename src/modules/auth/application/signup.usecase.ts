@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthUser } from '../domain/auth.entity';
 import { AuthRepository } from '../domain/auth.repository';
@@ -9,7 +9,7 @@ import { AuthRepository } from '../domain/auth.repository';
 export class SignupUseCase {
   constructor(
     private readonly authRepo: AuthRepository,
-    private readonly jwtService: JwtService,
+    private readonly emailJobs: EmailJobService,
   ) {}
 
   async execute(email: string, name: string, password: string) {
@@ -26,7 +26,10 @@ export class SignupUseCase {
     await this.authRepo.createUser(
       new AuthUser(uuidv4(), name, email, passwordHash),
     );
-
+    await this.emailJobs.sendWelcomeEmail({
+      email,
+      name,
+    });
     // // Generate JWT tokens
     // const payload = { sub: user.id, email: user.email };
     // const accessToken = await this.jwtService.signAsync(payload);

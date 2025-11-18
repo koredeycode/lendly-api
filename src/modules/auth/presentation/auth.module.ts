@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ProfileUseCase } from '../application/profile.usecase';
+import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { GoogleLoginUseCase } from '../application/google-login.usecase';
 import { LoginUseCase } from '../application/login.usecase';
+import { ProfileUseCase } from '../application/profile.usecase';
 import { SignupUseCase } from '../application/signup.usecase';
 import { AuthRepository } from '../domain/auth.repository';
 import { DrizzleAuthRepository } from '../infrastructure/auth.repository.drizzle';
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
       signOptions: { expiresIn: '15m' },
       // signOptions: { expiresIn: process.env.ACCESS_EXPIRES_IN! || '15m' },
     }),
+    JobsModule,
   ],
   controllers: [AuthController],
   providers: [
