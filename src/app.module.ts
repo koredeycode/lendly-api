@@ -9,11 +9,11 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 import { AuthModule } from './modules/auth/presentation/auth.module';
+import { BookingModule } from './modules/booking/presentation/booking.module';
 import { HealthModule } from './modules/health/presentation/health.module';
 import { ItemModule } from './modules/item/presentation/item.module';
 import { JobsModule } from './modules/jobs/presentation/job.module';
 import { QueueMonitorModule } from './modules/queue-monitor/queue-monitor.module';
-import { TransactionModule } from './modules/transaction/presentation/transaction.module';
 import { UserModule } from './modules/user/presentation/user.module';
 
 @Module({
@@ -42,7 +42,7 @@ import { UserModule } from './modules/user/presentation/user.module';
     QueueMonitorModule,
     UserModule,
     ItemModule,
-    TransactionModule,
+    BookingModule,
     HealthModule,
   ],
   controllers: [AppController],
