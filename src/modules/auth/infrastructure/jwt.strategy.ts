@@ -19,7 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: Payload) {
     // payload contains sub (user id) and email
-    console.log({ payload });
     const user = await this.authRepo.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException();

@@ -32,6 +32,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
       provide: AuthRepository,
       useClass: DrizzleAuthRepository,
     },
+
     JwtAuthGuard,
     JwtStrategy,
   ],

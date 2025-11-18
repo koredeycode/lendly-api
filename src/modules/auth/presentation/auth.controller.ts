@@ -7,6 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { GoogleUserDTO } from '../application/dto/google-user.dto';
 import { LoginResponseDTO } from '../application/dto/login-response.dto';
 import { LoginDTO } from '../application/dto/login.dto';
@@ -48,6 +49,7 @@ export class AuthController {
     description: 'Login successful',
     type: LoginResponseDTO,
   })
+  @Throttle({ default: { limit: 3, ttl: 6000 } })
   @Post('login')
   async login(@Body() body: LoginDTO) {
     return (await this.loginUseCase.execute(
