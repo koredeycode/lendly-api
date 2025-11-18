@@ -12,7 +12,7 @@ export class LoginUseCase {
 
   async execute(email: string, password: string) {
     const user = await this.authRepo.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('User not found');
 
     // verify hashed password
     const isPasswordValid = await bcrypt.compare(
@@ -33,6 +33,9 @@ export class LoginUseCase {
       secret: process.env.JWT_SECRET!,
     });
 
-    return { accessToken, refreshToken, user };
+    return {
+      message: 'Login successful',
+      data: { accessToken, refreshToken },
+    };
   }
 }

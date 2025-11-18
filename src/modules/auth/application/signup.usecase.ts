@@ -23,7 +23,7 @@ export class SignupUseCase {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Create new user
-    const user = await this.authRepo.createUser(
+    await this.authRepo.createUser(
       new AuthUser(uuidv4(), name, email, passwordHash),
     );
 
@@ -32,7 +32,7 @@ export class SignupUseCase {
     // const accessToken = await this.jwtService.signAsync(payload);
     // const refreshToken = await this.jwtService.signAsync(payload);
 
-    return { user };
+    return { message: 'Signup successful' };
     // return { accessToken, refreshToken, user };
   }
 }

@@ -6,15 +6,20 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import type { GoogleUserDTO } from '../application/dto/google-user.dto';
-import type { LoginDTO } from '../application/dto/login.dto';
-import type { SignupDTO } from '../application/dto/signup.dto';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GoogleUserDTO } from '../application/dto/google-user.dto';
+import { LoginResponseDTO } from '../application/dto/login-response.dto';
+import { LoginDTO } from '../application/dto/login.dto';
+import { ProfileResponseDTO } from '../application/dto/profile-response.dto';
+import { SignupResponseDTO } from '../application/dto/signup-response.dto';
+import { SignupDTO } from '../application/dto/signup.dto';
 import { GoogleLoginUseCase } from '../application/google-login.usecase';
 import { LoginUseCase } from '../application/login.usecase';
 import { ProfileUseCase } from '../application/profile.usecase';
 import { SignupUseCase } from '../application/signup.usecase';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -24,25 +29,54 @@ export class AuthController {
     private readonly profileUseCase: ProfileUseCase,
   ) {}
 
+  @ApiResponse({
+    status: 201,
+    description: 'Signup successful',
+    type: SignupResponseDTO,
+  })
   @Post('signup')
   async signup(@Body() body: SignupDTO) {
-    console.log({ body });
-    return this.signupUseCase.execute(body.email, body.name, body.password);
+    return (await this.signupUseCase.execute(
+      body.email,
+      body.name,
+      body.password,
+    )) as SignupResponseDTO;
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    type: LoginResponseDTO,
+  })
   @Post('login')
   async login(@Body() body: LoginDTO) {
-    return this.loginUseCase.execute(body.email, body.password);
+    return (await this.loginUseCase.execute(
+      body.email,
+      body.password,
+    )) as LoginResponseDTO;
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    type: LoginResponseDTO,
+  })
   @Post('google')
   async googleLogin(@Body() body: GoogleUserDTO) {
-    return this.googleLoginUseCase.execute(body); // typed DTO
+    return (await this.googleLoginUseCase.execute(body)) as LoginResponseDTO; // typed DTO
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @ApiResponse({
+    status: 200,
+    description: 'Profile retrieved',
+    type: ProfileResponseDTO,
+  })
+  @ApiBearerAuth()
   async profile(@Request() req) {
-    return this.profileUseCase.execute(req.user.id); // req.user from JWT
+    return (await this.profileUseCase.execute(
+      req.user.id,
+    )) as ProfileResponseDTO; // req.user from JWT
   }
 }

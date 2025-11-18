@@ -37,6 +37,9 @@ export class GoogleLoginUseCase {
       secret: process.env.JWT_SECRET!,
     });
 
-    return { accessToken, refreshToken, user };
+    return {
+      message: 'Google Signin successful',
+      data: { accessToken, refreshToken },
+    };
   }
 }
