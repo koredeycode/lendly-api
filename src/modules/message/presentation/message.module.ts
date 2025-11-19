@@ -23,4 +23,4 @@ import { MessageController } from './message.controller';
   ],
   exports: [MessageRepository],
 })
-export class ItemModule {}
+export class MessageModule {}
