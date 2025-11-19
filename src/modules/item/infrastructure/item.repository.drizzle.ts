@@ -1,5 +1,107 @@
+import { ItemCreateDto, ItemUpdateDto } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
+import { db } from 'src/config/db/drizzle/client';
+import { items } from 'src/config/db/schema';
 import { ItemRepository } from '../domain/item.repository';
 
 @Injectable()
-export class DrizzleItemRepository implements ItemRepository {}
+export class DrizzleItemRepository implements ItemRepository {
+  async createItem(data: ItemCreateDto) {
+    const [item] = await db.insert(items).values(data).returning();
+    return item;
+  }
+
+  async findItemById(id: string) {
+    const result = await db
+      .select()
+      .from(items)
+      .where(eq(items.id, id))
+      .limit(1);
+    return result[0] ?? null;
+  }
+
+  async findItemsByOwner(ownerId: string, includeDeleted = false) {
+    return await db
+      .select()
+      .from(items)
+      .where(
+        and(
+          eq(items.ownerId, ownerId),
+          includeDeleted ? undefined : isNull(items.deletedAt),
+        ),
+      )
+      .orderBy(desc(items.createdAt));
+  }
+
+  async searchItems({
+    lat,
+    lng,
+    radiusKm = 10,
+    category,
+    onlyAvailable = true,
+    onlyFree = false,
+    search,
+    page = 1,
+    limit = 20,
+  }: {
+    lat: number;
+    lng: number;
+    radiusKm?: number;
+    category?: string;
+    onlyAvailable?: boolean;
+    onlyFree?: boolean;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const offset = (page - 1) * limit;
+
+    return await db
+      .select({
+        item: items,
+        distance: sql<number>`ST_Distance(
+        ${items.location},
+        ST_Point(${lng}, ${lat})::geography
+      ) / 1000`,
+      })
+      .from(items)
+      .where(
+        and(
+          isNull(items.deletedAt),
+          onlyAvailable ? eq(items.isAvailable, true) : undefined,
+          onlyFree ? eq(items.dailyRentalPriceCents, 0) : undefined,
+          category ? eq(items.category, category) : undefined,
+          search
+            ? sql`to_tsvector('english', ${items.title} || ' ' || ${items.description}) @@ plainto_tsquery('english', ${search})`
+            : undefined,
+          sql`ST_DWithin(
+          ${items.location},
+          ST_Point(${lng}, ${lat})::geography,
+          ${radiusKm * 1000}
+        )`,
+        ),
+      )
+      .orderBy(sql`distance`)
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async updateItem(id: string, data: ItemUpdateDto) {
+    const [item] = await db
+      .update(items)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(items.id, id))
+      .returning();
+    return item;
+  }
+
+  async softDeleteItem(id: string) {
+    const [item] = await db
+      .update(items)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(eq(items.id, id))
+      .returning();
+    return item;
+  }
+}
