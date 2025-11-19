@@ -1,14 +1,24 @@
-import { ItemCreateDto, ItemUpdateDto } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { items } from 'src/config/db/schema';
+import { Item } from '../domain/item.entity';
 import { ItemRepository } from '../domain/item.repository';
 
 @Injectable()
 export class DrizzleItemRepository implements ItemRepository {
-  async createItem(data: ItemCreateDto) {
-    const [item] = await db.insert(items).values(data).returning();
+  async createItem(ownerId: string, data: Item) {
+    const { location, ...rest } = data;
+    const locationSql = sql`POINT(${location[0]}, ${location[1]})`;
+    // const locationSql = sql`ST_Point(${location.lng}, ${location.lat})::geography`;
+    const [item] = await db
+      .insert(items)
+      .values({
+        ...rest,
+        location: locationSql,
+        ownerId,
+      })
+      .returning();
     return item;
   }
 
@@ -87,10 +97,20 @@ export class DrizzleItemRepository implements ItemRepository {
       .offset(offset);
   }
 
-  async updateItem(id: string, data: ItemUpdateDto) {
+  async updateItem(id: string, data: Partial<Item>) {
+    const updatedData = { ...data, updatedAt: new Date() };
+
+    // if (data.location) {
+    //   // updatedData.location = sql`ST_Point(${data.location.lng}, ${data.location.lat})::geography`;
+    //   // updatedData.location = sql`POINT(${data.location.lng}, ${data.location.lat})`;
+    //   const location = [data.location.lat, data.location.lng] as [
+    //     number,
+    //     number,
+    //   ];
+    // }
     const [item] = await db
       .update(items)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...updatedData })
       .where(eq(items.id, id))
       .returning();
     return item;

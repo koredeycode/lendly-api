@@ -37,11 +37,8 @@ export class AuthController {
   })
   @Post('signup')
   async signup(@Body() body: SignupDTO) {
-    return (await this.signupUseCase.execute(
-      body.email,
-      body.name,
-      body.password,
-    )) as SignupResponseDTO;
+    await this.signupUseCase.execute(body.email, body.name, body.password);
+    return { message: 'Signup successful' };
   }
 
   @ApiResponse({
@@ -52,20 +49,26 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 6000 } })
   @Post('login')
   async login(@Body() body: LoginDTO) {
-    return (await this.loginUseCase.execute(
-      body.email,
-      body.password,
-    )) as LoginResponseDTO;
+    const data = await this.loginUseCase.execute(body.email, body.password);
+
+    return {
+      message: 'Login successful',
+      data,
+    };
   }
 
   @ApiResponse({
     status: 200,
-    description: 'Login successful',
+    description: 'Google Login successful',
     type: LoginResponseDTO,
   })
   @Post('google')
   async googleLogin(@Body() body: GoogleUserDTO) {
-    return (await this.googleLoginUseCase.execute(body)) as LoginResponseDTO; // typed DTO
+    const data = await this.googleLoginUseCase.execute(body); // typed DTO
+    return {
+      message: 'Google Signin successful',
+      data,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -77,8 +80,8 @@ export class AuthController {
   })
   @ApiBearerAuth()
   async profile(@Request() req) {
-    return (await this.profileUseCase.execute(
-      req.user.id,
-    )) as ProfileResponseDTO; // req.user from JWT
+    const user = await this.profileUseCase.execute(req.user.id);
+
+    return { message: 'Profile retrieved successfully', data: user };
   }
 }

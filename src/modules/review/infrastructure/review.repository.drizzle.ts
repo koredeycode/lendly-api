@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { and, count, eq } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { ReviewCreateDto, reviews } from 'src/config/db/schema';
+import { reviews } from 'src/config/db/schema';
 import { ReviewRepository } from '../domain/review.repository';
+import { Review } from './review.entity';
 
 @Injectable()
 export class DrizzleReviewRepository implements ReviewRepository {
-  async createReview(data: ReviewCreateDto) {
+  async createReview(data: Review) {
     const [review] = await db.insert(reviews).values(data).returning();
     return review;
   }

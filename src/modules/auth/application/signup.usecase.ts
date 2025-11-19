@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
-import { v4 as uuidv4 } from 'uuid';
 import { AuthUser } from '../domain/auth.entity';
 
 @Injectable()
@@ -23,9 +22,7 @@ export class SignupUseCase {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Create new user
-    await this.userRepo.createUser(
-      new AuthUser(uuidv4(), name, email, passwordHash),
-    );
+    await this.userRepo.createUser(new AuthUser(name, email, passwordHash));
     await this.emailJobs.sendWelcomeEmail({
       email,
       name,
@@ -35,7 +32,7 @@ export class SignupUseCase {
     // const accessToken = await this.jwtService.signAsync(payload);
     // const refreshToken = await this.jwtService.signAsync(payload);
 
-    return { message: 'Signup successful' };
+    // return { message: 'Signup successful' };
     // return { accessToken, refreshToken, user };
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { and, eq, sql } from 'drizzle-orm';
-import { db } from '../../../config/db/drizzle/client';
+
+import { db } from 'src/config/db/drizzle/client';
 import {
   deviceTokens,
   items,
@@ -24,7 +25,7 @@ export class DrizzleUserRepository implements UserRepository {
     const user = result[0] ?? null;
 
     if (!user) return null;
-    return new AuthUser(user.id, user.name, user.email, user.passwordHash);
+    return new AuthUser(user.name, user.email, user.passwordHash, user.id);
   }
 
   async findUserById(id: string) {
@@ -42,7 +43,7 @@ export class DrizzleUserRepository implements UserRepository {
 
   async createUser(user: AuthUser) {
     await db.insert(users).values({
-      id: user.id,
+      // id: user.id,
       email: user.email,
       passwordHash: user.passwordHash,
       name: user.name,

@@ -1,4 +1,4 @@
-import { MessageCreateDto } from '@koredeycode/lendly-types';
+import { MessageDto } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { and, asc, eq, not } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
@@ -16,7 +16,7 @@ export class DrizzleMessageRepository implements MessageRepository {
       .limit(limit);
   }
 
-  async createMessage(data: MessageCreateDto) {
+  async createMessage(data: MessageDto) {
     const [msg] = await db.insert(chatMessages).values(data).returning();
     return msg;
   }

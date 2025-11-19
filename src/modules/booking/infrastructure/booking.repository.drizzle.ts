@@ -1,15 +1,23 @@
-import { BookingCreateDto, bookingStatusEnum } from '@koredeycode/lendly-types';
+import { bookingStatusEnum } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { bookings } from 'src/config/db/schema';
+import { bookings, items } from 'src/config/db/schema';
+import { Booking } from '../domain/booking.entity';
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
 export class DrizzleBookingRepository implements BookingRepository {
-  async createBooking(data: BookingCreateDto) {
-    const [booking] = await db.insert(bookings).values(data).returning();
-    return booking;
+  async createBooking(borrowerId: string, data: Booking) {
+    const [booking] = await db
+      .insert(bookings)
+      .values({
+        ...data,
+        borrowerId,
+      })
+      .returning();
+
+    return booking as Booking;
   }
 
   async findBookingById(id: string) {
@@ -18,24 +26,32 @@ export class DrizzleBookingRepository implements BookingRepository {
       .from(bookings)
       .where(eq(bookings.id, id))
       .limit(1);
-    return result[0] ?? null;
+
+    const booking = result[0] ?? null;
+
+    if (!booking) return null;
+
+    return booking as Booking;
   }
 
   async getBookingsForUser(userId: string, type: 'lending' | 'borrowing') {
+    let userBookings;
     if (type === 'lending') {
-      return await db
+      userBookings = await db
         .select({ booking: bookings, item: items })
         .from(bookings)
         .innerJoin(items, eq(bookings.itemId, items.id))
         .where(eq(items.ownerId, userId))
         .orderBy(desc(bookings.createdAt));
+      return userBookings as Booking[];
     }
 
-    return await db
+    userBookings = await db
       .select()
       .from(bookings)
       .where(eq(bookings.borrowerId, userId))
       .orderBy(desc(bookings.createdAt));
+    return userBookings as Booking[];
   }
 
   async acceptBooking(bookingId: string, tipCents = 0) {

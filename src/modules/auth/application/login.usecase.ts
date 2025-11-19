@@ -33,9 +33,6 @@ export class LoginUseCase {
       secret: process.env.JWT_SECRET!,
     });
 
-    return {
-      message: 'Login successful',
-      data: { accessToken, refreshToken },
-    };
+    return { accessToken, refreshToken };
   }
 }

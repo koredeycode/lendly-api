@@ -1,7 +1,7 @@
-import { ItemCreateDto, ItemUpdateDto } from '@koredeycode/lendly-types';
+import { Item } from './item.entity';
 
 export abstract class ItemRepository {
-  abstract createItem(data: ItemCreateDto);
+  abstract createItem(ownerId: string, data: Item);
   abstract findItemById(id: string);
   abstract findItemsByOwner(ownerId: string, includeDeleted: boolean);
   abstract searchItems(search: {
@@ -15,6 +15,6 @@ export abstract class ItemRepository {
     page: number;
     limit: number;
   });
-  abstract updateItem(id: string, data: ItemUpdateDto);
+  abstract updateItem(id: string, data: Partial<Item>);
   abstract softDeleteItem(id: string);
 }
