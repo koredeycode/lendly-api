@@ -6,7 +6,7 @@ export class ProfileUseCase {
   constructor(private readonly userRepo: UserRepository) {}
 
   async execute(userId: string) {
-    const user = await this.userRepo.findById(userId);
+    const user = await this.userRepo.findUserById(userId);
     return { message: 'Profile retrieved successfully', data: user };
   }
 }

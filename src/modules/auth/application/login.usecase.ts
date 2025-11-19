@@ -11,7 +11,7 @@ export class LoginUseCase {
   ) {}
 
   async execute(email: string, password: string) {
-    const user = await this.userRepo.findByEmail(email);
+    const user = await this.userRepo.findUserByEmail(email);
     if (!user) throw new UnauthorizedException('User not found');
 
     // verify hashed password

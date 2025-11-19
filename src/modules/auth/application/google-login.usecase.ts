@@ -14,7 +14,7 @@ export class GoogleLoginUseCase {
   async execute(googleUser: GoogleUserDTO) {
     if (!googleUser) throw new UnauthorizedException();
 
-    let user = await this.userRepo.findByEmail(googleUser.email);
+    let user = await this.userRepo.findUserByEmail(googleUser.email);
 
     if (!user) {
       user = await this.userRepo.createGoogleUser({

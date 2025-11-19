@@ -14,7 +14,7 @@ export class SignupUseCase {
 
   async execute(email: string, name: string, password: string) {
     // Check if user already exists
-    const existingUser = await this.userRepo.findByEmail(email);
+    const existingUser = await this.userRepo.findUserByEmail(email);
     if (existingUser) {
       throw new BadRequestException('Email already registered');
     }
