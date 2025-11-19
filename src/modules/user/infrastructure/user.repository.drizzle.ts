@@ -3,6 +3,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../../../config/db/drizzle/client';
 import {
   deviceTokens,
+  items,
   reports,
   savedItems,
   userLocations,
