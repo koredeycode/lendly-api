@@ -1,8 +1,17 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Message')
 @Controller('messages')
 export class MessageController {
   constructor() {}
+
+  @ApiResponse({
+    status: 200,
+    description: 'Message endpoint',
+  })
+  @Get('/hello')
+  hello() {
+    return { message: 'Hello from message endpoint' };
+  }
 }

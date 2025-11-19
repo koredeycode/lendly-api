@@ -29,6 +29,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
+  console.log('🚀 Swagger docs running on http://localhost:5000/api-docs');
+
   app.getHttpAdapter().get('/api-docs-json', (_req, res) => {
     res.json(document);
   });
