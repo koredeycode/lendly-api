@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AuthRepository } from '../domain/auth.repository';
+import { UserRepository } from 'src/modules/user/domain/user.repository';
 
 @Injectable()
 export class ProfileUseCase {
-  constructor(private readonly authRepo: AuthRepository) {}
+  constructor(private readonly userRepo: UserRepository) {}
 
   async execute(userId: string) {
-    const user = await this.authRepo.findById(userId);
+    const user = await this.userRepo.findById(userId);
     return { message: 'Profile retrieved successfully', data: user };
   }
 }

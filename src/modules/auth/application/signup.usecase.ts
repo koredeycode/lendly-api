@@ -1,20 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
+import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthUser } from '../domain/auth.entity';
-import { AuthRepository } from '../domain/auth.repository';
 
 @Injectable()
 export class SignupUseCase {
   constructor(
-    private readonly authRepo: AuthRepository,
+    private readonly userRepo: UserRepository,
     private readonly emailJobs: EmailJobService,
   ) {}
 
   async execute(email: string, name: string, password: string) {
     // Check if user already exists
-    const existingUser = await this.authRepo.findByEmail(email);
+    const existingUser = await this.userRepo.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException('Email already registered');
     }
@@ -23,7 +23,7 @@ export class SignupUseCase {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Create new user
-    await this.authRepo.createUser(
+    await this.userRepo.createUser(
       new AuthUser(uuidv4(), name, email, passwordHash),
     );
     await this.emailJobs.sendWelcomeEmail({

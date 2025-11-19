@@ -1,23 +1,23 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { v4 as uuidv4 } from 'uuid';
-import { AuthRepository } from '../domain/auth.repository';
 import { GoogleUserDTO } from './dto/google-user.dto';
 
 @Injectable()
 export class GoogleLoginUseCase {
   constructor(
-    private readonly authRepo: AuthRepository,
+    private readonly userRepo: UserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
   async execute(googleUser: GoogleUserDTO) {
     if (!googleUser) throw new UnauthorizedException();
 
-    let user = await this.authRepo.findByEmail(googleUser.email);
+    let user = await this.userRepo.findByEmail(googleUser.email);
 
     if (!user) {
-      user = await this.authRepo.createGoogleUser({
+      user = await this.userRepo.createGoogleUser({
         id: uuidv4(),
         email: googleUser.email,
         name: googleUser.name,

@@ -1,8 +1,6 @@
-import { AuthUser } from './auth.entity';
-
 export abstract class AuthRepository {
-  abstract findByEmail(email: string): Promise<AuthUser | null>;
-  abstract findById(id: string): Promise<AuthUser | null>;
-  abstract createUser(user: AuthUser): Promise<AuthUser>;
-  abstract createGoogleUser(data: AuthUser): Promise<AuthUser>;
+  // abstract findByEmail(email: string): Promise<AuthUser | null>;
+  // abstract findById(id: string): Promise<AuthUser | null>;
+  // abstract createUser(user: AuthUser): Promise<AuthUser>;
+  // abstract createGoogleUser(data: AuthUser): Promise<AuthUser>;
 }
