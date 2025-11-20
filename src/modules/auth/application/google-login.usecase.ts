@@ -10,19 +10,19 @@ export class GoogleLoginUseCase {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(googleUser: GoogleUserDTO) {
-    if (!googleUser) throw new UnauthorizedException();
+  async execute(dto: GoogleUserDTO) {
+    if (!dto) throw new UnauthorizedException();
 
-    let user = await this.userRepo.findUserByEmail(googleUser.email);
+    let user = await this.userRepo.findUserByEmail(dto.email);
 
     if (!user) {
       user = await this.userRepo.createGoogleUser({
         // id: uuidv4(),
-        email: googleUser.email,
-        name: googleUser.name,
-        avatarUrl: googleUser.avatarUrl ?? undefined,
+        email: dto.email,
+        name: dto.name,
+        avatarUrl: dto.avatarUrl ?? undefined,
         oauthProvider: 'google',
-        oauthId: googleUser.googleId,
+        oauthId: dto.googleId,
       });
     }
 

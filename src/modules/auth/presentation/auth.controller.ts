@@ -37,7 +37,7 @@ export class AuthController {
   })
   @Post('signup')
   async signup(@Body() body: SignupDTO) {
-    await this.signupUseCase.execute(body.email, body.name, body.password);
+    await this.signupUseCase.execute(body);
     return { message: 'Signup successful' };
   }
 
@@ -49,7 +49,7 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 6000 } })
   @Post('login')
   async login(@Body() body: LoginDTO) {
-    const data = await this.loginUseCase.execute(body.email, body.password);
+    const data = await this.loginUseCase.execute(body);
 
     return {
       message: 'Login successful',

@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { ItemService } from '../application/item.service';
 
 @ApiTags('Item')
@@ -29,7 +30,7 @@ export class ItemController {
     description: 'The item has beeen successfully retrieved',
   })
   @Get(':id')
-  async getItem(@Param('id') id: string, @Body() body: any) {
+  async getItem(@Param('id') id: string) {
     return { message: 'Item successfuly retrieved' };
   }
 
@@ -38,7 +39,8 @@ export class ItemController {
     description: 'The item has beeen successfully created',
   })
   @Post()
-  async createItem(@Body() body: any) {
+  async createItem(@Body() body: CreateItemDTO) {
+    console.log({ body });
     return { message: 'Item created successfully' };
   }
 

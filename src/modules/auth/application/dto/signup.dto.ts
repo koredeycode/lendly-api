@@ -23,5 +23,6 @@ export class SignupDTO {
   })
   @IsString()
   @MinLength(6)
+  // @IsStrongPassword()
   password: string;
 }

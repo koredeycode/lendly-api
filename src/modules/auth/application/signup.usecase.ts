@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
 import { User } from 'src/modules/user/domain/user.entity';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
+import { SignupDTO } from './dto/signup.dto';
 
 @Injectable()
 export class SignupUseCase {
@@ -11,21 +12,21 @@ export class SignupUseCase {
     private readonly emailJobs: EmailJobService,
   ) {}
 
-  async execute(email: string, name: string, password: string) {
+  async execute(dto: SignupDTO) {
     // Check if user already exists
-    const existingUser = await this.userRepo.findUserByEmail(email);
+    const existingUser = await this.userRepo.findUserByEmail(dto.email);
     if (existingUser) {
       throw new BadRequestException('Email already registered');
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, 10);
 
     // Create new user
-    await this.userRepo.createUser(new User(name, email, passwordHash));
+    await this.userRepo.createUser(new User(dto.name, dto.email, passwordHash));
     await this.emailJobs.sendWelcomeEmail({
-      email,
-      name,
+      email: dto.email,
+      name: dto.name,
     });
     // // Generate JWT tokens
     // const payload = { sub: user.id, email: user.email };

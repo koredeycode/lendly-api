@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class LoginUseCase {
@@ -10,13 +11,13 @@ export class LoginUseCase {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(email: string, password: string) {
-    const user = await this.userRepo.findUserByEmail(email);
+  async execute(dto: LoginDTO) {
+    const user = await this.userRepo.findUserByEmail(dto.email);
     if (!user) throw new UnauthorizedException('User not found');
 
     // verify hashed password
     const isPasswordValid = await bcrypt.compare(
-      password,
+      dto.password,
       user.passwordHash || '',
     );
 
