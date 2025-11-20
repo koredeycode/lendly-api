@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
-import { v4 as uuidv4 } from 'uuid';
 import { GoogleUserDTO } from './dto/google-user.dto';
 
 @Injectable()
@@ -18,7 +17,7 @@ export class GoogleLoginUseCase {
 
     if (!user) {
       user = await this.userRepo.createGoogleUser({
-        id: uuidv4(),
+        // id: uuidv4(),
         email: googleUser.email,
         name: googleUser.name,
         avatarUrl: googleUser.avatarUrl ?? undefined,

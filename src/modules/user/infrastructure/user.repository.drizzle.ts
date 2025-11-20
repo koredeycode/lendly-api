@@ -10,7 +10,7 @@ import {
   userLocations,
   users,
 } from '../../../config/db/schema';
-import { AuthUser } from '../domain/user.entity';
+import { User } from '../domain/user.entity';
 import { UserRepository } from '../domain/user.repository';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class DrizzleUserRepository implements UserRepository {
     const user = result[0] ?? null;
 
     if (!user) return null;
-    return new AuthUser(user.name, user.email, user.passwordHash, user.id);
+    return new User(user.name, user.email, user.passwordHash, user.id);
   }
 
   async findUserById(id: string) {
@@ -38,10 +38,10 @@ export class DrizzleUserRepository implements UserRepository {
     const user = result[0] ?? null;
 
     if (!user) return null;
-    return new AuthUser(user.id, user.name, user.email);
+    return new User(user.name, user.email, undefined, user.id);
   }
 
-  async createUser(user: AuthUser) {
+  async createUser(user: User) {
     await db.insert(users).values({
       // id: user.id,
       email: user.email,
@@ -51,13 +51,13 @@ export class DrizzleUserRepository implements UserRepository {
     return user;
   }
 
-  async createGoogleUser(data: AuthUser) {
+  async createGoogleUser(data: User) {
     const [newUser] = await db.insert(users).values(data).returning();
 
     return newUser;
   }
 
-  async updateUser(id: string, data: Partial<AuthUser>) {
+  async updateUser(id: string, data: Partial<User>) {
     const [user] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })

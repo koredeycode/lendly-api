@@ -1,11 +1,11 @@
-import { AuthUser } from './user.entity';
+import { User } from './user.entity';
 
 export abstract class UserRepository {
-  abstract findUserByEmail(email: string): Promise<AuthUser | null>;
-  abstract findUserById(id: string): Promise<AuthUser | null>;
-  abstract createUser(user: AuthUser): Promise<AuthUser>;
-  abstract createGoogleUser(data: AuthUser): Promise<AuthUser>;
-  abstract updateUser(id: string, data: Partial<AuthUser>);
+  abstract findUserByEmail(email: string): Promise<User | null>;
+  abstract findUserById(id: string): Promise<User | null>;
+  abstract createUser(user: User): Promise<User>;
+  abstract createGoogleUser(data: User): Promise<User>;
+  abstract updateUser(id: string, data: Partial<User>);
 
   abstract upsertUserLocation(userId: string, lat: number, lng: number);
 
