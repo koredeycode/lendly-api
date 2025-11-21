@@ -3,7 +3,7 @@ import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { CreateReviewUseCase } from '../application/create-review.usecase';
 import { DeleteReviewUseCase } from '../application/delete-review.usecase';
 import { ReviewService } from '../application/review.service';
-import { UpdateReviewUseCase } from '../application/update-review.usecase';
+import { EditReviewUseCase } from '../application/edit-review.usecase';
 import { ReviewRepository } from '../domain/review.repository';
 import { DrizzleReviewRepository } from '../infrastructure/review.repository.drizzle';
 import { ReviewController } from './review.controller';
@@ -14,7 +14,7 @@ import { ReviewController } from './review.controller';
   providers: [
     ReviewService,
     CreateReviewUseCase,
-    UpdateReviewUseCase,
+    EditReviewUseCase,
     DeleteReviewUseCase,
     {
       provide: ReviewRepository,
