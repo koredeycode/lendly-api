@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ItemRepository } from '../domain/item.repository';
+import { SearchItemsDTO } from './dto/search-items.dto';
 
 @Injectable()
 export class ItemService {
@@ -11,5 +12,10 @@ export class ItemService {
       throw new NotFoundException('Item not found');
     }
     return item;
+  }
+
+  async searchItems(search: SearchItemsDTO) {
+    const items = await this.itemRepo.searchItems(search);
+    return items;
   }
 }

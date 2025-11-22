@@ -3,6 +3,7 @@ import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { items } from 'src/config/db/schema';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemRepository } from '../domain/item.repository';
 
@@ -55,27 +56,18 @@ export class DrizzleItemRepository implements ItemRepository {
     search,
     page = 1,
     limit = 20,
-  }: {
-    lat: number;
-    lng: number;
-    radiusKm?: number;
-    category?: string;
-    onlyAvailable?: boolean;
-    onlyFree?: boolean;
-    search?: string;
-    page?: number;
-    limit?: number;
-  }) {
+  }: SearchItemsDTO) {
     const offset = (page - 1) * limit;
 
-    return await db
-      .select({
-        item: items,
-        distance: sql<number>`ST_Distance(
-        ${items.location},
-        ST_Point(${lng}, ${lat})::geography
-      ) / 1000`,
-      })
+    const itemList = await db
+      //   {
+      //   item: items,
+      //   distance: sql<number>`ST_Distance(
+      //   ${items.location},
+      //   ST_Point(${lng}, ${lat})::geography
+      // ) / 1000`,
+      // }
+      .select()
       .from(items)
       .where(
         and(
@@ -93,9 +85,11 @@ export class DrizzleItemRepository implements ItemRepository {
         )`,
         ),
       )
-      .orderBy(sql`distance`)
+      // .orderBy(sql`distance`)
       .limit(limit)
       .offset(offset);
+
+    return itemList;
   }
 
   async updateItem(id: string, data: UpdateItemDTO) {

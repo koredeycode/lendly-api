@@ -16,6 +16,7 @@ import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-boo
 import { CreateItemUseCase } from '../application/create-item.usecase';
 import { DeleteItemUseCase } from '../application/delete-item.usecase';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemService } from '../application/item.service';
 import { UpdateItemUseCase } from '../application/update-item.usecase';
@@ -106,5 +107,16 @@ export class ItemController {
     // use req.user.id
     const data = await this.createBookingUseCase.execute(id, req.user.id, body);
     return { message: 'Booking request submitted successfully', data };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'A booking request has been successfully created',
+  })
+  @Post('search')
+  async searchItems(@Request() req, @Body() body: SearchItemsDTO) {
+    // use req.user.id
+    const data = await this.itemService.searchItems(body);
+    return { message: 'Search query run successfully', data };
   }
 }
