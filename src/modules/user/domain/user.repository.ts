@@ -3,7 +3,7 @@ import { User } from './user.entity';
 export abstract class UserRepository {
   abstract findUserByEmail(email: string): Promise<User | null>;
   abstract findUserById(id: string): Promise<User | null>;
-  abstract createUser(user: User): Promise<User>;
+  abstract createUser(user: User, passwordHash: string): Promise<User>;
   abstract createGoogleUser(data: User): Promise<User>;
   abstract updateUser(id: string, data: Partial<User>);
 

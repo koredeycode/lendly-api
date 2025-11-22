@@ -10,6 +10,10 @@ import {
   userLocations,
   users,
 } from '../../../config/db/schema';
+import {
+  CreateGoogleUserDTO,
+  CreateUserDTO,
+} from '../application/dto/create-user.dto';
 import { User } from '../domain/user.entity';
 import { UserRepository } from '../domain/user.repository';
 
@@ -41,17 +45,17 @@ export class DrizzleUserRepository implements UserRepository {
     return new User(user.name, user.email, undefined, user.id);
   }
 
-  async createUser(user: User) {
+  async createUser(user: CreateUserDTO, passwordHash: string) {
     await db.insert(users).values({
       // id: user.id,
       email: user.email,
-      passwordHash: user.passwordHash,
+      passwordHash,
       name: user.name,
     });
     return user;
   }
 
-  async createGoogleUser(data: User) {
+  async createGoogleUser(data: CreateGoogleUserDTO) {
     const [newUser] = await db.insert(users).values(data).returning();
 
     return newUser;
