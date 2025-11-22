@@ -6,9 +6,11 @@ import { UserService } from '../application/user.service';
 import { UserRepository } from '../domain/user.repository';
 import { DrizzleUserRepository } from '../infrastructure/user.repository.drizzle';
 import { UserController } from './user.controller';
+import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
+import { WalletService } from 'src/modules/wallet/application/wallet.service';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, WalletModule],
   controllers: [UserController],
   providers: [
     UserService,
@@ -18,6 +20,7 @@ import { UserController } from './user.controller';
       provide: UserRepository,
       useClass: DrizzleUserRepository,
     },
+    WalletService,
   ],
   exports: [UserRepository],
 })

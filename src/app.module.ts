@@ -17,7 +17,7 @@ import { MessageModule } from './modules/message/presentation/message.module';
 import { QueueMonitorModule } from './modules/queue-monitor/queue-monitor.module';
 import { ReviewModule } from './modules/review/presentation/review.module';
 import { UserModule } from './modules/user/presentation/user.module';
-import { WalletModule } from './modules/wallet/presentation/item.module';
+import { WalletModule } from './modules/wallet/presentation/wallet.module';
 
 @Module({
   imports: [

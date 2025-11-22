@@ -6,7 +6,7 @@ import { UpdateWalletUseCase } from '../application/update-wallet.usecase';
 import { WalletService } from '../application/wallet.service';
 import { WalletRepository } from '../domain/wallet.repository';
 import { DrizzleWalletRepository } from '../infrastructure/wallet.repository.drizzle';
-import { WalletController } from './item.controller';
+import { WalletController } from './wallet.controller';
 
 @Module({
   imports: [JobsModule],

@@ -1,8 +1,8 @@
-import { MessageDto } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { and, asc, eq, not } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { chatMessages } from '../../../config/db/schema';
+import { CreateMessageDTO } from '../application/dto/create-message.dto';
 import { MessageRepository } from '../domain/message.repository';
 
 @Injectable()
@@ -16,13 +16,20 @@ export class DrizzleMessageRepository implements MessageRepository {
       .limit(limit);
   }
 
-  async createMessage(data: MessageDto) {
-    const [msg] = await db.insert(chatMessages).values(data).returning();
+  async createMessage(
+    bookingId: string,
+    senderId: string,
+    data: CreateMessageDTO,
+  ) {
+    const [msg] = await db
+      .insert(chatMessages)
+      .values({ senderId, bookingId, ...data })
+      .returning();
     return msg;
   }
 
   async markMessagesAsRead(bookingId: string, userId: string) {
-    return await db
+    await db
       .update(chatMessages)
       .set({ isRead: true })
       .where(

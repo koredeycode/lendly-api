@@ -18,5 +18,5 @@ export abstract class ItemRepository {
     limit: number;
   });
   abstract updateItem(id: string, data: UpdateItemDTO): Promise<Item>;
-  abstract softDeleteItem(id: string);
+  abstract softDeleteItem(id: string): Promise<Item>;
 }

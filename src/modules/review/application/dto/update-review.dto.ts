@@ -17,5 +17,5 @@ export class UpdateReviewDTO {
   @IsInt()
   @Min(1)
   @Max(5)
-  rating: number;
+  rating: 1 | 2 | 3 | 4 | 5;
 }

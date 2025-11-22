@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserRepository } from '../domain/user.repository';
 
@@ -19,7 +20,10 @@ import { UserRepository } from '../domain/user.repository';
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly walletService: WalletService,
+  ) {}
   @ApiResponse({
     status: 200,
     description: 'User endpoint',
@@ -34,10 +38,20 @@ export class UserController {
     description: 'User endpoint',
   })
   @Get('/me')
-  async getCurrentuser(@Request() req) {
+  async getCurrentUser(@Request() req) {
     // const data = await this.profileUseCase.execute(req.user.id);
     const data = await this.userRepo.findUserById(req.user.id);
     return { message: 'User retrieved successfully', data };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'User Wallet',
+  })
+  @Get('/wallet')
+  async getUserWallet(@Request() req) {
+    const data = await this.walletService.getWallet(req.user.id);
+    return { message: 'User wallet retrieved successfully', data };
   }
 
   @ApiResponse({
