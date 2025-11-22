@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { EditItemDTO } from '../application/dto/edit-item.dto';
 import { ItemService } from '../application/item.service';
 
 @ApiTags('Item')
@@ -49,7 +50,7 @@ export class ItemController {
     description: 'The item has beeen successfully updated',
   })
   @Patch(':id')
-  async updateItem(@Param('id') id: string, @Body() body: any) {
+  async updateItem(@Param('id') id: string, @Body() body: EditItemDTO) {
     return { message: 'Item updated successfully' };
   }
 
@@ -58,8 +59,17 @@ export class ItemController {
     description: 'The item has beeen successfully deleted',
   })
   @Delete(':id')
-  async deleteItem(@Param('id') id: string, @Body() body: any) {
+  async deleteItem(@Param('id') id: string) {
     return { message: 'Item deleted successfully' };
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'Fetch bookings for an item',
+  })
+  @Get(':id/bookings')
+  async requestBooking(@Param('id') id: string) {
+    return { message: 'Bookings for an item retrieved successfully' };
   }
 
   @ApiResponse({

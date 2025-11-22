@@ -1,14 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateMessageDTO } from 'src/modules/message/application/dto/create-message.dto';
 import { BookingService } from '../application/booking.service';
+import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 @ApiTags('Booking')
 @Controller('bookings')
@@ -29,7 +23,7 @@ export class BookingController {
     description: 'The booking has beeen successfully retrieved',
   })
   @Get(':id')
-  async getBooking(@Param('id') id: string, @Body() body: any) {
+  async getBooking(@Param('id') id: string) {
     return { message: 'Booking successfuly retrieved' };
   }
 
@@ -38,7 +32,7 @@ export class BookingController {
     description: 'The booking has beeen successfully created',
   })
   @Post()
-  async createBooking(@Body() body: any) {
+  async createBooking(@Body() body: CreateBookingDTO) {
     return { message: 'Booking created successfully' };
   }
 
@@ -47,7 +41,7 @@ export class BookingController {
     description: 'The item has beeen successfully deleted',
   })
   @Delete(':id')
-  async deleteBooking(@Param('id') id: string, @Body() body: any) {
+  async deleteBooking(@Param('id') id: string) {
     return { message: 'Item deleted successfully' };
   }
 
@@ -55,8 +49,8 @@ export class BookingController {
     status: 201,
     description: 'The booking has been accepted',
   })
-  @Patch(':id/accept')
-  async acceptBookingRequest(@Param('id') id: string, @Body() body: any) {
+  @Post(':id/accept')
+  async acceptBookingRequest(@Param('id') id: string) {
     return { message: 'Booking request submitted successfully' };
   }
 
@@ -64,8 +58,29 @@ export class BookingController {
     status: 201,
     description: 'The booking has been reviewed',
   })
-  @Patch(':id/review')
+  @Post(':id/review')
   async reviewBooking(@Param('id') id: string, @Body() body: any) {
+    return { message: 'Booking request submitted successfully' };
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'Get a booking messages',
+  })
+  @Get(':id/messages')
+  async getBookingMessages(@Param('id') id: string) {
+    return { message: 'Booking request submitted successfully' };
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'Create a booking messages',
+  })
+  @Post(':id/messages')
+  async createBookingMessage(
+    @Param('id') id: string,
+    @Body() body: CreateMessageDTO,
+  ) {
     return { message: 'Booking request submitted successfully' };
   }
 }

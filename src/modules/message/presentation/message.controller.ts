@@ -14,4 +14,16 @@ export class MessageController {
   hello() {
     return { message: 'Hello from message endpoint' };
   }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Create a booking messages',
+  })
+  @Patch(':id')
+  async updateMessage(
+    @Param('id') id: string,
+    @Body() body: UpdateMessageDTOMessageDTO,
+  ) {
+    return { message: 'Booking request submitted successfully' };
+  }
 }
