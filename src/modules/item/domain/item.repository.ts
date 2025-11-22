@@ -1,7 +1,8 @@
-import { Item } from './item.entity';
+import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { UpdateItemDTO } from '../application/dto/update-item.dto';
 
 export abstract class ItemRepository {
-  abstract createItem(ownerId: string, data: Item);
+  abstract createItem(ownerId: string, data: CreateItemDTO);
   abstract findItemById(id: string);
   abstract findItemsByOwner(ownerId: string, includeDeleted: boolean);
   abstract searchItems(search: {
@@ -15,6 +16,6 @@ export abstract class ItemRepository {
     page: number;
     limit: number;
   });
-  abstract updateItem(id: string, data: Partial<Item>);
+  abstract updateItem(id: string, data: UpdateItemDTO);
   abstract softDeleteItem(id: string);
 }

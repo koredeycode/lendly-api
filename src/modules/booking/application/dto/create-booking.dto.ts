@@ -4,17 +4,16 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUUID,
   Min,
 } from 'class-validator';
 
 export class CreateBookingDTO {
-  @ApiProperty({
-    description: 'The unique ID of the item being booked (UUID format).',
-    example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-  })
-  @IsUUID()
-  itemId: string;
+  // @ApiProperty({
+  //   description: 'The unique ID of the item being booked (UUID format).',
+  //   example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+  // })
+  // @IsUUID()
+  // itemId: string;
 
   @ApiProperty({
     description: 'The requested start date of the rental period.',

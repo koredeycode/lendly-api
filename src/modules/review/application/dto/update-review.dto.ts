@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class CreateReviewDTO {
+export class UpdateReviewDTO {
   @ApiPropertyOptional({
     description: 'An optional comment on the booking',
     example: 'Warra booking',

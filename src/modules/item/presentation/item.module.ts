@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { CreateItemUseCase } from '../application/create-item.usecase';
 import { DeleteItemUseCase } from '../application/delete-item.usecase';
-import { EditItemUseCase } from '../application/edit-item.usecase';
 import { ItemService } from '../application/item.service';
+import { UpdateItemUseCase } from '../application/update-item.usecase';
 import { ItemRepository } from '../domain/item.repository';
 import { DrizzleItemRepository } from '../infrastructure/item.repository.drizzle';
 import { ItemController } from './item.controller';
@@ -14,7 +14,7 @@ import { ItemController } from './item.controller';
   providers: [
     ItemService,
     CreateItemUseCase,
-    EditItemUseCase,
+    UpdateItemUseCase,
     DeleteItemUseCase,
     {
       provide: ItemRepository,

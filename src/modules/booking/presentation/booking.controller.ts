@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateMessageDTO } from 'src/modules/message/application/dto/create-message.dto';
+import { CreateReviewDTO } from 'src/modules/review/application/dto/create-review.dto';
 import { BookingService } from '../application/booking.service';
-import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 @ApiTags('Booking')
 @Controller('bookings')
@@ -27,14 +27,14 @@ export class BookingController {
     return { message: 'Booking successfuly retrieved' };
   }
 
-  @ApiResponse({
-    status: 201,
-    description: 'The booking has beeen successfully created',
-  })
-  @Post()
-  async createBooking(@Body() body: CreateBookingDTO) {
-    return { message: 'Booking created successfully' };
-  }
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'The booking has beeen successfully created',
+  // })
+  // @Post()
+  // async createBooking(@Body() body: CreateBookingDTO) {
+  //   return { message: 'Booking created successfully' };
+  // }
 
   @ApiResponse({
     status: 200,
@@ -56,10 +56,19 @@ export class BookingController {
 
   @ApiResponse({
     status: 201,
+    description: 'The booking reviews has been retrieved',
+  })
+  @Get(':id/reviews')
+  async getBookingReviews(@Param('id') id: string) {
+    return { message: 'Booking reviews retrieved successfully' };
+  }
+
+  @ApiResponse({
+    status: 201,
     description: 'The booking has been reviewed',
   })
-  @Post(':id/review')
-  async reviewBooking(@Param('id') id: string, @Body() body: any) {
+  @Post(':id/reviews')
+  async reviewBooking(@Param('id') id: string, @Body() body: CreateReviewDTO) {
     return { message: 'Booking request submitted successfully' };
   }
 

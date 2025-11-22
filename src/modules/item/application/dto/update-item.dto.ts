@@ -10,7 +10,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class EditItemDTO {
+export class UpdateItemDTO {
   @ApiProperty({
     description: 'The item title',
     example: 'Baby clothes to be given out',

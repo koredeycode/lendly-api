@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { items } from 'src/config/db/schema';
-import { Item } from '../domain/item.entity';
+import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemRepository } from '../domain/item.repository';
 
 @Injectable()
 export class DrizzleItemRepository implements ItemRepository {
-  async createItem(ownerId: string, data: Item) {
+  async createItem(ownerId: string, data: CreateItemDTO) {
     const { location, ...rest } = data;
     const locationSql = sql`POINT(${location[0]}, ${location[1]})`;
     // const locationSql = sql`ST_Point(${location.lng}, ${location.lat})::geography`;
@@ -97,7 +98,7 @@ export class DrizzleItemRepository implements ItemRepository {
       .offset(offset);
   }
 
-  async updateItem(id: string, data: Partial<Item>) {
+  async updateItem(id: string, data: UpdateItemDTO) {
     const updatedData = { ...data, updatedAt: new Date() };
 
     // if (data.location) {

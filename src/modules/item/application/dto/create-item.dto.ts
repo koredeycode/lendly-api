@@ -22,9 +22,9 @@ export class CreateItemDTO {
     description: 'An optional category for the item',
     example: 'Clothes',
   })
-  @IsOptional()
+  // @IsOptional()
   @IsString()
-  category?: string;
+  category: string;
 
   @ApiProperty({
     description: 'Photos of the item',
