@@ -1,23 +1,31 @@
-import { bookingStatusEnum } from '@koredeycode/lendly-types';
+import { Booking, bookingStatusEnum } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { bookings, items } from 'src/config/db/schema';
-import { Booking } from '../domain/booking.entity';
+import { CreateBookingDTO } from '../application/dto/create-booking.dto';
+
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
 export class DrizzleBookingRepository implements BookingRepository {
-  async createBooking(borrowerId: string, data: Booking) {
+  async createBooking(
+    itemId: string,
+    borrowerId: string,
+    data: CreateBookingDTO,
+  ) {
     const [booking] = await db
       .insert(bookings)
       .values({
+        itemId,
         ...data,
+        requestedFrom: new Date(data.requestedFrom),
+        requestedTo: new Date(data.requestedTo),
         borrowerId,
       })
       .returning();
 
-    return booking as Booking;
+    return booking;
   }
 
   async findBookingById(id: string) {
@@ -31,7 +39,7 @@ export class DrizzleBookingRepository implements BookingRepository {
 
     if (!booking) return null;
 
-    return booking as Booking;
+    return booking;
   }
 
   async getBookingsForUser(userId: string, type: 'lending' | 'borrowing') {

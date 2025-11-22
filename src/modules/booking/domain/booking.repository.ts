@@ -1,8 +1,12 @@
-import { bookingStatusEnum } from '@koredeycode/lendly-types';
-import { Booking } from './booking.entity';
+import { Booking, bookingStatusEnum } from '@koredeycode/lendly-types';
+import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 export abstract class BookingRepository {
-  abstract createBooking(borrowerId: string, data: Booking): Promise<Booking>;
+  abstract createBooking(
+    itemId: string,
+    borrowerId: string,
+    data: CreateBookingDTO,
+  ): Promise<Booking>;
   abstract findBookingById(id: string): Promise<Booking | null>;
   abstract getBookingsForUser(userId, type: string): Promise<Booking[]>;
   abstract acceptBooking(bookingId: string, tipCents: number);

@@ -5,5 +5,7 @@ import { ItemRepository } from '../domain/item.repository';
 export class DeleteItemUseCase {
   constructor(private readonly itemRepo: ItemRepository) {}
 
-  async execute() {}
+  async execute(id: string) {
+    await this.itemRepo.softDeleteItem(id);
+  }
 }

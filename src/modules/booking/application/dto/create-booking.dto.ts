@@ -22,7 +22,7 @@ export class CreateBookingDTO {
     format: 'date-time',
   })
   @IsDateString()
-  requestedFrom: string; // The runtime type is Date after transformation, but validated as a string
+  requestedFrom: Date; // The runtime type is Date after transformation, but validated as a string
 
   @ApiProperty({
     description: 'The requested end date of the rental period.',
@@ -31,7 +31,7 @@ export class CreateBookingDTO {
     format: 'date-time',
   })
   @IsDateString()
-  requestedTo: string;
+  requestedTo: Date;
 
   @ApiProperty({
     description: 'The agreed rental fee in cents (e.g., 500 for $5.00).',

@@ -10,13 +10,13 @@ import { ItemRepository } from '../domain/item.repository';
 export class DrizzleItemRepository implements ItemRepository {
   async createItem(ownerId: string, data: CreateItemDTO) {
     const { location, ...rest } = data;
-    const locationSql = sql`POINT(${location[0]}, ${location[1]})`;
-    // const locationSql = sql`ST_Point(${location.lng}, ${location.lat})::geography`;
+    // const locationSql = sql`POINT(${location[0]}, ${location[1]})`;
+    // const locationSql = sql`ST_Point(${location[0]}, ${location[0]})::geography`;
     const [item] = await db
       .insert(items)
       .values({
         ...rest,
-        location: locationSql,
+        location,
         ownerId,
       })
       .returning();

@@ -15,6 +15,8 @@ import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserRepository } from '../domain/user.repository';
 
 @ApiTags('User')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userRepo: UserRepository) {}
@@ -27,13 +29,11 @@ export class UserController {
     return { message: 'Hello from user endpoint' };
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: 200,
     description: 'User endpoint',
   })
   @Get('/me')
-  @ApiBearerAuth()
   async getCurrentuser(@Request() req) {
     // const data = await this.profileUseCase.execute(req.user.id);
     const data = await this.userRepo.findUserById(req.user.id);
@@ -46,7 +46,7 @@ export class UserController {
   })
   @Patch()
   async updateUser(@Body() body: UpdateUserDTO) {
-    return { message: 'Item updated successfully' };
+    return { message: 'User updated successfully' };
   }
 
   @ApiResponse({
@@ -54,7 +54,6 @@ export class UserController {
     description: 'Get user items',
   })
   @Get('/:id/items')
-  @ApiBearerAuth()
   async getUserItems(@Request() req) {
     return { message: 'User items retrieved successfully' };
   }
@@ -64,7 +63,6 @@ export class UserController {
     description: 'Get user saved items',
   })
   @Get('/saved-items')
-  @ApiBearerAuth()
   async getUserSavedItems(@Request() req) {
     return { message: 'User saved items retrieved successfully' };
   }
@@ -74,7 +72,6 @@ export class UserController {
     description: 'Get user saved items',
   })
   @Post('/saved-items')
-  @ApiBearerAuth()
   async createUserSavedItem(@Request() req) {
     return { message: 'User saved item created successfully' };
   }
@@ -84,7 +81,6 @@ export class UserController {
     description: 'Delete user saved item',
   })
   @Delete('/saved-items/:id')
-  @ApiBearerAuth()
   async deleteUserSavedItem(@Request() req, @Param('id') id: string) {
     return { message: 'User saved item deleted successfully' };
   }

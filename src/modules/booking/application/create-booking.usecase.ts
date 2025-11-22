@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Booking } from '../domain/booking.entity';
 import { BookingRepository } from '../domain/booking.repository';
+import { CreateBookingDTO } from './dto/create-booking.dto';
 
 @Injectable()
 export class CreateBookingUseCase {
   constructor(private readonly bookingRepo: BookingRepository) {}
 
-  async execute(borrowerId: string, data: Booking) {
-    const booking = await this.bookingRepo.createBooking(borrowerId, data);
+  async execute(itemId: string, borrowerId: string, data: CreateBookingDTO) {
+    const booking = await this.bookingRepo.createBooking(
+      itemId,
+      borrowerId,
+      data,
+    );
     return booking;
   }
 }

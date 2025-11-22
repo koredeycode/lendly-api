@@ -6,16 +6,32 @@ import {
   Param,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
+import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-booking.dto';
+import { CreateItemUseCase } from '../application/create-item.usecase';
+import { DeleteItemUseCase } from '../application/delete-item.usecase';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemService } from '../application/item.service';
+import { UpdateItemUseCase } from '../application/update-item.usecase';
 
 @ApiTags('Item')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('items')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(
+    private readonly itemService: ItemService,
+    private readonly createItemUseCase: CreateItemUseCase,
+    private readonly updateItemUseCase: UpdateItemUseCase,
+    private readonly deleteItemUseCase: DeleteItemUseCase,
+    private readonly createBookingUseCase: CreateBookingUseCase,
+  ) {}
 
   @ApiResponse({
     status: 200,
@@ -32,7 +48,8 @@ export class ItemController {
   })
   @Get(':id')
   async getItem(@Param('id') id: string) {
-    return { message: 'Item successfuly retrieved' };
+    const data = await this.itemService.findItem(id);
+    return { message: 'Item successfuly retrieved', data };
   }
 
   @ApiResponse({
@@ -40,9 +57,11 @@ export class ItemController {
     description: 'The item has beeen successfully created',
   })
   @Post()
-  async createItem(@Body() body: CreateItemDTO) {
-    console.log({ body });
-    return { message: 'Item created successfully' };
+  async createItem(@Request() req, @Body() body: CreateItemDTO) {
+    //should use req.user.id
+
+    const data = await this.createItemUseCase.execute(req.user.id, body);
+    return { message: 'Item created successfully', data };
   }
 
   @ApiResponse({
@@ -51,7 +70,8 @@ export class ItemController {
   })
   @Patch(':id')
   async updateItem(@Param('id') id: string, @Body() body: UpdateItemDTO) {
-    return { message: 'Item updated successfully' };
+    const data = await this.updateItemUseCase.execute('', body);
+    return { message: 'Item updated successfully', data };
   }
 
   @ApiResponse({
@@ -60,24 +80,31 @@ export class ItemController {
   })
   @Delete(':id')
   async deleteItem(@Param('id') id: string) {
+    await this.deleteItemUseCase.execute(id);
     return { message: 'Item deleted successfully' };
   }
 
-  @ApiResponse({
-    status: 201,
-    description: 'Fetch bookings for an item',
-  })
-  @Get(':id/bookings')
-  async getItemBookings(@Param('id') id: string) {
-    return { message: 'Bookings for an item retrieved successfully' };
-  }
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Fetch bookings for an item',
+  // })
+  // @Get(':id/bookings')
+  // async getItemBookings(@Param('id') id: string) {
+  //   return { message: 'Bookings for an item retrieved successfully' };
+  // }
 
   @ApiResponse({
     status: 201,
     description: 'A booking request has been successfully created',
   })
   @Post(':id/bookings/request')
-  async requestBooking(@Param('id') id: string, @Body() body: any) {
-    return { message: 'Booking request submitted successfully' };
+  async requestBooking(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: CreateBookingDTO,
+  ) {
+    // use req.user.id
+    const data = await this.createBookingUseCase.execute(id, req.user.id, body);
+    return { message: 'Booking request submitted successfully', data };
   }
 }

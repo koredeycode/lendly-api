@@ -7,9 +7,11 @@ import { UpdateItemUseCase } from '../application/update-item.usecase';
 import { ItemRepository } from '../domain/item.repository';
 import { DrizzleItemRepository } from '../infrastructure/item.repository.drizzle';
 import { ItemController } from './item.controller';
+import { BookingModule } from 'src/modules/booking/presentation/booking.module';
+import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, BookingModule],
   controllers: [ItemController],
   providers: [
     ItemService,
@@ -20,6 +22,7 @@ import { ItemController } from './item.controller';
       provide: ItemRepository,
       useClass: DrizzleItemRepository,
     },
+    CreateBookingUseCase,
   ],
   exports: [ItemRepository],
 })
