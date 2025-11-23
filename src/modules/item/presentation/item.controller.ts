@@ -36,15 +36,6 @@ export class ItemController {
 
   @ApiResponse({
     status: 200,
-    description: 'Item endpoint',
-  })
-  @Get('/hello')
-  hello() {
-    return { message: 'Hello from item endpoint' };
-  }
-
-  @ApiResponse({
-    status: 200,
     description: 'The item has beeen successfully retrieved',
   })
   @Get(':id')

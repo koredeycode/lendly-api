@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Patch,
   UseGuards,
@@ -18,15 +17,6 @@ import { MessageService } from '../application/message.service';
 @UseGuards(JwtAuthGuard)
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
-
-  @ApiResponse({
-    status: 200,
-    description: 'Message endpoint',
-  })
-  @Get('/hello')
-  hello() {
-    return { message: 'Hello from message endpoint' };
-  }
 
   @ApiResponse({
     status: 200,

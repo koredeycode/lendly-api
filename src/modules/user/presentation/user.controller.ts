@@ -24,14 +24,6 @@ export class UserController {
     private readonly userService: UserService,
     private readonly walletService: WalletService,
   ) {}
-  @ApiResponse({
-    status: 200,
-    description: 'User endpoint',
-  })
-  @Get('/hello')
-  hello() {
-    return { message: 'Hello from user endpoint' };
-  }
 
   @ApiResponse({
     status: 200,

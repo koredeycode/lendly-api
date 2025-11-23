@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Patch,
   UseGuards,
@@ -18,15 +17,6 @@ import { ReviewService } from '../application/review.service';
 @Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
-
-  @ApiResponse({
-    status: 200,
-    description: 'Review endpoint',
-  })
-  @Get('/hello')
-  hello() {
-    return { message: 'Hello from review endpoint' };
-  }
 
   @ApiResponse({
     status: 200,

@@ -29,15 +29,6 @@ export class BookingController {
 
   @ApiResponse({
     status: 200,
-    description: 'Booking endpoint',
-  })
-  @Get('/hello')
-  hello() {
-    return { message: 'Hello from booking endpoint' };
-  }
-
-  @ApiResponse({
-    status: 200,
     description: 'The booking has beeen successfully retrieved',
   })
   @Get(':id')
