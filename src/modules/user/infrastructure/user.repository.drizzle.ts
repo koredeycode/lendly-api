@@ -14,7 +14,7 @@ import {
   CreateGoogleUserDTO,
   CreateUserDTO,
 } from '../application/dto/create-user.dto';
-import { User } from '../domain/user.entity';
+import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserRepository } from '../domain/user.repository';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class DrizzleUserRepository implements UserRepository {
     const user = result[0] ?? null;
 
     if (!user) return null;
-    return new User(user.name, user.email, user.passwordHash, user.id);
+    return user;
   }
 
   async findUserById(id: string) {
@@ -42,17 +42,20 @@ export class DrizzleUserRepository implements UserRepository {
     const user = result[0] ?? null;
 
     if (!user) return null;
-    return new User(user.name, user.email, undefined, user.id);
+    return user;
   }
 
   async createUser(user: CreateUserDTO, passwordHash: string) {
-    await db.insert(users).values({
-      // id: user.id,
-      email: user.email,
-      passwordHash,
-      name: user.name,
-    });
-    return user;
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        // id: user.id,
+        email: user.email,
+        passwordHash,
+        name: user.name,
+      })
+      .returning();
+    return newUser;
   }
 
   async createGoogleUser(data: CreateGoogleUserDTO) {
@@ -61,7 +64,7 @@ export class DrizzleUserRepository implements UserRepository {
     return newUser;
   }
 
-  async updateUser(id: string, data: Partial<User>) {
+  async updateUser(id: string, data: UpdateUserDTO) {
     const [user] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })

@@ -62,6 +62,10 @@ export class DrizzleBookingRepository implements BookingRepository {
     return userBookings as Booking[];
   }
 
+  async deleteBooking(id: string) {
+    await db.delete(bookings).where(eq(bookings.id, id));
+  }
+
   async acceptBooking(bookingId: string, tipCents = 0) {
     const [updated] = await db
       .update(bookings)

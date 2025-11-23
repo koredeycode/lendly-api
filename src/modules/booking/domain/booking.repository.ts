@@ -14,4 +14,5 @@ export abstract class BookingRepository {
     bookingId: string,
     status: (typeof bookingStatusEnum.enumValues)[number],
   ): Promise<Booking>;
+  abstract deleteBooking(id: string): Promise<void>;
 }

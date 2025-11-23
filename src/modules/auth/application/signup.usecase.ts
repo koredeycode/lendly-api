@@ -26,6 +26,7 @@ export class SignupUseCase {
       {
         name: dto.email,
         email: dto.email,
+        password: '',
       },
       passwordHash,
     );

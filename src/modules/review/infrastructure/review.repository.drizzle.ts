@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { and, count, eq } from 'drizzle-orm';
+import { and, asc, count, eq } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { reviews } from 'src/config/db/schema';
+import { Review, reviews } from 'src/config/db/schema';
 import { CreateReviewDTO } from '../application/dto/create-review.dto';
 import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 import { ReviewRepository } from '../domain/review.repository';
@@ -19,6 +19,14 @@ export class DrizzleReviewRepository implements ReviewRepository {
       .values({ bookingId, revieweeId, reviewerId, ...data })
       .returning();
     return review;
+  }
+
+  async getReviews(bookingId: string): Promise<Review[]> {
+    return await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.bookingId, bookingId))
+      .orderBy(asc(reviews.createdAt));
   }
 
   async updateReview(id: string, data: UpdateReviewDTO) {

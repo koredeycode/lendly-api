@@ -9,7 +9,11 @@ export abstract class ReviewRepository {
     revieweeId: string,
     data: CreateReviewDTO,
   ): Promise<Review>;
+  abstract getReviews(bookingId: string): Promise<Review[]>;
   abstract updateReview(id: string, data: UpdateReviewDTO): Promise<Review>;
   abstract deleteReview(id: string): Promise<void>;
-  abstract hasUserReviewedBooking;
+  abstract hasUserReviewedBooking(
+    bookingId: string,
+    reviewerId: string,
+  ): Promise<boolean>;
 }

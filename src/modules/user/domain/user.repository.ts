@@ -1,11 +1,17 @@
-import { User } from './user.entity';
+import { User } from '@koredeycode/lendly-types';
+import {
+  CreateGoogleUserDTO,
+  CreateUserDTO,
+} from '../application/dto/create-user.dto';
+import { UpdateUserDTO } from '../application/dto/update-user.dto';
+// import { User } from './user.entity';
 
 export abstract class UserRepository {
   abstract findUserByEmail(email: string): Promise<User | null>;
   abstract findUserById(id: string): Promise<User | null>;
-  abstract createUser(user: User, passwordHash: string): Promise<User>;
-  abstract createGoogleUser(data: User): Promise<User>;
-  abstract updateUser(id: string, data: Partial<User>);
+  abstract createUser(user: CreateUserDTO, passwordHash: string): Promise<User>;
+  abstract createGoogleUser(data: CreateGoogleUserDTO): Promise<User>;
+  abstract updateUser(id: string, data: UpdateUserDTO): Promise<User>;
 
   abstract upsertUserLocation(userId: string, lat: number, lng: number);
 

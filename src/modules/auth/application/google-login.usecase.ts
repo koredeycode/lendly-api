@@ -21,8 +21,8 @@ export class GoogleLoginUseCase {
         email: dto.email,
         name: dto.name,
         avatarUrl: dto.avatarUrl ?? undefined,
-        oauthProvider: 'google',
-        oauthId: dto.googleId,
+        oauthProvider: dto.oauthProvider || 'google',
+        oauthId: dto.oauthId,
       });
     }
 

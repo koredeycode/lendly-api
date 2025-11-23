@@ -3,6 +3,7 @@ import { and, asc, eq, not } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { chatMessages } from '../../../config/db/schema';
 import { CreateMessageDTO } from '../application/dto/create-message.dto';
+import { UpdateMessageDTO } from '../application/dto/update-message.dto';
 import { MessageRepository } from '../domain/message.repository';
 
 @Injectable()
@@ -26,6 +27,19 @@ export class DrizzleMessageRepository implements MessageRepository {
       .values({ senderId, bookingId, ...data })
       .returning();
     return msg;
+  }
+
+  async updateMessage(id: string, data: UpdateMessageDTO) {
+    const [message] = await db
+      .update(chatMessages)
+      .set(data)
+      .where(eq(chatMessages.id, id))
+      .returning();
+    return message;
+  }
+
+  async deleteMessage(id: string) {
+    await db.delete(chatMessages).where(eq(chatMessages.id, id));
   }
 
   async markMessagesAsRead(bookingId: string, userId: string) {

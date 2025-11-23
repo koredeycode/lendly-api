@@ -8,15 +8,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { UpdateReviewDTO } from '../application/dto/update-review.dto';
+import { ReviewService } from '../application/review.service';
 
 @ApiTags('Review')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('reviews')
 export class ReviewController {
-  constructor() {}
+  constructor(private readonly reviewService: ReviewService) {}
 
   @ApiResponse({
     status: 200,
@@ -33,7 +34,8 @@ export class ReviewController {
   })
   @Patch(':id')
   async updateReview(@Param('id') id: string, @Body() body: UpdateReviewDTO) {
-    return { message: 'Review updated successfully' };
+    const data = await this.reviewService.updateReview(id, body);
+    return { message: 'Review updated successfully', data };
   }
 
   @ApiResponse({
@@ -42,6 +44,7 @@ export class ReviewController {
   })
   @Delete(':id')
   async deleteReview(@Param('id') id: string) {
+    await this.reviewService.deleteReview(id);
     return { message: 'Review deleted successfully' };
   }
 }

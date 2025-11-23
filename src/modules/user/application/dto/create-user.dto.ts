@@ -54,5 +54,12 @@ export class CreateGoogleUserDTO {
     example: 'some id by google',
   })
   @IsString()
-  googleId: string;
+  oauthId: string;
+
+  @ApiProperty({
+    description: 'User googleId',
+    example: 'some id by google',
+  })
+  @IsString()
+  oauthProvider: string;
 }

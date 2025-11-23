@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
-import { CreateBookingUseCase } from '../application/create-booking.usecase';
+import { MessageService } from 'src/modules/message/application/message.service';
+import { MessageModule } from 'src/modules/message/presentation/message.module';
+import { ReviewService } from 'src/modules/review/application/review.service';
+import { ReviewModule } from 'src/modules/review/presentation/review.module';
 import { BookingService } from '../application/booking.service';
+import { CreateBookingUseCase } from '../application/create-booking.usecase';
 import { BookingRepository } from '../domain/booking.repository';
 import { DrizzleBookingRepository } from '../infrastructure/booking.repository.drizzle';
 import { BookingController } from './booking.controller';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, MessageModule, ReviewModule],
   controllers: [BookingController],
   providers: [
     BookingService,
@@ -16,6 +20,8 @@ import { BookingController } from './booking.controller';
       provide: BookingRepository,
       useClass: DrizzleBookingRepository,
     },
+    MessageService,
+    ReviewService,
   ],
   exports: [BookingRepository],
 })

@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
-import { UserRepository } from '../domain/user.repository';
+import { UserService } from '../application/user.service';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -21,7 +21,7 @@ import { UserRepository } from '../domain/user.repository';
 @Controller('users')
 export class UserController {
   constructor(
-    private readonly userRepo: UserRepository,
+    private readonly userService: UserService,
     private readonly walletService: WalletService,
   ) {}
   @ApiResponse({
@@ -40,7 +40,9 @@ export class UserController {
   @Get('/me')
   async getCurrentUser(@Request() req) {
     // const data = await this.profileUseCase.execute(req.user.id);
-    const data = await this.userRepo.findUserById(req.user.id);
+    const data = await this.userService.findUserByEmail(req.user.email);
+    console.log({ data });
+
     return { message: 'User retrieved successfully', data };
   }
 
@@ -56,11 +58,22 @@ export class UserController {
 
   @ApiResponse({
     status: 200,
+    description: 'User Wallet',
+  })
+  @Get('/:id')
+  async getUserDetails(@Request() req, @Param('id') id: string) {
+    const data = await this.userService.findUserById(id);
+    return { message: 'User wallet retrieved successfully', data };
+  }
+
+  @ApiResponse({
+    status: 200,
     description: 'The user has been successfully updated',
   })
   @Patch()
-  async updateUser(@Body() body: UpdateUserDTO) {
-    return { message: 'User updated successfully' };
+  async updateUser(@Request() req, @Body() body: UpdateUserDTO) {
+    const data = await this.userService.updateUser(req.user.id, body);
+    return { message: 'User updated successfully', data };
   }
 
   @ApiResponse({
