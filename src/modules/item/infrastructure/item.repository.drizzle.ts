@@ -25,6 +25,7 @@ export class DrizzleItemRepository implements ItemRepository {
   }
 
   async findItemById(id: string) {
+    //TODO: attach item owner
     const result = await db
       .select()
       .from(items)

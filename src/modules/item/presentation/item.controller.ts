@@ -95,7 +95,6 @@ export class ItemController {
     @Param('id') id: string,
     @Body() body: CreateBookingDTO,
   ) {
-    // use req.user.id
     const data = await this.createBookingUseCase.execute(id, req.user.id, body);
     return { message: 'Booking request submitted successfully', data };
   }

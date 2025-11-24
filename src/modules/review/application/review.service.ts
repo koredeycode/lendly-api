@@ -17,6 +17,7 @@ export class ReviewService {
     data: CreateReviewDTO,
   ) {
     //Todo: might just remove revieweeId from the table, the other party can be gotten
+    //TODO: notify the other party of the review via email
     let revieweeId: string = '';
     // const booking = await this.bookingRepo.findBookingById(bookingId);
     // const item = await this.itemRepo.findItemById(booking?.itemId || '');
