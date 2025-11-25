@@ -1,11 +1,15 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { QueueMonitorService } from './modules/queue-monitor/queue-monitor.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
@@ -15,6 +19,8 @@ async function bootstrap() {
       transform: true, // auto-transform payload to DTO instance
     }),
   );
+  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const queueMonitor = app.get(QueueMonitorService);
   queueMonitor.setApp(app);
@@ -35,10 +41,7 @@ async function bootstrap() {
     res.json(document);
   });
 
-  app.use((req, res, next) => {
-    console.log('Incoming request:', req.method, req.url);
-    next();
-  });
+
 
   await app.listen(process.env.PORT ?? 5000);
 }

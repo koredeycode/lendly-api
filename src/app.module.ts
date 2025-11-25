@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
@@ -25,6 +26,30 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
       isGlobal: true,
       load: [configuration],
       validate: (env) => validationSchema.parse(env),
+    }),
+
+    LoggerModule.forRoot({
+      pinoHttp: {
+        serializers: {
+          req: (req) => ({
+            id: req.id,
+            method: req.method,
+            url: req.url,
+          }),
+          res: (res) => ({
+            statusCode: res.statusCode,
+          }),
+        },
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: {
+                  singleLine: true,
+                },
+              }
+            : undefined,
+      },
     }),
 
     ThrottlerModule.forRootAsync({
