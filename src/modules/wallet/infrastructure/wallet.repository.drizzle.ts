@@ -1,8 +1,7 @@
-import { walletTransactionTypeEnum } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { wallets, walletTransactions } from 'src/config/db/schema';
+import { wallets, walletTransactions, walletTransactionTypeEnum } from 'src/config/db/schema';
 import { WalletRepository } from '../domain/wallet.repository';
 
 @Injectable()

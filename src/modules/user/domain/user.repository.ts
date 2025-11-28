@@ -1,4 +1,4 @@
-import { User } from '@koredeycode/lendly-types';
+import { User } from 'src/config/db/schema';
 import {
   CreateGoogleUserDTO,
   CreateUserDTO,

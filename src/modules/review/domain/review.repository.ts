@@ -1,4 +1,4 @@
-import { Review } from '@koredeycode/lendly-types';
+import { Review } from 'src/config/db/schema';
 import { CreateReviewDTO } from '../application/dto/create-review.dto';
 import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 

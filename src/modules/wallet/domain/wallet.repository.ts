@@ -1,4 +1,4 @@
-import { Wallet, walletTransactionTypeEnum } from '@koredeycode/lendly-types';
+import { Wallet, walletTransactionTypeEnum } from 'src/config/db/schema';
 
 export abstract class WalletRepository {
   abstract getWallet(userId: string): Promise<Wallet>;

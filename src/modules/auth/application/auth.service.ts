@@ -1,5 +1,4 @@
-// import { users } from '@koredeycode/lendly-types';
-// import { users } from '@koredeycode/lendly-types/drizzle';
+
 // import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { JwtService } from '@nestjs/jwt';
 // import { eq } from 'drizzle-orm';

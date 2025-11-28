@@ -1,4 +1,4 @@
-import { bookingStatusEnum } from '@koredeycode/lendly-types';
+import { bookingStatusEnum } from 'src/config/db/schema';
 
 export class Booking {
   constructor(

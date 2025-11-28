@@ -1,8 +1,7 @@
-import { Booking, bookingStatusEnum } from '@koredeycode/lendly-types';
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { bookings, items } from 'src/config/db/schema';
+import { Booking, bookings, bookingStatusEnum, items } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 import { BookingRepository } from '../domain/booking.repository';

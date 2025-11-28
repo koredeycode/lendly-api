@@ -1,4 +1,4 @@
-import { ChatMessage } from '@koredeycode/lendly-types';
+import { ChatMessage } from 'src/config/db/schema';
 import { CreateMessageDTO } from '../application/dto/create-message.dto';
 import { UpdateMessageDTO } from '../application/dto/update-message.dto';
 

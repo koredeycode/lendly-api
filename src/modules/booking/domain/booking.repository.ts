@@ -1,4 +1,4 @@
-import { Booking, bookingStatusEnum } from '@koredeycode/lendly-types';
+import { Booking, bookingStatusEnum } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 export abstract class BookingRepository {

@@ -1,4 +1,4 @@
-import { Item } from '@koredeycode/lendly-types';
+import { Item } from 'src/config/db/schema';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
