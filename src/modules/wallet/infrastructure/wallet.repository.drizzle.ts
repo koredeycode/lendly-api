@@ -47,55 +47,68 @@ export class DrizzleWalletRepository implements WalletRepository {
       return txRecord;
     });
   }
-  async holdFunds(userId: string, amountCents: number, bookingId: string | null) {
-    await db.transaction(async (tx) => {
-      const [wallet] = await tx
-        .select()
-        .from(wallets)
-        .where(eq(wallets.userId, userId))
-        .limit(1);
+  async holdFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null,
+    tx?: any,
+  ) {
+    const database = tx || db;
+    const [wallet] = await database
+      .select()
+      .from(wallets)
+      .where(eq(wallets.userId, userId))
+      .limit(1);
 
-      if (!wallet || wallet.availableBalanceCents < amountCents) {
-        throw new Error('Insufficient funds');
-      }
+    if (!wallet || wallet.availableBalanceCents < amountCents) {
+      throw new Error('Insufficient funds');
+    }
 
-      await tx
-        .update(wallets)
-        .set({
-          availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amountCents}`,
-          frozenBalanceCents: sql`${wallets.frozenBalanceCents} + ${amountCents}`,
-          updatedAt: new Date(),
-        })
-        .where(eq(wallets.userId, userId));
+    await database
+      .update(wallets)
+      .set({
+        availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amountCents}`,
+        frozenBalanceCents: sql`${wallets.frozenBalanceCents} + ${amountCents}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(wallets.userId, userId));
 
-      await tx.insert(walletTransactions).values({
-        walletId: userId,
-        amountCents: -amountCents,
-        type: 'hold',
-        bookingId,
-        description: 'Funds held for booking request',
-      });
+    await this.addWalletTransaction({
+      walletId: wallet.id,
+      amountCents: -amountCents,
+      type: 'hold',
+      bookingId,
+      description: 'Funds held for booking',
     });
   }
 
-  async releaseFunds(userId: string, amountCents: number, bookingId: string | null) {
-    await db.transaction(async (tx) => {
-      await tx
-        .update(wallets)
-        .set({
-          availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
-          frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
-          updatedAt: new Date(),
-        })
-        .where(eq(wallets.userId, userId));
+  async releaseFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null,
+    tx?: any,
+  ) {
+    const database = tx || db;
+    const wallet = await this.getWallet(userId);
+    if (!wallet) {
+      throw new Error('Wallet not found');
+    }
 
-      await tx.insert(walletTransactions).values({
-        walletId: userId,
-        amountCents: amountCents,
-        type: 'release',
-        bookingId,
-        description: 'Funds released from hold',
-      });
+    await database
+      .update(wallets)
+      .set({
+        availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
+        frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(wallets.userId, userId));
+
+    await this.addWalletTransaction({
+      walletId: userId,
+      amountCents,
+      type: 'release',
+      bookingId,
+      description: 'Funds released from hold',
     });
   }
 
@@ -104,40 +117,90 @@ export class DrizzleWalletRepository implements WalletRepository {
     toUserId: string,
     amountCents: number,
     bookingId: string,
+    tx?: any,
   ) {
+    const database = tx || db;
+    // Deduct from sender's frozen balance
+    await database
+      .update(wallets)
+      .set({
+        frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(wallets.userId, fromUserId));
+
+    // Add to receiver's available balance
+    await database
+      .update(wallets)
+      .set({
+        availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(wallets.userId, toUserId));
+
+    // Record transactions
+    const fromWallet = await this.getWallet(fromUserId);
+    const toWallet = await this.getWallet(toUserId);
+
+    if (!fromWallet || !toWallet) {
+      throw new Error('One or both wallets not found during transfer');
+    }
+
+    await this.addWalletTransaction({
+      walletId: fromUserId,
+      amountCents: -amountCents,
+      type: 'rental_payment',
+      bookingId,
+      description: 'Payment for booking',
+    });
+
+    await this.addWalletTransaction({
+      walletId: toUserId,
+      amountCents,
+      type: 'rental_receive',
+      bookingId,
+      description: 'Payment received for booking',
+    });
+  }
+  async topUp(userId: string, amountCents: number) {
     await db.transaction(async (tx) => {
-      // Deduct from borrower (frozen)
-      await tx
-        .update(wallets)
-        .set({
-          frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
-          updatedAt: new Date(),
-        })
-        .where(eq(wallets.userId, fromUserId));
-
-      await tx.insert(walletTransactions).values({
-        walletId: fromUserId,
-        amountCents: -amountCents,
-        type: 'rental_payment',
-        bookingId,
-        description: 'Payment for booking',
-      });
-
-      // Credit to lender (available)
       await tx
         .update(wallets)
         .set({
           availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
           updatedAt: new Date(),
         })
-        .where(eq(wallets.userId, toUserId));
+        .where(eq(wallets.userId, userId));
 
-      await tx.insert(walletTransactions).values({
-        walletId: toUserId,
-        amountCents: amountCents,
-        type: 'rental_receive',
-        bookingId,
-        description: 'Payment received for booking',
+      await this.addWalletTransaction({
+        walletId: userId,
+        amountCents,
+        type: 'top_up',
+        description: 'Wallet top-up',
+      });
+    });
+  }
+
+  async withdraw(userId: string, amountCents: number) {
+    await db.transaction(async (tx) => {
+      const wallet = await this.getWallet(userId);
+      if (wallet.availableBalanceCents < amountCents) {
+        throw new Error('Insufficient funds');
+      }
+
+      await tx
+        .update(wallets)
+        .set({
+          availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amountCents}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(wallets.userId, userId));
+
+      await this.addWalletTransaction({
+        walletId: userId,
+        amountCents: -amountCents,
+        type: 'withdrawal',
+        description: 'Wallet withdrawal',
       });
     });
   }

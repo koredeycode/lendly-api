@@ -48,6 +48,7 @@ export const walletTransactionTypeEnum = pgEnum("wallet_transaction_type", [
   "refund", // cancelled booking, dispute, etc.
   "withdrawal", // cash out to bank (future)
   "hold", // funds moved from available to frozen (booking request)
+  "top_up", // user added money
   "release", // funds moved back from frozen to available (booking rejected/cancelled)
 ]);
 

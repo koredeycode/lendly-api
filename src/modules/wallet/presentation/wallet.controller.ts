@@ -1,6 +1,7 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { WalletTransactionDTO } from '../application/dto/wallet-transaction.dto';
 import { WalletService } from '../application/wallet.service';
 
 @ApiTags('Wallet')
@@ -18,5 +19,24 @@ export class WalletController {
   async getMyWallet(@Request() req) {
     const wallet = await this.walletService.getWallet(req.user.id);
     return { message: 'Wallet retrieved successfully', data: wallet };
+  }
+  @ApiResponse({
+    status: 201,
+    description: 'Wallet topped up successfully',
+  })
+  @Post('top-up')
+  async topUp(@Request() req, @Body() body: WalletTransactionDTO) {
+    await this.walletService.topUp(req.user.id, body.amountCents);
+    return { message: 'Wallet topped up successfully' };
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'Funds withdrawn successfully',
+  })
+  @Post('withdraw')
+  async withdraw(@Request() req, @Body() body: WalletTransactionDTO) {
+    await this.walletService.withdraw(req.user.id, body.amountCents);
+    return { message: 'Funds withdrawn successfully' };
   }
 }

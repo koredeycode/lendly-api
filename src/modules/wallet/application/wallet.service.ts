@@ -16,12 +16,22 @@ export class WalletService {
   async createWallet(userId: string) {
     return await this.walletRepo.createWalletIfNotExists(userId);
   }
-  async holdFunds(userId: string, amountCents: number, bookingId: string | null) {
-    await this.walletRepo.holdFunds(userId, amountCents, bookingId);
+  async holdFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null,
+    tx?: any,
+  ) {
+    await this.walletRepo.holdFunds(userId, amountCents, bookingId, tx);
   }
 
-  async releaseFunds(userId: string, amountCents: number, bookingId: string | null) {
-    await this.walletRepo.releaseFunds(userId, amountCents, bookingId);
+  async releaseFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null,
+    tx?: any,
+  ) {
+    await this.walletRepo.releaseFunds(userId, amountCents, bookingId, tx);
   }
 
   async transferFunds(
@@ -29,12 +39,21 @@ export class WalletService {
     toUserId: string,
     amountCents: number,
     bookingId: string,
+    tx?: any,
   ) {
     await this.walletRepo.transferFunds(
       fromUserId,
       toUserId,
       amountCents,
       bookingId,
+      tx,
     );
+  }
+  async topUp(userId: string, amountCents: number) {
+    await this.walletRepo.topUp(userId, amountCents);
+  }
+
+  async withdraw(userId: string, amountCents: number) {
+    await this.walletRepo.withdraw(userId, amountCents);
   }
 }

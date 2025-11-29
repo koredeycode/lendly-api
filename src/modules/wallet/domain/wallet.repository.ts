@@ -14,19 +14,25 @@ export abstract class WalletRepository {
   abstract holdFunds(
     userId: string,
     amountCents: number,
-    bookingId: string | null
+    bookingId: string | null,
+    tx?: any,
   ): Promise<void>;
 
   abstract releaseFunds(
     userId: string,
     amountCents: number,
-    bookingId: string | null
+    bookingId: string | null,
+    tx?: any,
   ): Promise<void>;
 
   abstract transferFunds(
     fromUserId: string,
     toUserId: string,
     amountCents: number,
-    bookingId: string
+    bookingId: string,
+    tx?: any,
   ): Promise<void>;
+
+  abstract topUp(userId: string, amountCents: number): Promise<void>;
+  abstract withdraw(userId: string, amountCents: number): Promise<void>;
 }

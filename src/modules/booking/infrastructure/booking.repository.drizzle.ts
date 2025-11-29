@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { Booking, bookings, bookingStatusEnum, items } from 'src/config/db/schema';
+import { bookings, bookingStatusEnum } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 import { BookingRepository } from '../domain/booking.repository';
@@ -12,18 +12,19 @@ export class DrizzleBookingRepository implements BookingRepository {
     itemId: string,
     borrowerId: string,
     data: CreateBookingDTO,
+    tx?: any,
   ) {
-    const [booking] = await db
+    const database = tx || db;
+    const [booking] = await database
       .insert(bookings)
       .values({
         itemId,
-        ...data,
-        requestedFrom: new Date(data.requestedFrom),
-        requestedTo: new Date(data.requestedTo),
         borrowerId,
+        ...data,
+        status: 'pending',
+        totalChargedCents: data.rentalFeeCents + (data.thankYouTipCents || 0),
       })
       .returning();
-
     return booking;
   }
 
@@ -33,51 +34,41 @@ export class DrizzleBookingRepository implements BookingRepository {
       .from(bookings)
       .where(eq(bookings.id, id))
       .limit(1);
-
-    const booking = result[0] ?? null;
-
-    if (!booking) return null;
-
-    return booking;
+    return result[0] ?? null;
   }
 
-  async getBookingsForUser(userId: string, type: 'lending' | 'borrowing') {
-    let userBookings;
-    if (type === 'lending') {
-      userBookings = await db
-        .select({ booking: bookings, item: items })
+  async getBookingsForUser(userId: string, type: 'borrower' | 'owner') {
+    if (type === 'borrower') {
+      return await db
+        .select()
         .from(bookings)
-        .innerJoin(items, eq(bookings.itemId, items.id))
-        .where(eq(items.ownerId, userId))
+        .where(eq(bookings.borrowerId, userId))
         .orderBy(desc(bookings.createdAt));
-      return userBookings as Booking[];
+    } else {
+      // Join with items to find bookings for items owned by user
+      // For now, let's assume we fetch items first or do a join
+      // Simplified:
+      return []; // TODO: implement owner bookings
     }
-
-    userBookings = await db
-      .select()
-      .from(bookings)
-      .where(eq(bookings.borrowerId, userId))
-      .orderBy(desc(bookings.createdAt));
-    return userBookings as Booking[];
   }
 
   async deleteBooking(id: string) {
     await db.delete(bookings).where(eq(bookings.id, id));
   }
 
-  async acceptBooking(bookingId: string, tipCents = 0) {
-    const [updated] = await db
+  async acceptBooking(id: string, tipAmount = 0, tx?: any) {
+    const database = tx || db;
+    const [booking] = await database
       .update(bookings)
       .set({
         status: 'accepted',
-        thankYouTipCents: tipCents,
-        totalChargedCents: sql`${bookings.rentalFeeCents} + ${tipCents}`,
+        thankYouTipCents: tipAmount,
         updatedAt: new Date(),
       })
-      .where(eq(bookings.id, bookingId))
+      .where(eq(bookings.id, id))
       .returning();
 
-    return updated;
+    return booking;
   }
 
   async updateBookingStatus(

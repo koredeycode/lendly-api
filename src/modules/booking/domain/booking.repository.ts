@@ -6,13 +6,15 @@ export abstract class BookingRepository {
     itemId: string,
     borrowerId: string,
     data: CreateBookingDTO,
+    tx?: any,
   ): Promise<Booking>;
   abstract findBookingById(id: string): Promise<Booking | null>;
   abstract getBookingsForUser(userId, type: string): Promise<Booking[]>;
-  abstract acceptBooking(bookingId: string, tipCents: number): Promise<Booking>;
+  abstract acceptBooking(id: string, tipAmount?: number, tx?: any): Promise<Booking>;
   abstract updateBookingStatus(
-    bookingId: string,
+    id: string,
     status: (typeof bookingStatusEnum.enumValues)[number],
+    tx?: any,
   ): Promise<Booking>;
   abstract findBookingsByItem(
     itemId: string,

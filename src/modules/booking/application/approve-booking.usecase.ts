@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { db } from 'src/config/db/drizzle/client';
 import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
@@ -16,39 +17,46 @@ export class ApproveBookingUseCase {
   ) {}
 
   async execute(bookingId: string, userId: string) {
-    const booking = await this.bookingRepo.findBookingById(bookingId);
-    if (!booking) throw new NotFoundException('Booking not found');
+    return await db.transaction(async (tx) => {
+      const booking = await this.bookingRepo.findBookingById(bookingId);
+      if (!booking) throw new NotFoundException('Booking not found');
 
-    const item = await this.itemRepo.findItemById(booking.itemId);
-    if (!item) throw new NotFoundException('Item not found');
+      const item = await this.itemRepo.findItemById(booking.itemId);
+      if (!item) throw new NotFoundException('Item not found');
 
-    if (item.ownerId !== userId) {
-      throw new UnauthorizedException('Only the owner can approve bookings');
-    }
+      if (item.ownerId !== userId) {
+        throw new UnauthorizedException('Only the owner can approve bookings');
+      }
 
-    if (booking.status !== 'pending') {
-      throw new Error('Booking is not pending');
-    }
+      if (booking.status !== 'pending') {
+        throw new Error('Booking is not pending');
+      }
 
-    // Transfer funds
-    await this.walletService.transferFunds(
-      booking.borrowerId,
-      item.ownerId,
-      booking.totalChargedCents,
-      bookingId,
-    );
+      // Transfer funds
+      await this.walletService.transferFunds(
+        booking.borrowerId,
+        item.ownerId,
+        booking.totalChargedCents,
+        bookingId,
+        tx,
+      );
 
-    // Update status
-    await this.bookingRepo.acceptBooking(bookingId, booking.thankYouTipCents || 0);
+      // Update status
+      await this.bookingRepo.acceptBooking(
+        bookingId,
+        booking.thankYouTipCents || 0,
+        tx,
+      );
 
-    // Send email to borrower
-    const borrower = await this.userRepo.findUserById(booking.borrowerId);
-    if (borrower) {
-      await this.emailJobService.sendBookingApprovedEmail({
-        email: borrower.email,
-        borrowerName: borrower.name,
-        itemName: item.title,
-      });
-    }
+      // Send email to borrower
+      const borrower = await this.userRepo.findUserById(booking.borrowerId);
+      if (borrower) {
+        await this.emailJobService.sendBookingApprovedEmail({
+          email: borrower.email,
+          borrowerName: borrower.name,
+          itemName: item.title,
+        });
+      }
+    });
   }
 }

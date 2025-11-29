@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -117,7 +119,16 @@ export class ItemController {
     description: 'Fetch bookings for an item',
   })
   @Get(':id/bookings')
-  async getItemBookings(@Param('id') id: string) {
+  async getItemBookings(@Request() req, @Param('id') id: string) {
+    const item = await this.itemService.findItem(id);
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+
+    if (item.ownerId !== req.user.id) {
+      throw new ForbiddenException('You are not the owner of this item');
+    }
+
     const data = await this.bookingService.findBookingsByItem(id);
     return { message: 'Bookings retrieved successfully', data };
   }
