@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { and, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, getTableColumns, isNull, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { items } from 'src/config/db/schema';
+import { items, users } from 'src/config/db/schema';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
@@ -25,10 +25,16 @@ export class DrizzleItemRepository implements ItemRepository {
   }
 
   async findItemById(id: string) {
-    //TODO: attach item owner
     const result = await db
-      .select()
+      .select({
+        ...getTableColumns(items),
+        owner: {
+          id: users.id,
+          name: users.name,
+        },
+      })
       .from(items)
+      .innerJoin(users, eq(items.ownerId, users.id))
       .where(eq(items.id, id))
       .limit(1);
     return result[0] ?? null;
@@ -79,11 +85,13 @@ export class DrizzleItemRepository implements ItemRepository {
           search
             ? sql`to_tsvector('english', ${items.title} || ' ' || ${items.description}) @@ plainto_tsquery('english', ${search})`
             : undefined,
-          sql`ST_DWithin(
+          lat && lng
+            ? sql`ST_DWithin(
           ${items.location},
           ST_Point(${lng}, ${lat})::geography,
           ${radiusKm * 1000}
-        )`,
+        )`
+            : undefined,
         ),
       )
       // .orderBy(sql`distance`)

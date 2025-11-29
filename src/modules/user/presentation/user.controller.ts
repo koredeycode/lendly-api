@@ -59,6 +59,21 @@ export class UserController {
     return { message: 'User wallet retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get user bookings' })
+  @ApiResponse({
+    status: 200,
+    description: 'User bookings retrieved successfully',
+    type: [BookingResponseDTO],
+  })
+  @Get('/bookings')
+  async getUserBookings(
+    @Request() req: AuthenticatedRequest,
+    @Query('type') type: 'borrower' | 'owner',
+  ) {
+    const data = await this.bookingService.getUserBookings(req.user.id, type);
+    return { message: 'User bookings retrieved successfully', data };
+  }
+
   @ApiOperation({ summary: 'Get user details by ID' })
   @ApiResponse({
     status: 200,
@@ -127,18 +142,5 @@ export class UserController {
     return { message: 'User saved item deleted successfully' };
   }
 
-  @ApiOperation({ summary: 'Get user bookings' })
-  @ApiResponse({
-    status: 200,
-    description: 'User bookings retrieved successfully',
-    type: [BookingResponseDTO],
-  })
-  @Get('bookings')
-  async getUserBookings(
-    @Request() req: AuthenticatedRequest,
-    @Query('type') type: 'borrower' | 'owner',
-  ) {
-    const data = await this.bookingService.getUserBookings(req.user.id, type);
-    return { message: 'User bookings retrieved successfully', data };
-  }
+
 }

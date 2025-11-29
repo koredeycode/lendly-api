@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class SearchItemsDTO {
   @ApiProperty({
@@ -7,14 +7,14 @@ export class SearchItemsDTO {
     example: 90,
   })
   @IsOptional()
-  @IsInt()
+  @IsNumber()
   lat?: number;
 
   @ApiProperty({
     description: 'longitude',
     example: 90,
   })
-  @IsInt()
+  @IsNumber()
   @IsOptional()
   lng?: number;
 

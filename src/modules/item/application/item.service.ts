@@ -7,7 +7,7 @@ export class ItemService {
   constructor(private readonly itemRepo: ItemRepository) {}
 
   async findItem(id: string) {
-    const item = this.itemRepo.findItemById(id);
+    const item = await this.itemRepo.findItemById(id);
     if (item === null) {
       throw new NotFoundException('Item not found');
     }

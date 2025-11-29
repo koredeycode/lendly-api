@@ -2,6 +2,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
+export class ItemOwnerDTO {
+  @ApiProperty({
+    description: 'Owner ID',
+    example: '09d6f478-67bb-46d5-a0d2-edacfd418a4e',
+  })
+  @Expose()
+  id: string;
+
+  @ApiProperty({
+    description: 'Owner Name',
+    example: 'John Doe',
+  })
+  @Expose()
+  name: string;
+}
+
 export class ItemDataDTO {
   @ApiProperty({
     description: 'Item ID',
@@ -86,6 +102,10 @@ export class ItemDataDTO {
   })
   @Expose()
   ownerId: string;
+
+  @ApiProperty({ type: ItemOwnerDTO })
+  @Expose()
+  owner: ItemOwnerDTO;
 
   @ApiProperty({
     description: 'Created at',
