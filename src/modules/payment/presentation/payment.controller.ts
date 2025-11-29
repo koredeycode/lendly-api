@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { TopUpDto, TopUpResponseDto, VerifyPaymentDto, VerifyResponseDto, WithdrawDto, WithdrawResponseDto } from '../application/dto/payment.dto';
 import { PaymentService } from '../application/payment.service';
@@ -14,7 +15,7 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('top-up')
-  async topUp(@Request() req, @Body() body: TopUpDto) {
+  async topUp(@Request() req: AuthenticatedRequest, @Body() body: TopUpDto) {
     const response = await this.paymentService.initializeTopUp(
       req.user.id,
       body.amountCents,
@@ -41,7 +42,7 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('withdraw')
-  async withdraw(@Request() req, @Body() body: WithdrawDto) {
+  async withdraw(@Request() req: AuthenticatedRequest, @Body() body: WithdrawDto) {
     const transaction = await this.paymentService.requestWithdrawal(
       req.user.id,
       body.amountCents,

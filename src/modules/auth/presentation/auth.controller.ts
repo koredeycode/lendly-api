@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { GoogleUserDTO } from '../application/dto/google-user.dto';
 import { LoginResponseDTO } from '../application/dto/login-response.dto';
 import { LoginDTO } from '../application/dto/login.dto';
@@ -83,7 +84,7 @@ export class AuthController {
     type: ProfileResponseDTO,
   })
   @ApiBearerAuth()
-  async profile(@Request() req) {
+  async profile(@Request() req: AuthenticatedRequest) {
     const data = await this.profileUseCase.execute(req.user.id);
 
     return { message: 'Profile retrieved successfully', data };

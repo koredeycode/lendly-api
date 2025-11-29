@@ -1,4 +1,3 @@
-
 import {
   Body,
   Controller,
@@ -10,13 +9,25 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { CreateMessageDTO } from 'src/modules/message/application/dto/create-message.dto';
-import { MessageResponseDTO, MessagesResponseDTO } from 'src/modules/message/application/dto/message-response.dto';
+import {
+  MessageResponseDTO,
+  MessagesResponseDTO,
+} from 'src/modules/message/application/dto/message-response.dto';
 import { MessageService } from 'src/modules/message/application/message.service';
 import { CreateReviewDTO } from 'src/modules/review/application/dto/create-review.dto';
-import { ReviewResponseDTO, ReviewsResponseDTO } from 'src/modules/review/application/dto/review-response.dto';
+import {
+  ReviewResponseDTO,
+  ReviewsResponseDTO,
+} from 'src/modules/review/application/dto/review-response.dto';
 import { ReviewService } from 'src/modules/review/application/review.service';
 import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
 import { BookingService } from '../application/booking.service';
@@ -44,7 +55,7 @@ export class BookingController {
   })
   @Get('user')
   async getUserBookings(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Query('type') type: 'borrower' | 'owner',
   ) {
     const data = await this.bookingService.getUserBookings(req.user.id, type);
@@ -78,7 +89,10 @@ export class BookingController {
     description: 'The item has beeen successfully deleted',
   })
   @Delete(':id')
-  async deleteBooking(@Request() req, @Param('id') id: string) {
+  async deleteBooking(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     await this.bookingService.deleteBooking(id, req.user.id);
     return { message: 'Booking deleted successfully' };
   }
@@ -89,7 +103,10 @@ export class BookingController {
     description: 'The booking has been accepted',
   })
   @Post(':id/approve')
-  async approveBookingRequest(@Request() req, @Param('id') id: string) {
+  async approveBookingRequest(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     await this.approveBookingUseCase.execute(id, req.user.id);
     return { message: 'Booking approved successfully' };
   }
@@ -100,7 +117,10 @@ export class BookingController {
     description: 'The booking has been rejected/cancelled',
   })
   @Post(':id/reject')
-  async rejectBookingRequest(@Request() req, @Param('id') id: string) {
+  async rejectBookingRequest(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     await this.rejectBookingUseCase.execute(id, req.user.id);
     return { message: 'Booking rejected successfully' };
   }
@@ -125,7 +145,7 @@ export class BookingController {
   })
   @Post(':id/reviews')
   async reviewBooking(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: CreateReviewDTO,
   ) {
@@ -153,7 +173,7 @@ export class BookingController {
   })
   @Post(':id/messages')
   async createBookingMessage(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: CreateMessageDTO,
   ) {

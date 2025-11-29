@@ -1,19 +1,17 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    ForbiddenException,
-    Get,
-    NotFoundException,
-    Param,
-    Patch,
-    Post,
-    Query,
-    Request,
-    UseGuards,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  Request,
+  UseGuards
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
+import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
@@ -25,7 +23,6 @@ import { AvailabilityResponseDTO } from '../application/dto/availability-respons
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { ItemResponseDTO, ItemsResponseDTO } from '../application/dto/item-response.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
-import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemService } from '../application/item.service';
 import { UpdateItemUseCase } from '../application/update-item.usecase';
 
@@ -52,7 +49,7 @@ export class ItemController {
   @Get(':id')
   async getItem(@Param('id') id: string) {
     const data = await this.itemService.findItem(id);
-    return { message: 'Item successfuly retrieved', data };
+    return { message: 'Item retrieved successfully', data };
   }
 
   @ApiOperation({ summary: 'Create a new item' })
@@ -62,45 +59,12 @@ export class ItemController {
     type: ItemResponseDTO,
   })
   @Post()
-  async createItem(@Request() req, @Body() body: CreateItemDTO) {
+  async createItem(@Request() req: AuthenticatedRequest, @Body() body: CreateItemDTO) {
     //should use req.user.id
 
     const data = await this.createItemUseCase.execute(req.user.id, body);
     return { message: 'Item created successfully', data };
   }
-
-  @ApiOperation({ summary: 'Update an item' })
-  @ApiResponse({
-    status: 200,
-    description: 'The item has beeen successfully updated',
-    type: ItemResponseDTO,
-  })
-  @Patch(':id')
-  async updateItem(@Param('id') id: string, @Body() body: UpdateItemDTO) {
-    const data = await this.updateItemUseCase.execute('', body);
-    return { message: 'Item updated successfully', data };
-  }
-
-  @ApiOperation({ summary: 'Delete an item' })
-  @ApiResponse({
-    status: 200,
-    description: 'The item has beeen successfully deleted',
-    type: SuccessResponseDTO,
-  })
-  @Delete(':id')
-  async deleteItem(@Param('id') id: string) {
-    await this.deleteItemUseCase.execute(id);
-    return { message: 'Item deleted successfully' };
-  }
-
-  // @ApiResponse({
-  //   status: 201,
-  //   description: 'Fetch bookings for an item',
-  // })
-  // @Get(':id/bookings')
-  // async getItemBookings(@Param('id') id: string) {
-  //   return { message: 'Bookings for an item retrieved successfully' };
-  // }
 
   @ApiOperation({ summary: 'Request a booking for an item' })
   @ApiResponse({
@@ -110,7 +74,7 @@ export class ItemController {
   })
   @Post(':id/bookings/request')
   async requestBooking(
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() body: CreateBookingDTO,
   ) {
@@ -125,7 +89,7 @@ export class ItemController {
     type: ItemsResponseDTO,
   })
   @Post('search')
-  async searchItems(@Request() req, @Body() body: SearchItemsDTO) {
+  async searchItems(@Request() req: AuthenticatedRequest, @Body() body: SearchItemsDTO) {
     // use req.user.id
     const data = await this.itemService.searchItems(body);
     return { message: 'Search query run successfully', data };
@@ -137,7 +101,7 @@ export class ItemController {
     type: BookingsResponseDTO,
   })
   @Get(':id/bookings')
-  async getItemBookings(@Request() req, @Param('id') id: string) {
+  async getItemBookings(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     const item = await this.itemService.findItem(id);
     if (!item) {
       throw new NotFoundException('Item not found');

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
+import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { WalletResponseDTO } from '../application/dto/wallet-response.dto';
 import { WalletTransactionDTO } from '../application/dto/wallet-transaction.dto';
@@ -20,7 +21,7 @@ export class WalletController {
     type: WalletResponseDTO,
   })
   @Get('me')
-  async getMyWallet(@Request() req) {
+  async getMyWallet(@Request() req: AuthenticatedRequest) {
     const wallet = await this.walletService.getWallet(req.user.id);
     return { message: 'Wallet retrieved successfully', data: wallet };
   }
@@ -31,7 +32,7 @@ export class WalletController {
     type: SuccessResponseDTO,
   })
   @Post('top-up')
-  async topUp(@Request() req, @Body() body: WalletTransactionDTO) {
+  async topUp(@Request() req: AuthenticatedRequest, @Body() body: WalletTransactionDTO) {
     await this.walletService.topUp(req.user.id, body.amountCents);
     return { message: 'Wallet topped up successfully' };
   }
@@ -43,7 +44,7 @@ export class WalletController {
     type: SuccessResponseDTO,
   })
   @Post('withdraw')
-  async withdraw(@Request() req, @Body() body: WalletTransactionDTO) {
+  async withdraw(@Request() req: AuthenticatedRequest, @Body() body: WalletTransactionDTO) {
     await this.walletService.withdraw(req.user.id, body.amountCents);
     return { message: 'Funds withdrawn successfully' };
   }
@@ -54,7 +55,7 @@ export class WalletController {
     description: 'Wallet transactions retrieved successfully',
   })
   @Get('transactions')
-  async getTransactions(@Request() req) {
+  async getTransactions(@Request() req: AuthenticatedRequest) {
     const transactions = await this.walletService.getTransactions(req.user.id);
     return { message: 'Transactions retrieved successfully', data: transactions };
   }
