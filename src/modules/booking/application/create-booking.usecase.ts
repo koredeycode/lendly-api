@@ -1,4 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { ItemRepository } from 'src/modules/item/domain/item.repository';
+import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
+import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { BookingRepository } from '../domain/booking.repository';
 import { CreateBookingDTO } from './dto/create-booking.dto';
@@ -8,23 +11,14 @@ export class CreateBookingUseCase {
   constructor(
     private readonly bookingRepo: BookingRepository,
     private readonly walletService: WalletService,
+    private readonly itemRepo: ItemRepository,
+    private readonly userRepo: UserRepository,
+    private readonly emailJobService: EmailJobService,
   ) {}
 
   async execute(itemId: string, borrowerId: string, data: CreateBookingDTO) {
     const totalAmount = data.rentalFeeCents + (data.thankYouTipCents || 0);
 
-    // 1. Hold funds
-    // We pass a placeholder bookingId because the booking doesn't exist yet.
-    // Ideally, we would generate the ID first or use a transaction.
-    // For now, we'll use a temporary ID or handle it differently.
-    // Actually, we can generate the UUID here if we want, but Drizzle usually handles it.
-    // Let's just pass 'pending' or similar, or update it later.
-    // Better approach: Create booking with 'pending_payment' status (if we had it), then hold, then update.
-    // But schema says 'pending'.
-    // Let's hold funds first. If it fails, we don't create booking.
-    // We can pass null for bookingId initially if the schema allows, or just use a placeholder.
-    // The schema allows bookingId to be null in walletTransactions?
-    // Let's check schema.
     // walletTransactions.bookingId is nullable: bookingId: uuid("booking_id").references(...)
     // So we can pass null.
     
@@ -46,6 +40,19 @@ export class CreateBookingUseCase {
         data,
       );
       
+      // 3. Send email to owner
+      const item = await this.itemRepo.findItemById(itemId);
+      const owner = await this.userRepo.findUserById(item.ownerId);
+      const borrower = await this.userRepo.findUserById(borrowerId);
+
+      if (owner && borrower) {
+        await this.emailJobService.sendBookingRequestedEmail({
+          email: owner.email,
+          ownerName: owner.name,
+          borrowerName: borrower.name,
+          itemName: item.title,
+        });
+      }
       // TODO: Update the wallet transaction with the real booking ID? 
       // For now, we'll leave it as is to keep it simple.
       

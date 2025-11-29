@@ -11,8 +11,10 @@ import { ItemRepository } from '../domain/item.repository';
 import { DrizzleItemRepository } from '../infrastructure/item.repository.drizzle';
 import { ItemController } from './item.controller';
 
+import { UserModule } from 'src/modules/user/presentation/user.module';
+
 @Module({
-  imports: [JobsModule, forwardRef(() => BookingModule), WalletModule],
+  imports: [JobsModule, forwardRef(() => BookingModule), WalletModule, UserModule],
   controllers: [ItemController],
   providers: [
     ItemService,

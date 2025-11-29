@@ -15,8 +15,10 @@ import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
 import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
+import { UserModule } from 'src/modules/user/presentation/user.module';
+
 @Module({
-  imports: [JobsModule, MessageModule, ReviewModule, WalletModule, forwardRef(() => ItemModule)],
+  imports: [JobsModule, MessageModule, ReviewModule, WalletModule, forwardRef(() => ItemModule), UserModule],
   controllers: [BookingController],
   providers: [
     BookingService,

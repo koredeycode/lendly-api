@@ -1,5 +1,7 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/item/domain/item.repository';
+import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
+import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { BookingRepository } from '../domain/booking.repository';
 
@@ -9,44 +11,51 @@ export class RejectBookingUseCase {
     private readonly bookingRepo: BookingRepository,
     private readonly walletService: WalletService,
     private readonly itemRepo: ItemRepository,
+    private readonly userRepo: UserRepository,
+    private readonly emailJobService: EmailJobService,
   ) {}
 
   async execute(bookingId: string, userId: string) {
     const booking = await this.bookingRepo.findBookingById(bookingId);
-    if (!booking) {
-      throw new NotFoundException('Booking not found');
-    }
+    if (!booking) throw new NotFoundException('Booking not found');
 
     const item = await this.itemRepo.findItemById(booking.itemId);
-    if (!item) {
-      throw new NotFoundException('Item not found');
-    }
+    if (!item) throw new NotFoundException('Item not found');
 
-    // Allow owner to reject or borrower to cancel
+    // Only owner or borrower can reject/cancel
     if (item.ownerId !== userId && booking.borrowerId !== userId) {
-      throw new ForbiddenException('You are not authorized to reject/cancel this booking');
+      throw new UnauthorizedException('Not authorized to reject this booking');
     }
 
     if (booking.status !== 'pending') {
-      throw new ForbiddenException('Booking is not pending');
+      throw new Error('Booking is not pending');
     }
-
-    const totalAmount = booking.rentalFeeCents + (booking.thankYouTipCents || 0);
 
     // Release funds
     await this.walletService.releaseFunds(
       booking.borrowerId,
-      totalAmount,
-      booking.id,
+      booking.totalChargedCents,
+      bookingId,
     );
 
-    // Update booking status
-    const status = item.ownerId === userId ? 'cancelled' : 'cancelled'; // Or 'rejected' if owner? Schema has 'cancelled'.
-    // Schema has 'cancelled'. Let's use that for now.
-    // If owner rejects, it's effectively cancelled.
-    
-    const updatedBooking = await this.bookingRepo.updateBookingStatus(booking.id, 'cancelled');
-    
+    // Update status
+    const updatedBooking = await this.bookingRepo.updateBookingStatus(
+      bookingId,
+      'cancelled',
+    );
+
+    // Send email to borrower (if rejected by owner)
+    if (item.ownerId === userId) {
+      const borrower = await this.userRepo.findUserById(booking.borrowerId);
+      if (borrower) {
+        await this.emailJobService.sendBookingRejectedEmail({
+          email: borrower.email,
+          borrowerName: borrower.name,
+          itemName: item.title,
+        });
+      }
+    }
+
     return updatedBooking;
   }
 }
