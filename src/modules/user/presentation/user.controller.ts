@@ -1,15 +1,15 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Request,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Request,
+    UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
@@ -25,6 +25,7 @@ export class UserController {
     private readonly walletService: WalletService,
   ) {}
 
+  @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
     status: 200,
     description: 'User endpoint',
@@ -38,6 +39,7 @@ export class UserController {
     return { message: 'User retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get user wallet' })
   @ApiResponse({
     status: 200,
     description: 'User Wallet',
@@ -48,16 +50,18 @@ export class UserController {
     return { message: 'User wallet retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get user details by ID' })
   @ApiResponse({
     status: 200,
-    description: 'User Wallet',
+    description: 'User details',
   })
   @Get('/:id')
   async getUserDetails(@Request() req, @Param('id') id: string) {
     const data = await this.userService.findUserById(id);
-    return { message: 'User wallet retrieved successfully', data };
+    return { message: 'User details retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully updated',
@@ -68,6 +72,7 @@ export class UserController {
     return { message: 'User updated successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get user items' })
   @ApiResponse({
     status: 200,
     description: 'Get user items',
@@ -77,6 +82,7 @@ export class UserController {
     return { message: 'User items retrieved successfully' };
   }
 
+  @ApiOperation({ summary: 'Get user saved items' })
   @ApiResponse({
     status: 200,
     description: 'Get user saved items',
@@ -86,6 +92,7 @@ export class UserController {
     return { message: 'User saved items retrieved successfully' };
   }
 
+  @ApiOperation({ summary: 'Save an item' })
   @ApiResponse({
     status: 200,
     description: 'Get user saved items',
@@ -95,6 +102,7 @@ export class UserController {
     return { message: 'User saved item created successfully' };
   }
 
+  @ApiOperation({ summary: 'Remove a saved item' })
   @ApiResponse({
     status: 200,
     description: 'Delete user saved item',

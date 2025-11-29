@@ -1,12 +1,12 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  Patch,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Param,
+    Patch,
+    UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { UpdateMessageDTO } from '../application/dto/update-message.dto';
 import { MessageService } from '../application/message.service';
@@ -18,6 +18,7 @@ import { MessageService } from '../application/message.service';
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @ApiOperation({ summary: 'Update a message' })
   @ApiResponse({
     status: 200,
     description: 'Update a message',
@@ -28,6 +29,7 @@ export class MessageController {
     return { message: 'Message updated successfully', data };
   }
 
+  @ApiOperation({ summary: 'Delete a message' })
   @ApiResponse({
     status: 200,
     description: 'Delete a message',

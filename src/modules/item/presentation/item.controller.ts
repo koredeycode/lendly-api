@@ -12,7 +12,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
@@ -39,6 +39,7 @@ export class ItemController {
     private readonly bookingService: BookingService,
   ) {}
 
+  @ApiOperation({ summary: 'Get item details' })
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully retrieved',
@@ -49,6 +50,7 @@ export class ItemController {
     return { message: 'Item successfuly retrieved', data };
   }
 
+  @ApiOperation({ summary: 'Create a new item' })
   @ApiResponse({
     status: 201,
     description: 'The item has beeen successfully created',
@@ -61,6 +63,7 @@ export class ItemController {
     return { message: 'Item created successfully', data };
   }
 
+  @ApiOperation({ summary: 'Update an item' })
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully updated',
@@ -71,6 +74,7 @@ export class ItemController {
     return { message: 'Item updated successfully', data };
   }
 
+  @ApiOperation({ summary: 'Delete an item' })
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully deleted',
@@ -90,6 +94,7 @@ export class ItemController {
   //   return { message: 'Bookings for an item retrieved successfully' };
   // }
 
+  @ApiOperation({ summary: 'Request a booking for an item' })
   @ApiResponse({
     status: 201,
     description: 'A booking request has been successfully created',
@@ -104,9 +109,10 @@ export class ItemController {
     return { message: 'Booking request submitted successfully', data };
   }
 
+  @ApiOperation({ summary: 'Search for items' })
   @ApiResponse({
     status: 200,
-    description: 'A booking request has been successfully created',
+    description: 'Search results retrieved',
   })
   @Post('search')
   async searchItems(@Request() req, @Body() body: SearchItemsDTO) {
@@ -114,6 +120,7 @@ export class ItemController {
     const data = await this.itemService.searchItems(body);
     return { message: 'Search query run successfully', data };
   }
+  @ApiOperation({ summary: 'Get bookings for an item (Owner only)' })
   @ApiResponse({
     status: 200,
     description: 'Fetch bookings for an item',
@@ -133,6 +140,7 @@ export class ItemController {
     return { message: 'Bookings retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Check item availability' })
   @ApiResponse({
     status: 200,
     description: 'Check item availability',

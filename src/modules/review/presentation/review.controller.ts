@@ -1,12 +1,12 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  Patch,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Param,
+    Patch,
+    UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 import { ReviewService } from '../application/review.service';
@@ -18,6 +18,7 @@ import { ReviewService } from '../application/review.service';
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @ApiOperation({ summary: 'Update a review' })
   @ApiResponse({
     status: 200,
     description: 'Update a review',
@@ -28,6 +29,7 @@ export class ReviewController {
     return { message: 'Review updated successfully', data };
   }
 
+  @ApiOperation({ summary: 'Delete a review' })
   @ApiResponse({
     status: 200,
     description: 'Delete a review',

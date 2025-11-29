@@ -1,14 +1,14 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Request,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { CreateMessageDTO } from 'src/modules/message/application/dto/create-message.dto';
 import { MessageService } from 'src/modules/message/application/message.service';
@@ -32,6 +32,7 @@ export class BookingController {
     private readonly rejectBookingUseCase: RejectBookingUseCase,
   ) {}
 
+  @ApiOperation({ summary: 'Get booking details' })
   @ApiResponse({
     status: 200,
     description: 'The booking has beeen successfully retrieved',
@@ -51,6 +52,7 @@ export class BookingController {
   //   return { message: 'Booking created successfully' };
   // }
 
+  @ApiOperation({ summary: 'Delete a booking' })
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully deleted',
@@ -61,6 +63,7 @@ export class BookingController {
     return { message: 'Item deleted successfully' };
   }
 
+  @ApiOperation({ summary: 'Approve a booking request' })
   @ApiResponse({
     status: 200,
     description: 'The booking has been accepted',
@@ -71,6 +74,7 @@ export class BookingController {
     return { message: 'Booking approved successfully' };
   }
 
+  @ApiOperation({ summary: 'Reject or cancel a booking request' })
   @ApiResponse({
     status: 200,
     description: 'The booking has been rejected/cancelled',
@@ -81,6 +85,7 @@ export class BookingController {
     return { message: 'Booking rejected successfully' };
   }
 
+  @ApiOperation({ summary: 'Get reviews for a booking' })
   @ApiResponse({
     status: 201,
     description: 'The booking reviews has been retrieved',
@@ -91,6 +96,7 @@ export class BookingController {
     return { message: 'Booking reviews retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Create a review for a booking' })
   @ApiResponse({
     status: 201,
     description: 'The booking has been reviewed',
@@ -105,6 +111,7 @@ export class BookingController {
     return { message: 'Booking revivew created successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get messages for a booking' })
   @ApiResponse({
     status: 201,
     description: 'Get a booking messages',
@@ -115,6 +122,7 @@ export class BookingController {
     return { message: 'Booking request submitted successfully', data };
   }
 
+  @ApiOperation({ summary: 'Send a message for a booking' })
   @ApiResponse({
     status: 201,
     description: 'Create a booking messages',

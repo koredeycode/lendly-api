@@ -1,12 +1,12 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
+    Body,
+    Controller,
+    Get,
+    Post,
+    Request,
+    UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { GoogleUserDTO } from '../application/dto/google-user.dto';
 import { LoginResponseDTO } from '../application/dto/login-response.dto';
@@ -30,6 +30,7 @@ export class AuthController {
     private readonly profileUseCase: ProfileUseCase,
   ) {}
 
+  @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({
     status: 201,
     description: 'Signup successful',
@@ -41,6 +42,7 @@ export class AuthController {
     return { message: 'Signup successful' };
   }
 
+  @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({
     status: 200,
     description: 'Login successful',
@@ -57,6 +59,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Login with Google' })
   @ApiResponse({
     status: 200,
     description: 'Google Login successful',
@@ -73,6 +76,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
     status: 200,
     description: 'Profile retrieved',
