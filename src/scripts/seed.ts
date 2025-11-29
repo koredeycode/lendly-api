@@ -3,16 +3,16 @@ import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/db/drizzle/client';
 import {
-    bookings,
-    chatMessages,
-    items,
-    reviews,
-    users,
-    wallets,
-    walletTransactions,
-    type Booking,
-    type Item,
-    type User,
+  bookings,
+  chatMessages,
+  items,
+  reviews,
+  users,
+  wallets,
+  walletTransactions,
+  type Booking,
+  type Item,
+  type User,
 } from '../config/db/schema';
 
 // Real image URLs from Unsplash
@@ -84,7 +84,7 @@ async function main() {
       const [user] = await db
         .insert(users)
         .values({
-          email: faker.internet.email(),
+          email: faker.internet.email({ provider: 'gmail.com' }).toLowerCase(),
           passwordHash: passwordHash,
           name: faker.person.fullName(),
           avatarUrl: faker.image.avatar(),

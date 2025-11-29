@@ -10,12 +10,19 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { BookingResponseDTO } from 'src/modules/booking/application/dto/booking-response.dto';
+import { ItemsResponseDTO } from 'src/modules/item/application/dto/item-response.dto';
+import { ItemService } from 'src/modules/item/application/item.service';
 import { WalletResponseDTO } from 'src/modules/wallet/application/dto/wallet-response.dto';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
@@ -31,6 +38,7 @@ export class UserController {
     private readonly userService: UserService,
     private readonly walletService: WalletService,
     private readonly bookingService: BookingService,
+    private readonly itemService: ItemService,
   ) {}
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
@@ -81,7 +89,10 @@ export class UserController {
     type: UserResponseDTO,
   })
   @Get('/:id')
-  async getUserDetails(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+  async getUserDetails(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     const data = await this.userService.findUserById(id);
     return { message: 'User details retrieved successfully', data };
   }
@@ -93,7 +104,10 @@ export class UserController {
     type: UserResponseDTO,
   })
   @Patch()
-  async updateUser(@Request() req: AuthenticatedRequest, @Body() body: UpdateUserDTO) {
+  async updateUser(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: UpdateUserDTO,
+  ) {
     const data = await this.userService.updateUser(req.user.id, body);
     return { message: 'User updated successfully', data };
   }
@@ -102,11 +116,15 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Get user items',
-    type: SuccessResponseDTO,
+    type: ItemsResponseDTO,
   })
   @Get('/:id/items')
-  async getUserItems(@Request() req: AuthenticatedRequest) {
-    return { message: 'User items retrieved successfully' };
+  async getUserItems(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    const data = await this.itemService.getUserItems(id);
+    return { message: 'User items retrieved successfully', data };
   }
 
   @ApiOperation({ summary: 'Get user saved items' })
@@ -138,9 +156,10 @@ export class UserController {
     type: SuccessResponseDTO,
   })
   @Delete('/saved-items/:id')
-  async deleteUserSavedItem(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+  async deleteUserSavedItem(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     return { message: 'User saved item deleted successfully' };
   }
-
-
 }

@@ -164,6 +164,6 @@ export class BookingController {
     @Body() body: CreateMessageDTO,
   ) {
     const data = await this.messageService.createMessage(id, req.user.id, body);
-    return { message: 'Booking request submitted successfully', data };
+    return { message: 'Message sent successfully', data };
   }
 }

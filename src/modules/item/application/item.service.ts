@@ -18,4 +18,8 @@ export class ItemService {
     const items = await this.itemRepo.searchItems(search);
     return items;
   }
+
+  async getUserItems(userId: string) {
+    return this.itemRepo.findItemsByOwner(userId, false);
+  }
 }

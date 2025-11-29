@@ -21,18 +21,24 @@ export class CreateBookingUseCase {
     const totalAmount = data.rentalFeeCents + (data.thankYouTipCents || 0);
 
     return await db.transaction(async (tx) => {
-      // 1. Hold funds (will throw if insufficient)
-      await this.walletService.holdFunds(borrowerId, totalAmount, null, tx);
+      // 1. Create booking first to get the ID
+      const booking = await this.bookingRepo.createBooking(
+        itemId,
+        borrowerId,
+        data,
+        tx,
+      );
+      console.log("Booking created successfully", booking);
+      // 2. Hold funds (will throw if insufficient)
+      // Now we have the booking ID to link the transaction!
+      await this.walletService.holdFunds(
+        borrowerId,
+        totalAmount,
+        booking.id,
+        tx,
+      );
 
       try {
-        // 2. Create booking
-        const booking = await this.bookingRepo.createBooking(
-          itemId,
-          borrowerId,
-          data,
-          tx,
-        );
-
         // 3. Send email to owner (outside transaction or inside? inside is safer for consistency, but email sending should be async/job)
         // The email job service just adds to queue, so it's fast.
         const item = await this.itemRepo.findItemById(itemId);
@@ -41,7 +47,7 @@ export class CreateBookingUseCase {
           throw new NotFoundException('Item not found');
         }
 
-        const owner = await this.userRepo.findUserById(item.ownerId); 
+        const owner = await this.userRepo.findUserById(item.ownerId);
 
         const borrower = await this.userRepo.findUserById(borrowerId);
 
@@ -56,8 +62,7 @@ export class CreateBookingUseCase {
 
         return booking;
       } catch (error) {
-        // If booking creation fails, the transaction will rollback, so no need to manually release funds!
-        // That's the beauty of transactions.
+        // If anything fails, the transaction will rollback.
         throw error;
       }
     });

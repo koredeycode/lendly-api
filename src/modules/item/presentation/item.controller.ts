@@ -60,7 +60,7 @@ export class ItemController {
   })
   @Post()
   async createItem(@Request() req: AuthenticatedRequest, @Body() body: CreateItemDTO) {
-    //should use req.user.id
+
 
     const data = await this.createItemUseCase.execute(req.user.id, body);
     return { message: 'Item created successfully', data };
@@ -90,7 +90,7 @@ export class ItemController {
   })
   @Post('search')
   async searchItems(@Request() req: AuthenticatedRequest, @Body() body: SearchItemsDTO) {
-    // use req.user.id
+
     const data = await this.itemService.searchItems(body);
     return { message: 'Search query run successfully', data };
   }

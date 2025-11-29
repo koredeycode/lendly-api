@@ -31,6 +31,7 @@ export class DrizzleItemRepository implements ItemRepository {
         owner: {
           id: users.id,
           name: users.name,
+          trustScore: users.trustScore,
         },
       })
       .from(items)

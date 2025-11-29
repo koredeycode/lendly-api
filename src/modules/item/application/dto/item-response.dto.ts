@@ -16,6 +16,13 @@ export class ItemOwnerDTO {
   })
   @Expose()
   name: string;
+
+  @ApiProperty({
+    description: 'Owner Trust Score',
+    example: 4.5,
+  })
+  @Expose()
+  trustScore: number;
 }
 
 export class ItemDataDTO {

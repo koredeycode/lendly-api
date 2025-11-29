@@ -24,6 +24,6 @@ import { ItemController } from './item.controller';
       useClass: DrizzleItemRepository,
     },
   ],
-  exports: [ItemRepository],
+  exports: [ItemRepository, ItemService],
 })
 export class ItemModule {}

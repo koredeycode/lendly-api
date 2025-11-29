@@ -23,20 +23,23 @@ export class DrizzleWalletRepository implements WalletRepository {
       .returning();
   }
 
-  async addWalletTransaction(data: {
-    walletId: string;
-    amountCents: number;
-    type: (typeof walletTransactionTypeEnum.enumValues)[number];
-    bookingId?: string | null;
-    description?: string;
-  }) {
-    return await db.transaction(async (tx) => {
-      const [txRecord] = await tx
+  async addWalletTransaction(
+    data: {
+      walletId: string;
+      amountCents: number;
+      type: (typeof walletTransactionTypeEnum.enumValues)[number];
+      bookingId?: string | null;
+      description?: string;
+    },
+    tx?: any,
+  ) {
+    const runInTransaction = async (transaction: any) => {
+      const [txRecord] = await transaction
         .insert(walletTransactions)
         .values(data)
         .returning();
 
-      await tx
+      await transaction
         .update(wallets)
         .set({
           availableBalanceCents: sql`${wallets.availableBalanceCents} + ${data.amountCents}`,
@@ -45,14 +48,22 @@ export class DrizzleWalletRepository implements WalletRepository {
         .where(eq(wallets.userId, data.walletId));
 
       return txRecord;
-    });
+    };
+
+    if (tx) {
+      return await runInTransaction(tx);
+    } else {
+      return await db.transaction(runInTransaction);
+    }
   }
+
   async holdFunds(
     userId: string,
     amountCents: number,
     bookingId: string | null,
     tx?: any,
   ) {
+    console.log("Hold funds for user", userId);
     const database = tx || db;
     const [wallet] = await database
       .select()
@@ -60,9 +71,11 @@ export class DrizzleWalletRepository implements WalletRepository {
       .where(eq(wallets.userId, userId))
       .limit(1);
 
-    if (!wallet || wallet.availableBalanceCents < amountCents) {
-      throw new Error('Insufficient funds');
-    }
+      if (!wallet || wallet.availableBalanceCents < amountCents) {
+        throw new Error('Insufficient funds');
+      }
+
+      console.log("Wallet found", wallet);
 
     await database
       .update(wallets)
@@ -73,13 +86,19 @@ export class DrizzleWalletRepository implements WalletRepository {
       })
       .where(eq(wallets.userId, userId));
 
-    await this.addWalletTransaction({
-      walletId: wallet.id,
-      amountCents: -amountCents,
-      type: 'hold',
-      bookingId,
-      description: 'Funds held for booking',
-    });
+    console.log("Funds held successfully", wallet);
+
+    await this.addWalletTransaction(
+      {
+        walletId: wallet.userId,
+        amountCents: -amountCents,
+        type: 'hold',
+        bookingId,
+        description: 'Funds held for booking',
+      },
+      database,
+    );
+    console.log("Transaction added successfully");
   }
 
   async releaseFunds(

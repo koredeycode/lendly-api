@@ -1,10 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
-  IsDateString,
+  IsDate,
   IsInt,
   IsOptional,
   IsString,
-  Min,
+  Min
 } from 'class-validator';
 
 export class CreateBookingDTO {
@@ -21,7 +22,8 @@ export class CreateBookingDTO {
     type: String, // Use String for DateString in Swagger UI
     format: 'date-time',
   })
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   requestedFrom: Date; // The runtime type is Date after transformation, but validated as a string
 
   @ApiProperty({
@@ -30,7 +32,8 @@ export class CreateBookingDTO {
     type: String,
     format: 'date-time',
   })
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   requestedTo: Date;
 
   @ApiProperty({
