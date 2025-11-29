@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { db } from 'src/config/db/drizzle/client';
 import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
@@ -36,7 +36,13 @@ export class CreateBookingUseCase {
         // 3. Send email to owner (outside transaction or inside? inside is safer for consistency, but email sending should be async/job)
         // The email job service just adds to queue, so it's fast.
         const item = await this.itemRepo.findItemById(itemId);
-        const owner = await this.userRepo.findUserById(item.ownerId);
+
+        if (!item) {
+          throw new NotFoundException('Item not found');
+        }
+
+        const owner = await this.userRepo.findUserById(item.ownerId); 
+
         const borrower = await this.userRepo.findUserById(borrowerId);
 
         if (owner && borrower) {
