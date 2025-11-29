@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { BookingService } from 'src/modules/booking/application/booking.service';
+import { BookingResponseDTO } from 'src/modules/booking/application/dto/booking-response.dto';
 import { WalletResponseDTO } from 'src/modules/wallet/application/dto/wallet-response.dto';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
@@ -27,6 +30,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly walletService: WalletService,
+    private readonly bookingService: BookingService,
   ) {}
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
@@ -121,5 +125,20 @@ export class UserController {
   @Delete('/saved-items/:id')
   async deleteUserSavedItem(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
     return { message: 'User saved item deleted successfully' };
+  }
+
+  @ApiOperation({ summary: 'Get user bookings' })
+  @ApiResponse({
+    status: 200,
+    description: 'User bookings retrieved successfully',
+    type: [BookingResponseDTO],
+  })
+  @Get('bookings')
+  async getUserBookings(
+    @Request() req: AuthenticatedRequest,
+    @Query('type') type: 'borrower' | 'owner',
+  ) {
+    const data = await this.bookingService.getUserBookings(req.user.id, type);
+    return { message: 'User bookings retrieved successfully', data };
   }
 }

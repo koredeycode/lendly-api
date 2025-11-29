@@ -1,16 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+import { BookingModule } from 'src/modules/booking/presentation/booking.module';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
+import { WalletService } from 'src/modules/wallet/application/wallet.service';
+import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
 import { CreateUserUseCase } from '../application/create-user.usecase';
 import { UpdateUserUseCase } from '../application/update-user.usecase';
 import { UserService } from '../application/user.service';
 import { UserRepository } from '../domain/user.repository';
 import { DrizzleUserRepository } from '../infrastructure/user.repository.drizzle';
 import { UserController } from './user.controller';
-import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
-import { WalletService } from 'src/modules/wallet/application/wallet.service';
 
 @Module({
-  imports: [JobsModule, WalletModule],
+  imports: [JobsModule, WalletModule, forwardRef(() => BookingModule)],
   controllers: [UserController],
   providers: [
     UserService,

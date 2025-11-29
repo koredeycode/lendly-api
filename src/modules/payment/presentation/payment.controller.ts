@@ -1,17 +1,41 @@
-import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
-import { TopUpDto, TopUpResponseDto, VerifyPaymentDto, VerifyResponseDto, WithdrawDto, WithdrawResponseDto } from '../application/dto/payment.dto';
+import {
+  TopUpDto,
+  TopUpResponseDto,
+  VerifyPaymentDto,
+  VerifyResponseDto,
+  WithdrawDto,
+  WithdrawResponseDto,
+} from '../application/dto/payment.dto';
 import { PaymentService } from '../application/payment.service';
 
 @ApiTags('Payment')
-@Controller('payment')
+@Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @ApiOperation({ summary: 'Initialize wallet top-up' })
-  @ApiResponse({ status: 201, description: 'Top-up initialized', type: TopUpResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Top-up initialized',
+    type: TopUpResponseDto,
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('top-up')
@@ -26,7 +50,11 @@ export class PaymentController {
   }
 
   @ApiOperation({ summary: 'Verify payment transaction' })
-  @ApiResponse({ status: 200, description: 'Transaction verified', type: VerifyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction verified',
+    type: VerifyResponseDto,
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('verify')
@@ -38,11 +66,18 @@ export class PaymentController {
   }
 
   @ApiOperation({ summary: 'Request withdrawal' })
-  @ApiResponse({ status: 201, description: 'Withdrawal requested', type: WithdrawResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Withdrawal requested',
+    type: WithdrawResponseDto,
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('withdraw')
-  async withdraw(@Request() req: AuthenticatedRequest, @Body() body: WithdrawDto) {
+  async withdraw(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: WithdrawDto,
+  ) {
     const transaction = await this.paymentService.requestWithdrawal(
       req.user.id,
       body.amountCents,
@@ -50,5 +85,4 @@ export class PaymentController {
     );
     return { message: 'Withdrawal requested', data: transaction };
   }
-
 }

@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   Post,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -47,20 +46,7 @@ export class BookingController {
     private readonly rejectBookingUseCase: RejectBookingUseCase,
   ) {}
 
-  @ApiOperation({ summary: 'Get user bookings' })
-  @ApiResponse({
-    status: 200,
-    description: 'User bookings retrieved successfully',
-    type: [BookingResponseDTO],
-  })
-  @Get('user')
-  async getUserBookings(
-    @Request() req: AuthenticatedRequest,
-    @Query('type') type: 'borrower' | 'owner',
-  ) {
-    const data = await this.bookingService.getUserBookings(req.user.id, type);
-    return { message: 'User bookings retrieved successfully', data };
-  }
+
 
   @ApiOperation({ summary: 'Get booking details' })
   @ApiResponse({

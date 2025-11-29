@@ -1,5 +1,4 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
 import { BookingModule } from 'src/modules/booking/presentation/booking.module';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
@@ -11,10 +10,9 @@ import { ItemRepository } from '../domain/item.repository';
 import { DrizzleItemRepository } from '../infrastructure/item.repository.drizzle';
 import { ItemController } from './item.controller';
 
-import { UserModule } from 'src/modules/user/presentation/user.module';
 
 @Module({
-  imports: [JobsModule, forwardRef(() => BookingModule), WalletModule, UserModule],
+  imports: [JobsModule, forwardRef(() => BookingModule), WalletModule],
   controllers: [ItemController],
   providers: [
     ItemService,
@@ -25,7 +23,6 @@ import { UserModule } from 'src/modules/user/presentation/user.module';
       provide: ItemRepository,
       useClass: DrizzleItemRepository,
     },
-    CreateBookingUseCase,
   ],
   exports: [ItemRepository],
 })
