@@ -8,20 +8,31 @@ import {
   Post,
   Query,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
-import { BookingResponseDTO, BookingsResponseDTO } from 'src/modules/booking/application/dto/booking-response.dto';
+import {
+  BookingResponseDTO,
+  BookingsResponseDTO,
+} from 'src/modules/booking/application/dto/booking-response.dto';
 import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-booking.dto';
 import { CreateItemUseCase } from '../application/create-item.usecase';
 import { DeleteItemUseCase } from '../application/delete-item.usecase';
 import { AvailabilityResponseDTO } from '../application/dto/availability-response.dto';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
-import { ItemResponseDTO, ItemsResponseDTO } from '../application/dto/item-response.dto';
+import {
+  ItemResponseDTO,
+  ItemsResponseDTO,
+} from '../application/dto/item-response.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { ItemService } from '../application/item.service';
 import { UpdateItemUseCase } from '../application/update-item.usecase';
@@ -59,9 +70,10 @@ export class ItemController {
     type: ItemResponseDTO,
   })
   @Post()
-  async createItem(@Request() req: AuthenticatedRequest, @Body() body: CreateItemDTO) {
-
-
+  async createItem(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: CreateItemDTO,
+  ) {
     const data = await this.createItemUseCase.execute(req.user.id, body);
     return { message: 'Item created successfully', data };
   }
@@ -89,8 +101,10 @@ export class ItemController {
     type: ItemsResponseDTO,
   })
   @Post('search')
-  async searchItems(@Request() req: AuthenticatedRequest, @Body() body: SearchItemsDTO) {
-
+  async searchItems(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: SearchItemsDTO,
+  ) {
     const data = await this.itemService.searchItems(body);
     return { message: 'Search query run successfully', data };
   }
@@ -101,7 +115,10 @@ export class ItemController {
     type: BookingsResponseDTO,
   })
   @Get(':id/bookings')
-  async getItemBookings(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+  async getItemBookings(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
     const item = await this.itemService.findItem(id);
     if (!item) {
       throw new NotFoundException('Item not found');

@@ -12,7 +12,12 @@ import { DrizzleUserRepository } from '../infrastructure/user.repository.drizzle
 import { UserController } from './user.controller';
 
 @Module({
-  imports: [JobsModule, WalletModule, forwardRef(() => BookingModule), ItemModule],
+  imports: [
+    JobsModule,
+    WalletModule,
+    forwardRef(() => BookingModule),
+    ItemModule,
+  ],
   controllers: [UserController],
   providers: [
     UserService,

@@ -8,7 +8,7 @@ import {
   PaymentVerificationResponse,
   TransferFundsDto,
   TransferResponse,
-  WebhookEvent
+  WebhookEvent,
 } from '../../domain/payment.provider.interface';
 
 @Injectable()
@@ -24,7 +24,9 @@ export class StripeProvider implements IPaymentProvider {
     // });
   }
 
-  async initializePayment(dto: InitializePaymentDto): Promise<PaymentInitializationResponse> {
+  async initializePayment(
+    dto: InitializePaymentDto,
+  ): Promise<PaymentInitializationResponse> {
     try {
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -96,13 +98,13 @@ export class StripeProvider implements IPaymentProvider {
     // For this implementation, let's assume Payouts to own bank account (not typical for user withdrawal unless they are connected accounts).
     // If users are not connected accounts, we can't easily payout to them via API without collecting bank details and creating a connected account first.
     // For simplicity/mocking in this context (as requested "experiment with"), I'll implement a Transfer to a connected account ID (assuming recipientAccount.accountNumber is the connected account ID).
-    
+
     // NOTE: Real implementation requires onboarding users as Connect accounts.
-    
+
     try {
-        // Mocking a transfer for now as we don't have Connect setup
-        // In real world:
-        /*
+      // Mocking a transfer for now as we don't have Connect setup
+      // In real world:
+      /*
         const transfer = await this.stripe.transfers.create({
             amount: dto.amountCents,
             currency: dto.currency.toLowerCase(),
@@ -110,30 +112,33 @@ export class StripeProvider implements IPaymentProvider {
             description: dto.reason,
         });
         */
-       
-       // Throwing error to indicate this needs Connect setup or specific configuration
-       // But to satisfy the interface for "experiment", I will log and return pending/mock success if configured.
-       
-       this.logger.warn('Stripe transfer requires Connect setup. Simulating success for experiment.');
-       
-       return {
-           status: 'success',
-           reference: `mock_transfer_${Date.now()}`,
-           externalId: `tr_mock_${Date.now()}`,
-       };
 
+      // Throwing error to indicate this needs Connect setup or specific configuration
+      // But to satisfy the interface for "experiment", I will log and return pending/mock success if configured.
+
+      this.logger.warn(
+        'Stripe transfer requires Connect setup. Simulating success for experiment.',
+      );
+
+      return {
+        status: 'success',
+        reference: `mock_transfer_${Date.now()}`,
+        externalId: `tr_mock_${Date.now()}`,
+      };
     } catch (error) {
-       this.logger.error(`Stripe transfer failed: ${error.message}`);
-       return {
-           status: 'failed',
-           reference: dto.reference || '',
-           message: error.message,
-       };
+      this.logger.error(`Stripe transfer failed: ${error.message}`);
+      return {
+        status: 'failed',
+        reference: dto.reference || '',
+        message: error.message,
+      };
     }
   }
 
   validateWebhook(payload: any, signature: string): boolean {
-    const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+    const endpointSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET',
+    );
     if (!endpointSecret) return false;
 
     try {
@@ -144,19 +149,28 @@ export class StripeProvider implements IPaymentProvider {
     }
   }
 
-  async getWebhookEvent(payload: any, signature: string): Promise<WebhookEvent | null> {
-    const endpointSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+  async getWebhookEvent(
+    payload: any,
+    signature: string,
+  ): Promise<WebhookEvent | null> {
+    const endpointSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET',
+    );
     if (!endpointSecret) return null;
 
     let event: Stripe.Event;
     try {
-      event = this.stripe.webhooks.constructEvent(payload, signature, endpointSecret);
+      event = this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        endpointSecret,
+      );
     } catch (err) {
       return null;
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
       return {
         type: 'deposit',
         status: 'success',
@@ -165,22 +179,22 @@ export class StripeProvider implements IPaymentProvider {
         metadata: session.metadata,
       };
     } else if (event.type === 'payout.paid') {
-       // Assuming we use Payouts for withdrawals
-       const payout = event.data.object as Stripe.Payout;
-       return {
-           type: 'withdrawal',
-           status: 'success',
-           reference: payout.id, // Or metadata reference if we attached it
-           externalId: payout.id,
-       };
+      // Assuming we use Payouts for withdrawals
+      const payout = event.data.object;
+      return {
+        type: 'withdrawal',
+        status: 'success',
+        reference: payout.id, // Or metadata reference if we attached it
+        externalId: payout.id,
+      };
     } else if (event.type === 'payout.failed') {
-        const payout = event.data.object as Stripe.Payout;
-        return {
-            type: 'withdrawal',
-            status: 'failed',
-            reference: payout.id,
-            externalId: payout.id,
-        };
+      const payout = event.data.object;
+      return {
+        type: 'withdrawal',
+        status: 'failed',
+        reference: payout.id,
+        externalId: payout.id,
+      };
     }
 
     return null;

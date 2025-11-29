@@ -1,4 +1,3 @@
-
 export interface InitializePaymentDto {
   amountCents: number;
   email: string;
@@ -50,9 +49,14 @@ export interface WebhookEvent {
 }
 
 export interface IPaymentProvider {
-  initializePayment(dto: InitializePaymentDto): Promise<PaymentInitializationResponse>;
+  initializePayment(
+    dto: InitializePaymentDto,
+  ): Promise<PaymentInitializationResponse>;
   verifyPayment(reference: string): Promise<PaymentVerificationResponse>;
   transferFunds(dto: TransferFundsDto): Promise<TransferResponse>;
   validateWebhook(payload: any, signature: string): boolean;
-  getWebhookEvent(payload: any, signature: string): Promise<WebhookEvent | null>;
+  getWebhookEvent(
+    payload: any,
+    signature: string,
+  ): Promise<WebhookEvent | null>;
 }

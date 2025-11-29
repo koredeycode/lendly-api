@@ -1,18 +1,30 @@
-
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class TopUpDto {
   @ApiProperty({ description: 'Amount to top up in cents', example: 5000 })
   @IsNumber()
   amountCents: number;
 
-  @ApiProperty({ description: 'User email address', example: 'user@example.com' })
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+  })
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'Callback URL for payment redirection', example: 'https://lendly.app/payment/callback' })
+  @ApiProperty({
+    description: 'Callback URL for payment redirection',
+    example: 'https://lendly.app/payment/callback',
+  })
   @IsString()
   @IsNotEmpty()
   callbackUrl: string;
@@ -29,7 +41,11 @@ export class AccountDetailsDto {
   @IsNotEmpty()
   accountNumber: string;
 
-  @ApiProperty({ required: false, description: 'Account name', example: 'John Doe' })
+  @ApiProperty({
+    required: false,
+    description: 'Account name',
+    example: 'John Doe',
+  })
   @IsString()
   @IsOptional()
   accountName?: string;
@@ -57,7 +73,10 @@ export class PaymentInitializationResponseDto {
   @ApiProperty({ description: 'Payment reference', example: 'ref_123456789' })
   reference: string;
 
-  @ApiProperty({ description: 'Authorization URL to redirect user to', example: 'https://checkout.paystack.com/...' })
+  @ApiProperty({
+    description: 'Authorization URL to redirect user to',
+    example: 'https://checkout.paystack.com/...',
+  })
   authorizationUrl: string;
 
   @ApiProperty({ description: 'External provider ID', example: 'ext_123' })
@@ -89,7 +108,11 @@ export class PaymentTransactionDto {
   @ApiProperty({ description: 'Transaction reference', example: 'ref_123' })
   reference: string;
 
-  @ApiProperty({ description: 'External ID', example: 'ext_123', required: false })
+  @ApiProperty({
+    description: 'External ID',
+    example: 'ext_123',
+    required: false,
+  })
   externalId?: string;
 
   @ApiProperty({ description: 'Metadata', required: false })
@@ -103,7 +126,10 @@ export class PaymentTransactionDto {
 }
 
 export class TopUpResponseDto {
-  @ApiProperty({ description: 'Response message', example: 'Top-up initialized' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Top-up initialized',
+  })
   message: string;
 
   @ApiProperty({ type: PaymentInitializationResponseDto })
@@ -111,7 +137,10 @@ export class TopUpResponseDto {
 }
 
 export class VerifyResponseDto {
-  @ApiProperty({ description: 'Response message', example: 'Transaction verified' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Transaction verified',
+  })
   message: string;
 
   @ApiProperty({ type: PaymentTransactionDto })
@@ -119,7 +148,10 @@ export class VerifyResponseDto {
 }
 
 export class WithdrawResponseDto {
-  @ApiProperty({ description: 'Response message', example: 'Withdrawal requested' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Withdrawal requested',
+  })
   message: string;
 
   @ApiProperty({ type: PaymentTransactionDto })

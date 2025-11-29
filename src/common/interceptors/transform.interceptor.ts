@@ -1,8 +1,8 @@
 import {
-    CallHandler,
-    ExecutionContext,
-    Injectable,
-    NestInterceptor,
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -30,10 +30,10 @@ export class TransformInterceptor<T>
         const statusCode = response.statusCode;
 
         if (data && data.message && data.data) {
-           return {
-             statusCode,
-             ...data
-           }
+          return {
+            statusCode,
+            ...data,
+          };
         }
 
         return {

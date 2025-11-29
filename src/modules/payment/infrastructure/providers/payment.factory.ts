@@ -25,7 +25,9 @@ export class PaymentFactory {
       case 'monnify':
         return this.monnifyProvider;
       default:
-        throw new NotFoundException(`Payment provider ${provider} not supported`);
+        throw new NotFoundException(
+          `Payment provider ${provider} not supported`,
+        );
     }
   }
 }

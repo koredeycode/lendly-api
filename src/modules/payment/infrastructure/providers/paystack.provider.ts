@@ -19,10 +19,13 @@ export class PaystackProvider implements IPaymentProvider {
   private readonly baseUrl = 'https://api.paystack.co';
 
   constructor(private readonly configService: ConfigService) {
-    this.secretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY') || '';
+    this.secretKey =
+      this.configService.get<string>('PAYSTACK_SECRET_KEY') || '';
   }
 
-  async initializePayment(dto: InitializePaymentDto): Promise<PaymentInitializationResponse> {
+  async initializePayment(
+    dto: InitializePaymentDto,
+  ): Promise<PaymentInitializationResponse> {
     const response = await fetch(`${this.baseUrl}/transaction/initialize`, {
       method: 'POST',
       headers: {
@@ -51,12 +54,15 @@ export class PaystackProvider implements IPaymentProvider {
   }
 
   async verifyPayment(reference: string): Promise<PaymentVerificationResponse> {
-    const response = await fetch(`${this.baseUrl}/transaction/verify/${reference}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.secretKey}`,
+    const response = await fetch(
+      `${this.baseUrl}/transaction/verify/${reference}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.secretKey}`,
+        },
       },
-    });
+    );
 
     const data = await response.json();
     if (!data.status) {
@@ -97,7 +103,9 @@ export class PaystackProvider implements IPaymentProvider {
 
     const recipientData = await recipientResponse.json();
     if (!recipientData.status) {
-      throw new Error(`Paystack recipient creation failed: ${recipientData.message}`);
+      throw new Error(
+        `Paystack recipient creation failed: ${recipientData.message}`,
+      );
     }
 
     const recipientCode = recipientData.data.recipient_code;
@@ -142,7 +150,10 @@ export class PaystackProvider implements IPaymentProvider {
     return hash === signature;
   }
 
-  async getWebhookEvent(payload: any, signature: string): Promise<WebhookEvent | null> {
+  async getWebhookEvent(
+    payload: any,
+    signature: string,
+  ): Promise<WebhookEvent | null> {
     if (!this.validateWebhook(payload, signature)) {
       return null;
     }

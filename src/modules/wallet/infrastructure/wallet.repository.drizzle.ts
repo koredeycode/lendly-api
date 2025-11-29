@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { wallets, walletTransactions, walletTransactionTypeEnum } from 'src/config/db/schema';
+import {
+  wallets,
+  walletTransactions,
+  walletTransactionTypeEnum,
+} from 'src/config/db/schema';
 import { WalletRepository } from '../domain/wallet.repository';
 
 @Injectable()
@@ -63,7 +67,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     bookingId: string | null,
     tx?: any,
   ) {
-    console.log("Hold funds for user", userId);
+    console.log('Holding funds for user', userId);
     const database = tx || db;
     const [wallet] = await database
       .select()
@@ -71,11 +75,11 @@ export class DrizzleWalletRepository implements WalletRepository {
       .where(eq(wallets.userId, userId))
       .limit(1);
 
-      if (!wallet || wallet.availableBalanceCents < amountCents) {
-        throw new Error('Insufficient funds');
-      }
+    if (!wallet || wallet.availableBalanceCents < amountCents) {
+      throw new Error('Insufficient funds');
+    }
 
-      console.log("Wallet found", wallet);
+    console.log('Wallet found', wallet);
 
     await database
       .update(wallets)
@@ -86,7 +90,7 @@ export class DrizzleWalletRepository implements WalletRepository {
       })
       .where(eq(wallets.userId, userId));
 
-    console.log("Funds held successfully", wallet);
+    console.log('Funds held successfully', wallet);
 
     await this.addWalletTransaction(
       {
@@ -98,7 +102,7 @@ export class DrizzleWalletRepository implements WalletRepository {
       },
       database,
     );
-    console.log("Transaction added successfully");
+    console.log('Transaction added successfully');
   }
 
   async releaseFunds(

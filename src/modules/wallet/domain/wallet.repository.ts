@@ -10,7 +10,7 @@ export abstract class WalletRepository {
     bookingId?: string | null;
     description?: string;
   });
-  
+
   abstract holdFunds(
     userId: string,
     amountCents: number,

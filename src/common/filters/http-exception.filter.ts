@@ -1,10 +1,10 @@
 import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -31,19 +31,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: typeof message === 'string' ? message : (message as any).message || message,
-      error: typeof message === 'object' ? (message as any).error : undefined
+      message:
+        typeof message === 'string'
+          ? message
+          : (message as any).message || message,
+      error: typeof message === 'object' ? (message as any).error : undefined,
     };
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-        this.logger.error(
-            `${request.method} ${request.url}`,
-            exception instanceof Error ? exception.stack : 'Unknown error',
-        );
+      this.logger.error(
+        `${request.method} ${request.url}`,
+        exception instanceof Error ? exception.stack : 'Unknown error',
+      );
     } else {
-        this.logger.warn(
-            `${request.method} ${request.url} - ${status} - ${JSON.stringify(errorResponse.message)}`
-        );
+      this.logger.warn(
+        `${request.method} ${request.url} - ${status} - ${JSON.stringify(errorResponse.message)}`,
+      );
     }
 
     response.status(status).json(errorResponse);

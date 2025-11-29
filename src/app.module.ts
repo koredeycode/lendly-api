@@ -32,13 +32,12 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     LoggerModule.forRoot({
       pinoHttp: {
         serializers: {
-          req: (req) => ({
-            id: req.id,
+          req: (req: Request) => ({
             method: req.method,
             url: req.url,
           }),
-          res: (res) => ({
-            statusCode: res.statusCode,
+          res: (res: Response) => ({
+            statusCode: res.status,
           }),
         },
         transport:

@@ -1,5 +1,17 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
@@ -32,7 +44,10 @@ export class WalletController {
     type: SuccessResponseDTO,
   })
   @Post('top-up')
-  async topUp(@Request() req: AuthenticatedRequest, @Body() body: WalletTransactionDTO) {
+  async topUp(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: WalletTransactionDTO,
+  ) {
     await this.walletService.topUp(req.user.id, body.amountCents);
     return { message: 'Wallet topped up successfully' };
   }
@@ -44,7 +59,10 @@ export class WalletController {
     type: SuccessResponseDTO,
   })
   @Post('withdraw')
-  async withdraw(@Request() req: AuthenticatedRequest, @Body() body: WalletTransactionDTO) {
+  async withdraw(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: WalletTransactionDTO,
+  ) {
     await this.walletService.withdraw(req.user.id, body.amountCents);
     return { message: 'Funds withdrawn successfully' };
   }
@@ -57,6 +75,9 @@ export class WalletController {
   @Get('transactions')
   async getTransactions(@Request() req: AuthenticatedRequest) {
     const transactions = await this.walletService.getTransactions(req.user.id);
-    return { message: 'Transactions retrieved successfully', data: transactions };
+    return {
+      message: 'Transactions retrieved successfully',
+      data: transactions,
+    };
   }
 }

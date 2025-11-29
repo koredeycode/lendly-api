@@ -47,7 +47,14 @@ const ITEM_IMAGES = {
   ],
 };
 
-const CATEGORIES = ['Electronics', 'Tools', 'Fashion', 'Books', 'Home & Garden', 'Sports'];
+const CATEGORIES = [
+  'Electronics',
+  'Tools',
+  'Fashion',
+  'Books',
+  'Home & Garden',
+  'Sports',
+];
 
 async function clearDatabase() {
   console.log('🧹 Clearing database...');
@@ -124,13 +131,17 @@ async function main() {
     for (let i = 0; i < 30; i++) {
       const owner = faker.helpers.arrayElement(createdUsers);
       const category = faker.helpers.arrayElement(CATEGORIES);
-      
+
       // Get a random image based on category mapping (simplified)
       let imageUrls: string[] = [];
-      if (category === 'Electronics') imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.electronics)];
-      else if (category === 'Tools') imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.tools)];
-      else if (category === 'Fashion') imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.fashion)];
-      else if (category === 'Books') imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.books)];
+      if (category === 'Electronics')
+        imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.electronics)];
+      else if (category === 'Tools')
+        imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.tools)];
+      else if (category === 'Fashion')
+        imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.fashion)];
+      else if (category === 'Books')
+        imageUrls = [faker.helpers.arrayElement(ITEM_IMAGES.books)];
       else imageUrls = [faker.image.url()]; // Fallback
 
       const [item] = await db
@@ -157,8 +168,10 @@ async function main() {
     const createdBookings: Booking[] = [];
     for (let i = 0; i < 40; i++) {
       const item = faker.helpers.arrayElement(createdItems);
-      const borrower = faker.helpers.arrayElement(createdUsers.filter(u => u.id !== item.ownerId));
-      
+      const borrower = faker.helpers.arrayElement(
+        createdUsers.filter((u) => u.id !== item.ownerId),
+      );
+
       if (!borrower) continue;
 
       const status = faker.helpers.arrayElement([
@@ -171,9 +184,17 @@ async function main() {
       ]);
 
       const requestedFrom = faker.date.recent({ days: 30 });
-      const requestedTo = new Date(requestedFrom.getTime() + faker.number.int({ min: 1, max: 7 }) * 24 * 60 * 60 * 1000);
-      
-      const rentalFeeCents = item.dailyRentalPriceCents * Math.ceil((requestedTo.getTime() - requestedFrom.getTime()) / (1000 * 60 * 60 * 24));
+      const requestedTo = new Date(
+        requestedFrom.getTime() +
+          faker.number.int({ min: 1, max: 7 }) * 24 * 60 * 60 * 1000,
+      );
+
+      const rentalFeeCents =
+        item.dailyRentalPriceCents *
+        Math.ceil(
+          (requestedTo.getTime() - requestedFrom.getTime()) /
+            (1000 * 60 * 60 * 24),
+        );
 
       const [booking] = await db
         .insert(bookings)
@@ -184,7 +205,10 @@ async function main() {
           requestedFrom: requestedFrom,
           requestedTo: requestedTo,
           rentalFeeCents: rentalFeeCents,
-          totalChargedCents: status === 'completed' || status === 'returned' ? rentalFeeCents : 0,
+          totalChargedCents:
+            status === 'completed' || status === 'returned'
+              ? rentalFeeCents
+              : 0,
         })
         .returning();
       createdBookings.push(booking);
@@ -214,11 +238,13 @@ async function main() {
 
     // 5. Seed Reviews
     console.log('Creating reviews...');
-    const completedBookings = createdBookings.filter(b => b.status === 'completed');
+    const completedBookings = createdBookings.filter(
+      (b) => b.status === 'completed',
+    );
     for (const booking of completedBookings) {
-      const item = createdItems.find(i => i.id === booking.itemId);
+      const item = createdItems.find((i) => i.id === booking.itemId);
       if (!item) continue;
-      
+
       // Borrower reviews Lender/Item
       await db.insert(reviews).values({
         bookingId: booking.id,
@@ -233,14 +259,16 @@ async function main() {
     // 6. Seed Messages
     console.log('Creating messages...');
     for (const booking of createdBookings) {
-      const item = createdItems.find(i => i.id === booking.itemId);
+      const item = createdItems.find((i) => i.id === booking.itemId);
       if (!item) continue;
 
       const messagesCount = faker.number.int({ min: 0, max: 5 });
-      
+
       for (let i = 0; i < messagesCount; i++) {
-        const senderId = faker.datatype.boolean() ? booking.borrowerId : item.ownerId;
-        
+        const senderId = faker.datatype.boolean()
+          ? booking.borrowerId
+          : item.ownerId;
+
         await db.insert(chatMessages).values({
           bookingId: booking.id,
           senderId: senderId,

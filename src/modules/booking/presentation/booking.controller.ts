@@ -46,8 +46,6 @@ export class BookingController {
     private readonly rejectBookingUseCase: RejectBookingUseCase,
   ) {}
 
-
-
   @ApiOperation({ summary: 'Get booking details' })
   @ApiResponse({
     status: 200,

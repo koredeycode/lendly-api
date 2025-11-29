@@ -1,12 +1,17 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Request,
-    UseGuards,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { GoogleUserDTO } from '../application/dto/google-user.dto';

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { db } from 'src/config/db/drizzle/client';
 import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
@@ -26,7 +30,9 @@ export class RejectBookingUseCase {
 
       // Only owner or borrower can reject/cancel
       if (item.ownerId !== userId && booking.borrowerId !== userId) {
-        throw new UnauthorizedException('Not authorized to reject this booking');
+        throw new UnauthorizedException(
+          'Not authorized to reject this booking',
+        );
       }
 
       if (booking.status !== 'pending') {

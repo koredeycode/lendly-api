@@ -18,10 +18,13 @@ export class FlutterwaveProvider implements IPaymentProvider {
   private readonly baseUrl = 'https://api.flutterwave.com/v3';
 
   constructor(private readonly configService: ConfigService) {
-    this.secretKey = this.configService.get<string>('FLUTTERWAVE_SECRET_KEY') || '';
+    this.secretKey =
+      this.configService.get<string>('FLUTTERWAVE_SECRET_KEY') || '';
   }
 
-  async initializePayment(dto: InitializePaymentDto): Promise<PaymentInitializationResponse> {
+  async initializePayment(
+    dto: InitializePaymentDto,
+  ): Promise<PaymentInitializationResponse> {
     const response = await fetch(`${this.baseUrl}/payments`, {
       method: 'POST',
       headers: {
@@ -30,7 +33,7 @@ export class FlutterwaveProvider implements IPaymentProvider {
       },
       body: JSON.stringify({
         tx_ref: `tx-${Date.now()}`, // Flutterwave requires unique tx_ref
-        amount: dto.amountCents, // Note: Flutterwave usually takes main currency unit, but let's assume cents/kobo if configured or divide. 
+        amount: dto.amountCents, // Note: Flutterwave usually takes main currency unit, but let's assume cents/kobo if configured or divide.
         // Wait, Flutterwave API takes amount in major units (e.g. NGN 100.00).
         // My system uses cents. I should divide by 100.
         // But wait, Paystack also takes kobo (cents).
@@ -62,12 +65,15 @@ export class FlutterwaveProvider implements IPaymentProvider {
   async verifyPayment(reference: string): Promise<PaymentVerificationResponse> {
     // Verification by transaction ID or tx_ref?
     // Endpoint: /transactions?tx_ref=...
-    const response = await fetch(`${this.baseUrl}/transactions?tx_ref=${reference}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.secretKey}`,
+    const response = await fetch(
+      `${this.baseUrl}/transactions?tx_ref=${reference}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.secretKey}`,
+        },
       },
-    });
+    );
 
     const data = await response.json();
     if (data.status !== 'success' || !data.data || data.data.length === 0) {
@@ -129,7 +135,10 @@ export class FlutterwaveProvider implements IPaymentProvider {
     return signature === secretHash;
   }
 
-  async getWebhookEvent(payload: any, signature: string): Promise<WebhookEvent | null> {
+  async getWebhookEvent(
+    payload: any,
+    signature: string,
+  ): Promise<WebhookEvent | null> {
     if (!this.validateWebhook(payload, signature)) {
       return null;
     }

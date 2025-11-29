@@ -24,7 +24,8 @@ export class MonnifyProvider implements IPaymentProvider {
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.get<string>('MONNIFY_API_KEY') || '';
     this.secretKey = this.configService.get<string>('MONNIFY_SECRET_KEY') || '';
-    this.contractCode = this.configService.get<string>('MONNIFY_CONTRACT_CODE') || '';
+    this.contractCode =
+      this.configService.get<string>('MONNIFY_CONTRACT_CODE') || '';
   }
 
   private async getAccessToken(): Promise<string> {
@@ -32,7 +33,9 @@ export class MonnifyProvider implements IPaymentProvider {
       return this.accessToken;
     }
 
-    const auth = Buffer.from(`${this.apiKey}:${this.secretKey}`).toString('base64');
+    const auth = Buffer.from(`${this.apiKey}:${this.secretKey}`).toString(
+      'base64',
+    );
     const response = await fetch(`${this.baseUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
@@ -50,30 +53,35 @@ export class MonnifyProvider implements IPaymentProvider {
     return this.accessToken!;
   }
 
-  async initializePayment(dto: InitializePaymentDto): Promise<PaymentInitializationResponse> {
+  async initializePayment(
+    dto: InitializePaymentDto,
+  ): Promise<PaymentInitializationResponse> {
     const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}/api/v1/merchant/transactions/init-transaction`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${this.baseUrl}/api/v1/merchant/transactions/init-transaction`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: dto.amountCents, // Monnify usually takes amount in Naira (major), not kobo. Check docs.
+          // Docs say: "Amount to be paid by the customer." usually major units.
+          // I will assume major units for Monnify as well and divide by 100 if needed.
+          // But wait, Paystack is kobo.
+          // Let's assume I pass what is needed.
+          customerName: 'User', // Should pass name
+          customerEmail: dto.email,
+          paymentReference: `tx-${Date.now()}`,
+          paymentDescription: 'Wallet Top-up',
+          currencyCode: dto.currency,
+          contractCode: this.contractCode,
+          redirectUrl: dto.callbackUrl,
+          metaData: dto.metadata,
+        }),
       },
-      body: JSON.stringify({
-        amount: dto.amountCents, // Monnify usually takes amount in Naira (major), not kobo. Check docs.
-        // Docs say: "Amount to be paid by the customer." usually major units.
-        // I will assume major units for Monnify as well and divide by 100 if needed.
-        // But wait, Paystack is kobo.
-        // Let's assume I pass what is needed.
-        customerName: 'User', // Should pass name
-        customerEmail: dto.email,
-        paymentReference: `tx-${Date.now()}`,
-        paymentDescription: 'Wallet Top-up',
-        currencyCode: dto.currency,
-        contractCode: this.contractCode,
-        redirectUrl: dto.callbackUrl,
-        metaData: dto.metadata,
-      }),
-    });
+    );
 
     const data = await response.json();
     if (!data.requestSuccessful) {
@@ -124,22 +132,25 @@ export class MonnifyProvider implements IPaymentProvider {
 
   async transferFunds(dto: TransferFundsDto): Promise<TransferResponse> {
     const token = await this.getAccessToken();
-    const response = await fetch(`${this.baseUrl}/api/v2/disbursements/single`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${this.baseUrl}/api/v2/disbursements/single`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: dto.amountCents,
+          reference: dto.reference,
+          narration: dto.reason,
+          destinationBankCode: dto.recipientAccount.bankCode,
+          destinationAccountNumber: dto.recipientAccount.accountNumber,
+          currency: dto.currency,
+          sourceAccountNumber: 'WALLET', // Or specific wallet account
+        }),
       },
-      body: JSON.stringify({
-        amount: dto.amountCents,
-        reference: dto.reference,
-        narration: dto.reason,
-        destinationBankCode: dto.recipientAccount.bankCode,
-        destinationAccountNumber: dto.recipientAccount.accountNumber,
-        currency: dto.currency,
-        sourceAccountNumber: 'WALLET', // Or specific wallet account
-      }),
-    });
+    );
 
     const data = await response.json();
     if (!data.requestSuccessful) {
@@ -164,7 +175,10 @@ export class MonnifyProvider implements IPaymentProvider {
     return true; // Placeholder
   }
 
-  async getWebhookEvent(payload: any, signature: string): Promise<WebhookEvent | null> {
+  async getWebhookEvent(
+    payload: any,
+    signature: string,
+  ): Promise<WebhookEvent | null> {
     // Monnify payload: { eventType: 'SUCCESSFUL_TRANSACTION', eventData: { ... } }
     const eventType = payload.eventType;
     const data = payload.eventData;

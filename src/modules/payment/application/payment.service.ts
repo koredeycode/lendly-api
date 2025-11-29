@@ -18,7 +18,12 @@ export class PaymentService {
     return 'paystack';
   }
 
-  async initializeTopUp(userId: string, amountCents: number, email: string, callbackUrl: string) {
+  async initializeTopUp(
+    userId: string,
+    amountCents: number,
+    email: string,
+    callbackUrl: string,
+  ) {
     const providerName = this.getDefaultProvider();
     const provider = this.paymentFactory.getProvider(providerName);
 
@@ -59,7 +64,7 @@ export class PaymentService {
       // For now, I'll just proceed and fix repository later if needed.
       // Actually, I can't update reference with current repository method.
       // I'll assume I can pass reference in metadata or just update the implementation.
-      
+
       return response;
     } catch (error) {
       await this.paymentRepository.updateTransaction(transaction.id, {
@@ -71,9 +76,10 @@ export class PaymentService {
   }
 
   async verifyTransaction(reference: string) {
-    const transaction = await this.paymentRepository.getTransactionByReference(reference);
+    const transaction =
+      await this.paymentRepository.getTransactionByReference(reference);
     if (!transaction) {
-        throw new NotFoundException('Transaction not found');
+      throw new NotFoundException('Transaction not found');
     }
 
     const provider = this.paymentFactory.getProvider(transaction.provider);
@@ -88,7 +94,10 @@ export class PaymentService {
         status: 'success',
         metadata: verification.metadata,
       });
-      await this.walletService.topUp(transaction.userId, transaction.amountCents);
+      await this.walletService.topUp(
+        transaction.userId,
+        transaction.amountCents,
+      );
     } else if (verification.status === 'failed') {
       await this.paymentRepository.updateTransaction(transaction.id, {
         status: 'failed',
@@ -102,7 +111,11 @@ export class PaymentService {
   async requestWithdrawal(
     userId: string,
     amountCents: number,
-    accountDetails: { bankCode: string; accountNumber: string; accountName?: string },
+    accountDetails: {
+      bankCode: string;
+      accountNumber: string;
+      accountName?: string;
+    },
   ) {
     const providerName = this.getDefaultProvider();
     const provider = this.paymentFactory.getProvider(providerName);
@@ -154,7 +167,7 @@ export class PaymentService {
 
   async handleWebhook(providerName: string, payload: any, signature: string) {
     const provider = this.paymentFactory.getProvider(providerName);
-    
+
     // Delegate parsing to provider
     const event = await provider.getWebhookEvent(payload, signature);
     if (!event) {
@@ -162,43 +175,51 @@ export class PaymentService {
       return { status: 'ignored' };
     }
 
-    this.logger.log(`Processing webhook event: ${event.type} ${event.status} ${event.reference}`);
+    this.logger.log(
+      `Processing webhook event: ${event.type} ${event.status} ${event.reference}`,
+    );
 
     if (event.type === 'deposit') {
       await this.verifyTransaction(event.reference);
     } else if (event.type === 'withdrawal') {
-       // Find transaction by reference (or externalId if needed)
-       // Our repository getTransactionByReference uses provider reference.
-       let transaction = await this.paymentRepository.getTransactionByReference(event.reference);
-       
-       if (!transaction && event.externalId) {
-           // Try finding by external ID if reference didn't match (some providers might send different refs)
-           // But our schema stores provider reference in `reference` column.
-           // If we stored our internal ID as reference for transfer (like in Paystack/Monnify implementation),
-           // then event.reference might be our internal ID.
-           // Let's try to find by ID if reference looks like UUID, or just rely on what provider returns as reference.
-           // For now, assume event.reference matches what we stored or is the key.
-       }
+      // Find transaction by reference (or externalId if needed)
+      // Our repository getTransactionByReference uses provider reference.
+      const transaction =
+        await this.paymentRepository.getTransactionByReference(event.reference);
 
-       if (transaction) {
-           if (event.status === 'success') {
-               await this.paymentRepository.updateTransaction(transaction.id, {
-                   status: 'success',
-                   externalId: event.externalId,
-                   metadata: event.metadata,
-               });
-           } else if (event.status === 'failed') {
-               await this.paymentRepository.updateTransaction(transaction.id, {
-                   status: 'failed',
-                   externalId: event.externalId,
-                   metadata: event.metadata,
-               });
-               // Refund wallet
-               await this.walletService.topUp(transaction.userId, transaction.amountCents);
-           }
-       } else {
-           this.logger.warn(`Transaction not found for webhook reference: ${event.reference}`);
-       }
+      if (!transaction && event.externalId) {
+        // Try finding by external ID if reference didn't match (some providers might send different refs)
+        // But our schema stores provider reference in `reference` column.
+        // If we stored our internal ID as reference for transfer (like in Paystack/Monnify implementation),
+        // then event.reference might be our internal ID.
+        // Let's try to find by ID if reference looks like UUID, or just rely on what provider returns as reference.
+        // For now, assume event.reference matches what we stored or is the key.
+      }
+
+      if (transaction) {
+        if (event.status === 'success') {
+          await this.paymentRepository.updateTransaction(transaction.id, {
+            status: 'success',
+            externalId: event.externalId,
+            metadata: event.metadata,
+          });
+        } else if (event.status === 'failed') {
+          await this.paymentRepository.updateTransaction(transaction.id, {
+            status: 'failed',
+            externalId: event.externalId,
+            metadata: event.metadata,
+          });
+          // Refund wallet
+          await this.walletService.topUp(
+            transaction.userId,
+            transaction.amountCents,
+          );
+        }
+      } else {
+        this.logger.warn(
+          `Transaction not found for webhook reference: ${event.reference}`,
+        );
+      }
     }
 
     return { status: 'success' };

@@ -28,7 +28,7 @@ export class CreateBookingUseCase {
         data,
         tx,
       );
-      console.log("Booking created successfully", booking);
+      console.log('Booking created successfully', booking);
       // 2. Hold funds (will throw if insufficient)
       // Now we have the booking ID to link the transaction!
       await this.walletService.holdFunds(
@@ -38,6 +38,7 @@ export class CreateBookingUseCase {
         tx,
       );
 
+      console.log('funds successfully held');
       try {
         // 3. Send email to owner (outside transaction or inside? inside is safer for consistency, but email sending should be async/job)
         // The email job service just adds to queue, so it's fast.

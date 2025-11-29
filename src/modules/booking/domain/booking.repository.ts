@@ -10,7 +10,11 @@ export abstract class BookingRepository {
   ): Promise<Booking>;
   abstract findBookingById(id: string): Promise<Booking | null>;
   abstract getBookingsForUser(userId, type: string): Promise<Booking[]>;
-  abstract acceptBooking(id: string, tipAmount?: number, tx?: any): Promise<Booking>;
+  abstract acceptBooking(
+    id: string,
+    tipAmount?: number,
+    tx?: any,
+  ): Promise<Booking>;
   abstract updateBookingStatus(
     id: string,
     status: (typeof bookingStatusEnum.enumValues)[number],

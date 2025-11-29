@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { NewPaymentTransaction, PaymentTransaction, paymentTransactions } from 'src/config/db/schema';
-import { PaymentRepository, UpdatePaymentTransactionDto } from '../domain/payment.repository';
+import {
+  NewPaymentTransaction,
+  PaymentTransaction,
+  paymentTransactions,
+} from 'src/config/db/schema';
+import {
+  PaymentRepository,
+  UpdatePaymentTransactionDto,
+} from '../domain/payment.repository';
 
 @Injectable()
 export class DrizzlePaymentRepository implements PaymentRepository {
-  async createTransaction(data: NewPaymentTransaction): Promise<PaymentTransaction> {
+  async createTransaction(
+    data: NewPaymentTransaction,
+  ): Promise<PaymentTransaction> {
     const [tx] = await db.insert(paymentTransactions).values(data).returning();
     return tx;
   }
@@ -28,7 +37,9 @@ export class DrizzlePaymentRepository implements PaymentRepository {
     return tx;
   }
 
-  async getTransactionByReference(reference: string): Promise<PaymentTransaction | null> {
+  async getTransactionByReference(
+    reference: string,
+  ): Promise<PaymentTransaction | null> {
     const [tx] = await db
       .select()
       .from(paymentTransactions)
