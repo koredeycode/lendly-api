@@ -7,7 +7,9 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { MessageResponseDTO } from '../application/dto/message-response.dto';
 import { UpdateMessageDTO } from '../application/dto/update-message.dto';
 import { MessageService } from '../application/message.service';
 
@@ -22,6 +24,7 @@ export class MessageController {
   @ApiResponse({
     status: 200,
     description: 'Update a message',
+    type: MessageResponseDTO,
   })
   @Patch(':id')
   async updateMessage(@Param('id') id: string, @Body() body: UpdateMessageDTO) {
@@ -33,6 +36,7 @@ export class MessageController {
   @ApiResponse({
     status: 200,
     description: 'Delete a message',
+    type: SuccessResponseDTO,
   })
   @Delete(':id')
   async deleteMessage(@Param('id') id: string) {

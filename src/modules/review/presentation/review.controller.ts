@@ -7,7 +7,9 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { ReviewResponseDTO } from '../application/dto/review-response.dto';
 import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 import { ReviewService } from '../application/review.service';
 
@@ -22,6 +24,7 @@ export class ReviewController {
   @ApiResponse({
     status: 200,
     description: 'Update a review',
+    type: ReviewResponseDTO,
   })
   @Patch(':id')
   async updateReview(@Param('id') id: string, @Body() body: UpdateReviewDTO) {
@@ -33,6 +36,7 @@ export class ReviewController {
   @ApiResponse({
     status: 200,
     description: 'Delete a review',
+    type: SuccessResponseDTO,
   })
   @Delete(':id')
   async deleteReview(@Param('id') id: string) {

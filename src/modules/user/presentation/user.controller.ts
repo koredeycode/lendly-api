@@ -10,9 +10,12 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { WalletResponseDTO } from 'src/modules/wallet/application/dto/wallet-response.dto';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
+import { UserResponseDTO } from '../application/dto/user-response.dto';
 import { UserService } from '../application/user.service';
 
 @ApiTags('User')
@@ -29,6 +32,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User endpoint',
+    type: UserResponseDTO,
   })
   @Get('/me')
   async getCurrentUser(@Request() req) {
@@ -43,6 +47,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User Wallet',
+    type: WalletResponseDTO,
   })
   @Get('/wallet')
   async getUserWallet(@Request() req) {
@@ -54,6 +59,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User details',
+    type: UserResponseDTO,
   })
   @Get('/:id')
   async getUserDetails(@Request() req, @Param('id') id: string) {
@@ -65,6 +71,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully updated',
+    type: UserResponseDTO,
   })
   @Patch()
   async updateUser(@Request() req, @Body() body: UpdateUserDTO) {
@@ -76,6 +83,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Get user items',
+    type: SuccessResponseDTO,
   })
   @Get('/:id/items')
   async getUserItems(@Request() req) {
@@ -86,6 +94,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Get user saved items',
+    type: SuccessResponseDTO,
   })
   @Get('/saved-items')
   async getUserSavedItems(@Request() req) {
@@ -96,6 +105,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Get user saved items',
+    type: SuccessResponseDTO,
   })
   @Post('/saved-items')
   async createUserSavedItem(@Request() req) {
@@ -106,6 +116,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Delete user saved item',
+    type: SuccessResponseDTO,
   })
   @Delete('/saved-items/:id')
   async deleteUserSavedItem(@Request() req, @Param('id') id: string) {

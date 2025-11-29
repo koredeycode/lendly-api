@@ -1,22 +1,24 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Request,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { CreateMessageDTO } from 'src/modules/message/application/dto/create-message.dto';
+import { MessageResponseDTO, MessagesResponseDTO } from 'src/modules/message/application/dto/message-response.dto';
 import { MessageService } from 'src/modules/message/application/message.service';
 import { CreateReviewDTO } from 'src/modules/review/application/dto/create-review.dto';
+import { ReviewResponseDTO, ReviewsResponseDTO } from 'src/modules/review/application/dto/review-response.dto';
 import { ReviewService } from 'src/modules/review/application/review.service';
-import { BookingService } from '../application/booking.service';
-
 import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
+import { BookingService } from '../application/booking.service';
+import { BookingResponseDTO } from '../application/dto/booking-response.dto';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 @ApiTags('Booking')
@@ -36,6 +38,7 @@ export class BookingController {
   @ApiResponse({
     status: 200,
     description: 'The booking has beeen successfully retrieved',
+    type: BookingResponseDTO,
   })
   @Get(':id')
   async getBooking(@Param('id') id: string) {
@@ -89,6 +92,7 @@ export class BookingController {
   @ApiResponse({
     status: 201,
     description: 'The booking reviews has been retrieved',
+    type: ReviewsResponseDTO,
   })
   @Get(':id/reviews')
   async getBookingReviews(@Param('id') id: string) {
@@ -100,6 +104,7 @@ export class BookingController {
   @ApiResponse({
     status: 201,
     description: 'The booking has been reviewed',
+    type: ReviewResponseDTO,
   })
   @Post(':id/reviews')
   async reviewBooking(
@@ -115,6 +120,7 @@ export class BookingController {
   @ApiResponse({
     status: 201,
     description: 'Get a booking messages',
+    type: MessagesResponseDTO,
   })
   @Get(':id/messages')
   async getBookingMessages(@Param('id') id: string) {
@@ -126,6 +132,7 @@ export class BookingController {
   @ApiResponse({
     status: 201,
     description: 'Create a booking messages',
+    type: MessageResponseDTO,
   })
   @Post(':id/messages')
   async createBookingMessage(

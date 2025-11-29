@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AppResponseDTO } from './app.dto';
 import { AppService } from './app.service';
 
 @Controller()
@@ -10,6 +11,7 @@ export class AppController {
   @ApiResponse({
     status: 200,
     description: 'Hello World',
+    type: AppResponseDTO,
   })
   @Get()
   getHello(): string {

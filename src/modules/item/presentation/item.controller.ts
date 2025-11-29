@@ -1,25 +1,29 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Request,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    ForbiddenException,
+    Get,
+    NotFoundException,
+    Param,
+    Patch,
+    Post,
+    Query,
+    Request,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SuccessResponseDTO } from 'src/common/dto/success-response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
+import { BookingResponseDTO, BookingsResponseDTO } from 'src/modules/booking/application/dto/booking-response.dto';
 import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-booking.dto';
 import { CreateItemUseCase } from '../application/create-item.usecase';
 import { DeleteItemUseCase } from '../application/delete-item.usecase';
+import { AvailabilityResponseDTO } from '../application/dto/availability-response.dto';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
+import { ItemResponseDTO, ItemsResponseDTO } from '../application/dto/item-response.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemService } from '../application/item.service';
@@ -43,6 +47,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully retrieved',
+    type: ItemResponseDTO,
   })
   @Get(':id')
   async getItem(@Param('id') id: string) {
@@ -54,6 +59,7 @@ export class ItemController {
   @ApiResponse({
     status: 201,
     description: 'The item has beeen successfully created',
+    type: ItemResponseDTO,
   })
   @Post()
   async createItem(@Request() req, @Body() body: CreateItemDTO) {
@@ -67,6 +73,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully updated',
+    type: ItemResponseDTO,
   })
   @Patch(':id')
   async updateItem(@Param('id') id: string, @Body() body: UpdateItemDTO) {
@@ -78,6 +85,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'The item has beeen successfully deleted',
+    type: SuccessResponseDTO,
   })
   @Delete(':id')
   async deleteItem(@Param('id') id: string) {
@@ -98,6 +106,7 @@ export class ItemController {
   @ApiResponse({
     status: 201,
     description: 'A booking request has been successfully created',
+    type: BookingResponseDTO,
   })
   @Post(':id/bookings/request')
   async requestBooking(
@@ -113,6 +122,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'Search results retrieved',
+    type: ItemsResponseDTO,
   })
   @Post('search')
   async searchItems(@Request() req, @Body() body: SearchItemsDTO) {
@@ -124,6 +134,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'Fetch bookings for an item',
+    type: BookingsResponseDTO,
   })
   @Get(':id/bookings')
   async getItemBookings(@Request() req, @Param('id') id: string) {
@@ -144,6 +155,7 @@ export class ItemController {
   @ApiResponse({
     status: 200,
     description: 'Check item availability',
+    type: AvailabilityResponseDTO,
   })
   @Get(':id/availability')
   async checkAvailability(
