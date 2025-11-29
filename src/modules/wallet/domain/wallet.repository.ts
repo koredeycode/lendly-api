@@ -35,4 +35,5 @@ export abstract class WalletRepository {
 
   abstract topUp(userId: string, amountCents: number): Promise<void>;
   abstract withdraw(userId: string, amountCents: number): Promise<void>;
+  abstract getTransactions(userId: string): Promise<any[]>;
 }

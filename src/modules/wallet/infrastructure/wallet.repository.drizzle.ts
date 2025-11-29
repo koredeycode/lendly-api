@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq, sql } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import { wallets, walletTransactions, walletTransactionTypeEnum } from 'src/config/db/schema';
 import { WalletRepository } from '../domain/wallet.repository';
@@ -203,5 +203,12 @@ export class DrizzleWalletRepository implements WalletRepository {
         description: 'Wallet withdrawal',
       });
     });
+  }
+  async getTransactions(userId: string) {
+    return await db
+      .select()
+      .from(walletTransactions)
+      .where(eq(walletTransactions.walletId, userId))
+      .orderBy(desc(walletTransactions.createdAt));
   }
 }

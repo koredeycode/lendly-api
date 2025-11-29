@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
@@ -13,8 +13,16 @@ export class BookingService {
     return booking;
   }
 
-  async deleteBooking(id: string) {
+  async deleteBooking(id: string, userId: string) {
+    const booking = await this.findBooking(id);
+    if (booking.borrowerId !== userId) {
+      throw new ForbiddenException('You can only delete your own bookings');
+    }
     await this.bookingRepo.deleteBooking(id);
+  }
+
+  async getUserBookings(userId: string, type: 'borrower' | 'owner') {
+    return await this.bookingRepo.getBookingsForUser(userId, type);
   }
 
   async findBookingsByItem(itemId: string) {

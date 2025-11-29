@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { bookings, bookingStatusEnum } from 'src/config/db/schema';
+import { bookings, bookingStatusEnum, items } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 import { BookingRepository } from '../domain/booking.repository';
@@ -46,9 +46,16 @@ export class DrizzleBookingRepository implements BookingRepository {
         .orderBy(desc(bookings.createdAt));
     } else {
       // Join with items to find bookings for items owned by user
-      // For now, let's assume we fetch items first or do a join
-      // Simplified:
-      return []; // TODO: implement owner bookings
+      const result = await db
+        .select({
+          booking: bookings,
+        })
+        .from(bookings)
+        .innerJoin(items, eq(bookings.itemId, items.id))
+        .where(eq(items.ownerId, userId))
+        .orderBy(desc(bookings.createdAt));
+
+      return result.map((r) => r.booking);
     }
   }
 

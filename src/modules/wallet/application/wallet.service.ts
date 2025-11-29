@@ -56,4 +56,8 @@ export class WalletService {
   async withdraw(userId: string, amountCents: number) {
     await this.walletRepo.withdraw(userId, amountCents);
   }
+
+  async getTransactions(userId: string) {
+    return await this.walletRepo.getTransactions(userId);
+  }
 }

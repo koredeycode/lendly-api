@@ -1,12 +1,14 @@
+
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Request,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
@@ -33,6 +35,21 @@ export class BookingController {
     private readonly approveBookingUseCase: ApproveBookingUseCase,
     private readonly rejectBookingUseCase: RejectBookingUseCase,
   ) {}
+
+  @ApiOperation({ summary: 'Get user bookings' })
+  @ApiResponse({
+    status: 200,
+    description: 'User bookings retrieved successfully',
+    type: [BookingResponseDTO],
+  })
+  @Get('user')
+  async getUserBookings(
+    @Request() req,
+    @Query('type') type: 'borrower' | 'owner',
+  ) {
+    const data = await this.bookingService.getUserBookings(req.user.id, type);
+    return { message: 'User bookings retrieved successfully', data };
+  }
 
   @ApiOperation({ summary: 'Get booking details' })
   @ApiResponse({
@@ -61,9 +78,9 @@ export class BookingController {
     description: 'The item has beeen successfully deleted',
   })
   @Delete(':id')
-  async deleteBooking(@Param('id') id: string) {
-    await this.bookingService.deleteBooking(id);
-    return { message: 'Item deleted successfully' };
+  async deleteBooking(@Request() req, @Param('id') id: string) {
+    await this.bookingService.deleteBooking(id, req.user.id);
+    return { message: 'Booking deleted successfully' };
   }
 
   @ApiOperation({ summary: 'Approve a booking request' })

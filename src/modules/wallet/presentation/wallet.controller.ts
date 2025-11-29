@@ -47,4 +47,15 @@ export class WalletController {
     await this.walletService.withdraw(req.user.id, body.amountCents);
     return { message: 'Funds withdrawn successfully' };
   }
+
+  @ApiOperation({ summary: 'Get wallet transactions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Wallet transactions retrieved successfully',
+  })
+  @Get('transactions')
+  async getTransactions(@Request() req) {
+    const transactions = await this.walletService.getTransactions(req.user.id);
+    return { message: 'Transactions retrieved successfully', data: transactions };
+  }
 }
