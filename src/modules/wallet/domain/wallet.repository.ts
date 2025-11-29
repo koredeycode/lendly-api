@@ -10,4 +10,23 @@ export abstract class WalletRepository {
     bookingId?: string | null;
     description?: string;
   });
+  
+  abstract holdFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null
+  ): Promise<void>;
+
+  abstract releaseFunds(
+    userId: string,
+    amountCents: number,
+    bookingId: string | null
+  ): Promise<void>;
+
+  abstract transferFunds(
+    fromUserId: string,
+    toUserId: string,
+    amountCents: number,
+    bookingId: string
+  ): Promise<void>;
 }

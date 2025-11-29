@@ -1,12 +1,12 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Request,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
@@ -15,6 +15,9 @@ import { MessageService } from 'src/modules/message/application/message.service'
 import { CreateReviewDTO } from 'src/modules/review/application/dto/create-review.dto';
 import { ReviewService } from 'src/modules/review/application/review.service';
 import { BookingService } from '../application/booking.service';
+
+import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
+import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 @ApiTags('Booking')
 @Controller('bookings')
@@ -25,6 +28,8 @@ export class BookingController {
     private readonly bookingService: BookingService,
     private readonly messageService: MessageService,
     private readonly reviewService: ReviewService,
+    private readonly approveBookingUseCase: ApproveBookingUseCase,
+    private readonly rejectBookingUseCase: RejectBookingUseCase,
   ) {}
 
   @ApiResponse({
@@ -56,14 +61,25 @@ export class BookingController {
     return { message: 'Item deleted successfully' };
   }
 
-  // @ApiResponse({
-  //   status: 201,
-  //   description: 'The booking has been accepted',
-  // })
-  // @Post(':id/accept')
-  // async acceptBookingRequest(@Param('id') id: string) {
-  //   return { message: 'Booking request submitted successfully' };
-  // }
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been accepted',
+  })
+  @Post(':id/approve')
+  async approveBookingRequest(@Request() req, @Param('id') id: string) {
+    await this.approveBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking approved successfully' };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been rejected/cancelled',
+  })
+  @Post(':id/reject')
+  async rejectBookingRequest(@Request() req, @Param('id') id: string) {
+    await this.rejectBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking rejected successfully' };
+  }
 
   @ApiResponse({
     status: 201,

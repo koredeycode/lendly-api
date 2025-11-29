@@ -39,12 +39,106 @@ export class DrizzleWalletRepository implements WalletRepository {
       await tx
         .update(wallets)
         .set({
-          balanceCents: sql`${wallets.balanceCents} + ${data.amountCents}`,
+          availableBalanceCents: sql`${wallets.availableBalanceCents} + ${data.amountCents}`,
           updatedAt: new Date(),
         })
         .where(eq(wallets.userId, data.walletId));
 
       return txRecord;
+    });
+  }
+  async holdFunds(userId: string, amountCents: number, bookingId: string | null) {
+    await db.transaction(async (tx) => {
+      const [wallet] = await tx
+        .select()
+        .from(wallets)
+        .where(eq(wallets.userId, userId))
+        .limit(1);
+
+      if (!wallet || wallet.availableBalanceCents < amountCents) {
+        throw new Error('Insufficient funds');
+      }
+
+      await tx
+        .update(wallets)
+        .set({
+          availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amountCents}`,
+          frozenBalanceCents: sql`${wallets.frozenBalanceCents} + ${amountCents}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(wallets.userId, userId));
+
+      await tx.insert(walletTransactions).values({
+        walletId: userId,
+        amountCents: -amountCents,
+        type: 'hold',
+        bookingId,
+        description: 'Funds held for booking request',
+      });
+    });
+  }
+
+  async releaseFunds(userId: string, amountCents: number, bookingId: string | null) {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(wallets)
+        .set({
+          availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
+          frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(wallets.userId, userId));
+
+      await tx.insert(walletTransactions).values({
+        walletId: userId,
+        amountCents: amountCents,
+        type: 'release',
+        bookingId,
+        description: 'Funds released from hold',
+      });
+    });
+  }
+
+  async transferFunds(
+    fromUserId: string,
+    toUserId: string,
+    amountCents: number,
+    bookingId: string,
+  ) {
+    await db.transaction(async (tx) => {
+      // Deduct from borrower (frozen)
+      await tx
+        .update(wallets)
+        .set({
+          frozenBalanceCents: sql`${wallets.frozenBalanceCents} - ${amountCents}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(wallets.userId, fromUserId));
+
+      await tx.insert(walletTransactions).values({
+        walletId: fromUserId,
+        amountCents: -amountCents,
+        type: 'rental_payment',
+        bookingId,
+        description: 'Payment for booking',
+      });
+
+      // Credit to lender (available)
+      await tx
+        .update(wallets)
+        .set({
+          availableBalanceCents: sql`${wallets.availableBalanceCents} + ${amountCents}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(wallets.userId, toUserId));
+
+      await tx.insert(walletTransactions).values({
+        walletId: toUserId,
+        amountCents: amountCents,
+        type: 'rental_receive',
+        bookingId,
+        description: 'Payment received for booking',
+      });
     });
   }
 }

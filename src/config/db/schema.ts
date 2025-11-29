@@ -3,21 +3,21 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import {
-    bigint,
-    boolean,
-    geometry,
-    index,
-    integer,
-    pgEnum,
-    pgTable,
-    primaryKey,
-    smallint,
-    text,
-    timestamp,
-    unique,
-    uniqueIndex,
-    uuid,
-    varchar,
+  bigint,
+  boolean,
+  geometry,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  smallint,
+  text,
+  timestamp,
+  unique,
+  uniqueIndex,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 // ======================= ENUMS =======================
@@ -47,6 +47,8 @@ export const walletTransactionTypeEnum = pgEnum("wallet_transaction_type", [
   "tip_receive", // lender receives tip
   "refund", // cancelled booking, dispute, etc.
   "withdrawal", // cash out to bank (future)
+  "hold", // funds moved from available to frozen (booking request)
+  "release", // funds moved back from frozen to available (booking rejected/cancelled)
 ]);
 
 // ======================= USERS =======================
@@ -90,7 +92,10 @@ export const wallets = pgTable("wallets", {
   userId: uuid("user_id")
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
-  balanceCents: bigint("balance_cents", { mode: "number" })
+  availableBalanceCents: bigint("available_balance_cents", { mode: "number" })
+    .default(0)
+    .notNull(),
+  frozenBalanceCents: bigint("frozen_balance_cents", { mode: "number" })
     .default(0)
     .notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

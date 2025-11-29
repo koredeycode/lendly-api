@@ -21,6 +21,6 @@ import { WalletController } from './wallet.controller';
       useClass: DrizzleWalletRepository,
     },
   ],
-  exports: [WalletRepository],
+  exports: [WalletRepository, WalletService],
 })
 export class WalletModule {}
