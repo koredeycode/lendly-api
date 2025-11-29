@@ -1,0 +1,66 @@
+/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/scripts/seed.ts(57,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { name: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; ... 12 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type '0 | SQL<unknown> | 100 | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { name: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; ... 12 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'email' does not exist in type '{ name: string | SQL<unknown> | Placeholder<string, any>; email: string | SQL<unknown> | Placeholder<string, any>; id?: string | SQL<unknown> | Placeholder<string, any> | undefined; ... 12 more ...; updatedAt?: SQL<...> | ... 2 more ... | undefined; }[]'.
+src/scripts/seed.ts(69,25): error TS2345: Argument of type '{ id: string; name: string; email: string; passwordHash: string | null; avatarUrl: string | null; bio: string | null; phone: string | null; phoneVerified: boolean | null; oauthProvider: string | null; ... 6 more ...; updatedAt: Date; }' is not assignable to parameter of type 'never'.
+src/scripts/seed.ts(77,22): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(84,24): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(101,52): error TS2322: Type 'string' is not assignable to type 'never'.
+src/scripts/seed.ts(102,51): error TS2322: Type 'string' is not assignable to type 'never'.
+src/scripts/seed.ts(103,53): error TS2322: Type 'string' is not assignable to type 'never'.
+src/scripts/seed.ts(104,51): error TS2322: Type 'string' is not assignable to type 'never'.
+src/scripts/seed.ts(105,25): error TS2322: Type 'string' is not assignable to type 'never'.
+src/scripts/seed.ts(109,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { ownerId: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<string, any>; category: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; deletedAt?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string' is not assignable to type 'SQL<unknown> | Placeholder<string, any> | [number, number]'.
+  Overload 2 of 2, '(values: { ownerId: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<string, any>; category: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; deletedAt?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'ownerId' does not exist in type '{ ownerId: string | SQL<unknown> | Placeholder<string, any>; title: string | SQL<unknown> | Placeholder<string, any>; category: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; deletedAt?: SQL<...> | ... 3 more ... | undefined; }[]'.
+src/scripts/seed.ts(110,26): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(122,25): error TS2345: Argument of type '{ id: string; createdAt: Date; updatedAt: Date; description: string | null; ownerId: string; title: string; category: string; photos: string[]; isPermanentGive: boolean | null; isAvailable: boolean; ... 4 more ...; deletedAt: Date | null; }' is not assignable to parameter of type 'never'.
+src/scripts/seed.ts(131,78): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(131,90): error TS2339: Property 'ownerId' does not exist on type 'never'.
+src/scripts/seed.ts(147,35): error TS2339: Property 'dailyRentalPriceCents' does not exist on type 'never'.
+src/scripts/seed.ts(152,24): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(153,32): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(161,28): error TS2345: Argument of type '{ id: string; createdAt: Date; updatedAt: Date; itemId: string; borrowerId: string; status: "pending" | "accepted" | "picked_up" | "returned" | "completed" | "cancelled" | "overdue"; ... 5 more ...; actualReturnedAt: Date | null; }' is not assignable to parameter of type 'never'.
+src/scripts/seed.ts(167,30): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(171,51): error TS2339: Property 'title' does not exist on type 'never'.
+src/scripts/seed.ts(176,26): error TS2339: Property 'ownerId' does not exist on type 'never'.
+src/scripts/seed.ts(180,50): error TS2339: Property 'title' does not exist on type 'never'.
+src/scripts/seed.ts(188,61): error TS2339: Property 'status' does not exist on type 'never'.
+src/scripts/seed.ts(190,45): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(190,60): error TS2339: Property 'itemId' does not exist on type 'never'.
+src/scripts/seed.ts(194,28): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(195,29): error TS2339: Property 'borrowerId' does not exist on type 'never'.
+src/scripts/seed.ts(196,21): error TS18048: 'item' is possibly 'undefined'.
+src/scripts/seed.ts(206,45): error TS2339: Property 'id' does not exist on type 'never'.
+src/scripts/seed.ts(206,60): error TS2339: Property 'itemId' does not exist on type 'never'.
+src/scripts/seed.ts(210,61): error TS2339: Property 'borrowerId' does not exist on type 'never'.
+src/scripts/seed.ts(210,74): error TS18048: 'item' is possibly 'undefined'.
+src/scripts/seed.ts(213,30): error TS2339: Property 'id' does not exist on type 'never'.
+
+    at createTSError (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1893:10
+    at Object.require.extensions.<computed> [as .ts] (/home/yusufakoredey/Desktop/lendly/lendly-api/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14) {
+  diagnosticCodes: [
+    2769,  2345,  2339, 2339, 2322,
+    2322,  2322,  2322, 2322, 2769,
+    2339,  2345,  2339, 2339, 2339,
+    2339,  2339,  2345, 2339, 2339,
+    2339,  2339,  2339, 2339, 2339,
+    2339,  2339, 18048, 2339, 2339,
+    2339, 18048,  2339
+  ]
+}
