@@ -30,6 +30,6 @@ import { RejectBookingUseCase } from '../application/reject-booking.usecase';
     MessageService,
     ReviewService,
   ],
-  exports: [BookingRepository],
+  exports: [BookingRepository, BookingService, CreateBookingUseCase],
 })
 export class BookingModule {}

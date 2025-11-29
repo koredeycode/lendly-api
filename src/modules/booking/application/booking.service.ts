@@ -16,4 +16,12 @@ export class BookingService {
   async deleteBooking(id: string) {
     await this.bookingRepo.deleteBooking(id);
   }
+
+  async findBookingsByItem(itemId: string) {
+    return await this.bookingRepo.findBookingsByItem(itemId);
+  }
+
+  async checkAvailability(itemId: string, from: Date, to: Date) {
+    return await this.bookingRepo.checkAvailability(itemId, from, to);
+  }
 }

@@ -6,11 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
+import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
 import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-booking.dto';
 import { CreateItemUseCase } from '../application/create-item.usecase';
@@ -32,6 +34,7 @@ export class ItemController {
     private readonly updateItemUseCase: UpdateItemUseCase,
     private readonly deleteItemUseCase: DeleteItemUseCase,
     private readonly createBookingUseCase: CreateBookingUseCase,
+    private readonly bookingService: BookingService,
   ) {}
 
   @ApiResponse({
@@ -108,5 +111,35 @@ export class ItemController {
     // use req.user.id
     const data = await this.itemService.searchItems(body);
     return { message: 'Search query run successfully', data };
+  }
+  @ApiResponse({
+    status: 200,
+    description: 'Fetch bookings for an item',
+  })
+  @Get(':id/bookings')
+  async getItemBookings(@Param('id') id: string) {
+    const data = await this.bookingService.findBookingsByItem(id);
+    return { message: 'Bookings retrieved successfully', data };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Check item availability',
+  })
+  @Get(':id/availability')
+  async checkAvailability(
+    @Param('id') id: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    const isAvailable = await this.bookingService.checkAvailability(
+      id,
+      new Date(from),
+      new Date(to),
+    );
+    return {
+      message: 'Availability checked successfully',
+      data: { isAvailable },
+    };
   }
 }

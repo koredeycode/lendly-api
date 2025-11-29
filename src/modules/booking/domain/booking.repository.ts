@@ -14,5 +14,14 @@ export abstract class BookingRepository {
     bookingId: string,
     status: (typeof bookingStatusEnum.enumValues)[number],
   ): Promise<Booking>;
+  abstract findBookingsByItem(
+    itemId: string,
+    status?: string,
+  ): Promise<Booking[]>;
+  abstract checkAvailability(
+    itemId: string,
+    from: Date,
+    to: Date,
+  ): Promise<boolean>;
   abstract deleteBooking(id: string): Promise<void>;
 }

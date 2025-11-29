@@ -95,4 +95,45 @@ export class DrizzleBookingRepository implements BookingRepository {
       .returning();
     return booking;
   }
+  async findBookingsByItem(itemId: string, status?: any) {
+    const query = db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.itemId, itemId))
+      .orderBy(desc(bookings.createdAt));
+
+    if (status) {
+      // If status is provided, we filter by it.
+      // However, drizzle's where clause needs to be composed differently if we want to add conditions dynamically.
+      // Let's rewrite this slightly.
+      return await db
+        .select()
+        .from(bookings)
+        .where(
+          status
+            ? sql`${bookings.itemId} = ${itemId} AND ${bookings.status} = ${status}`
+            : eq(bookings.itemId, itemId),
+        )
+        .orderBy(desc(bookings.createdAt));
+    }
+
+    return await query;
+  }
+
+  async checkAvailability(itemId: string, from: Date, to: Date) {
+    // Check if there are any overlapping bookings that are accepted or picked_up
+    // Overlap logic: (StartA <= EndB) and (EndA >= StartB)
+    const [result] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(bookings)
+      .where(
+        sql`
+          ${bookings.itemId} = ${itemId}
+          AND ${bookings.status} IN ('accepted', 'picked_up')
+          AND tstzrange(${bookings.requestedFrom}, ${bookings.requestedTo}, '[)') && tstzrange(${from}, ${to}, '[)')
+        `,
+      );
+
+    return result.count === 0;
+  }
 }

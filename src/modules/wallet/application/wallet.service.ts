@@ -5,10 +5,12 @@ import { WalletRepository } from '../domain/wallet.repository';
 export class WalletService {
   constructor(private readonly walletRepo: WalletRepository) {}
 
-  async getWallet(id: string) {
-    const wallet = await this.walletRepo.getWallet(id);
-    // return wallet;
-    return { balance: 'money' };
+  async getWallet(userId: string) {
+    let wallet = await this.walletRepo.getWallet(userId);
+    if (!wallet) {
+      wallet = await this.walletRepo.createWalletIfNotExists(userId);
+    }
+    return wallet;
   }
   async holdFunds(userId: string, amountCents: number, bookingId: string | null) {
     await this.walletRepo.holdFunds(userId, amountCents, bookingId);
