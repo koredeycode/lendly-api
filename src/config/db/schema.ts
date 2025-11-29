@@ -3,21 +3,21 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import {
-  bigint,
-  boolean,
-  geometry,
-  index,
-  integer,
-  pgEnum,
-  pgTable,
-  primaryKey,
-  smallint,
-  text,
-  timestamp,
-  unique,
-  uniqueIndex,
-  uuid,
-  varchar,
+    bigint,
+    boolean,
+    geometry,
+    index,
+    integer,
+    pgEnum,
+    pgTable,
+    primaryKey,
+    smallint,
+    text,
+    timestamp,
+    unique,
+    uniqueIndex,
+    uuid,
+    varchar,
 } from "drizzle-orm/pg-core";
 
 // ======================= ENUMS =======================
@@ -331,3 +331,50 @@ export type ChatMessage = InferSelectModel<typeof chatMessages>;
 export type NewChatMessage = InferInsertModel<typeof chatMessages>;
 export type Wallet = InferSelectModel<typeof wallets>;
 export type WalletTransaction = InferSelectModel<typeof walletTransactions>;
+
+// ======================= PAYMENTS =======================
+export const paymentProviderEnum = pgEnum("payment_provider", [
+  "stripe",
+  "paystack",
+  "flutterwave",
+  "monnify",
+]);
+
+export const paymentTypeEnum = pgEnum("payment_type", [
+  "deposit",
+  "withdrawal",
+]);
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "success",
+  "failed",
+]);
+
+export const paymentTransactions = pgTable(
+  "payment_transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    amountCents: bigint("amount_cents", { mode: "number" }).notNull(),
+    currency: text("currency").default("NGN").notNull(),
+    provider: paymentProviderEnum("provider").notNull(),
+    type: paymentTypeEnum("type").notNull(),
+    status: paymentStatusEnum("status").default("pending").notNull(),
+    reference: text("reference").unique(), // Provider's reference
+    externalId: text("external_id"), // Provider's internal ID if different
+    metadata: text("metadata").default("{}"), // JSON stringified
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("idx_payment_tx_user").on(t.userId),
+    index("idx_payment_tx_ref").on(t.reference),
+    index("idx_payment_tx_status").on(t.status),
+  ]
+);
+
+export type PaymentTransaction = InferSelectModel<typeof paymentTransactions>;
+export type NewPaymentTransaction = InferInsertModel<typeof paymentTransactions>;

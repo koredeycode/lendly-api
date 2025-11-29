@@ -15,6 +15,7 @@ import { HealthModule } from './modules/health/presentation/health.module';
 import { ItemModule } from './modules/item/presentation/item.module';
 import { JobsModule } from './modules/jobs/presentation/job.module';
 import { MessageModule } from './modules/message/presentation/message.module';
+import { PaymentModule } from './modules/payment/presentation/payment.module';
 import { QueueMonitorModule } from './modules/queue-monitor/queue-monitor.module';
 import { ReviewModule } from './modules/review/presentation/review.module';
 import { UserModule } from './modules/user/presentation/user.module';
@@ -75,6 +76,7 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     MessageModule,
     ReviewModule,
     HealthModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [
