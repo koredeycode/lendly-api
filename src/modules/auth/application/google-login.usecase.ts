@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
+import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { GoogleUserDTO } from './dto/google-user.dto';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class GoogleLoginUseCase {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly walletService: WalletService,
   ) {}
 
   async execute(dto: GoogleUserDTO) {
@@ -24,6 +26,9 @@ export class GoogleLoginUseCase {
         oauthProvider: dto.oauthProvider || 'google',
         oauthId: dto.oauthId,
       });
+
+      // Create wallet for new user
+      await this.walletService.createWallet(user.id);
     }
 
     const payload = { sub: user.id, email: user.email };

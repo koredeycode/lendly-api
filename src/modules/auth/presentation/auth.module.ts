@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { UserModule } from 'src/modules/user/presentation/user.module';
+import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
 import { GoogleLoginUseCase } from '../application/google-login.usecase';
 import { LoginUseCase } from '../application/login.usecase';
 import { ProfileUseCase } from '../application/profile.usecase';
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     }),
     JobsModule,
     UserModule,
+    WalletModule,
   ],
   controllers: [AuthController],
   providers: [

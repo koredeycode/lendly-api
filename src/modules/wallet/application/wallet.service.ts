@@ -6,11 +6,15 @@ export class WalletService {
   constructor(private readonly walletRepo: WalletRepository) {}
 
   async getWallet(userId: string) {
-    let wallet = await this.walletRepo.getWallet(userId);
-    if (!wallet) {
-      wallet = await this.walletRepo.createWalletIfNotExists(userId);
-    }
+    const wallet = await this.walletRepo.getWallet(userId);
+    // if (!wallet) {
+    //   wallet = await this.walletRepo.createWalletIfNotExists(userId);
+    // }
     return wallet;
+  }
+
+  async createWallet(userId: string) {
+    return await this.walletRepo.createWalletIfNotExists(userId);
   }
   async holdFunds(userId: string, amountCents: number, bookingId: string | null) {
     await this.walletRepo.holdFunds(userId, amountCents, bookingId);
