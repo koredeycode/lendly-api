@@ -17,6 +17,7 @@ import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 import { UserModule } from 'src/modules/user/presentation/user.module';
 
+
 @Module({
   imports: [
     JobsModule,
@@ -25,6 +26,7 @@ import { UserModule } from 'src/modules/user/presentation/user.module';
     WalletModule,
     forwardRef(() => ItemModule),
     forwardRef(() => UserModule),
+
   ],
   controllers: [BookingController],
   providers: [
@@ -38,6 +40,7 @@ import { UserModule } from 'src/modules/user/presentation/user.module';
     },
     MessageService,
     ReviewService,
+
   ],
   exports: [BookingRepository, BookingService, CreateBookingUseCase],
 })

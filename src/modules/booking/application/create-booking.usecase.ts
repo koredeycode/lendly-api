@@ -74,12 +74,24 @@ export class CreateBookingUseCase {
             );
           }
 
+          const startDate = new Date(data.requestedFrom).toLocaleDateString();
+          const endDate = new Date(data.requestedTo).toLocaleDateString();
+          // Calculate total price
+          const totalPrice = (totalAmount / 100).toLocaleString('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+          }); 
+
           await this.emailJobService.sendBookingRequestedEmail({
             email: owner.email,
             ownerName: owner.name,
             borrowerName: borrower.name,
             itemName: item.title,
+            startDate,
+            endDate,
+            totalPrice,
             message: data.message,
+            bookingUrl: `https://lendly.app/bookings/${booking.id}`,
           });
         }
 
