@@ -179,7 +179,9 @@ export class DrizzleWalletRepository implements WalletRepository {
     const toWallet = await this.getWallet(toUserId);
 
     if (!fromWallet || !toWallet) {
-      throw new NotFoundException('One or both wallets not found during transfer');
+      throw new NotFoundException(
+        'One or both wallets not found during transfer',
+      );
     }
 
     await this.addWalletTransaction({

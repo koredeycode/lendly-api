@@ -1,14 +1,16 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   Request,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -34,6 +36,7 @@ import {
   ItemsResponseDTO,
 } from '../application/dto/item-response.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
+import { UpdateItemDTO } from '../application/dto/update-item.dto';
 import { ItemService } from '../application/item.service';
 import { UpdateItemUseCase } from '../application/update-item.usecase';
 
@@ -76,6 +79,36 @@ export class ItemController {
   ) {
     const data = await this.createItemUseCase.execute(req.user.id, body);
     return { message: 'Item created successfully', data };
+  }
+
+  @ApiOperation({ summary: 'Update an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'The item has been successfully updated',
+    type: ItemResponseDTO,
+  })
+  @Put(':id')
+  async updateItem(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: UpdateItemDTO,
+  ) {
+    await this.updateItemUseCase.execute(req.user.id, id, body);
+    return { message: 'Item updated successfully' };
+  }
+
+  @ApiOperation({ summary: 'Delete an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'The item has been successfully deleted',
+  })
+  @Delete(':id')
+  async deleteItem(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.deleteItemUseCase.execute(req.user.id, id);
+    return { message: 'Item deleted successfully' };
   }
 
   @ApiOperation({ summary: 'Request a booking for an item' })
