@@ -123,6 +123,24 @@ export const walletTransactions = pgTable(
   ],
 );
 
+export const itemCategoryEnum = pgEnum('item_category', [
+  'electronics',
+  'tools',
+  'clothing',
+  'books',
+  'sports_outdoors',
+  'home_garden',
+  'toys_games',
+  'automotive',
+  'baby_kids',
+  'health_beauty',
+  'musical_instruments',
+  'office_supplies',
+  'pet_supplies',
+  'art_collectibles',
+  'others',
+]);
+
 // ======================= ITEMS =======================
 export const items = pgTable(
   'items',
@@ -133,7 +151,7 @@ export const items = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     title: text('title').notNull(),
     description: text('description'),
-    category: text('category').notNull(),
+    category: itemCategoryEnum('category').notNull(),
     photos: text('photos')
       .array()
       .notNull()

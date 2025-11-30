@@ -15,6 +15,13 @@
       "when": 1764380478484,
       "tag": "0001_ancient_outlaw_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764495829361,
+      "tag": "0002_wild_scream",
+      "breakpoints": true
     }
   ]
 }

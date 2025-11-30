@@ -1,14 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  IsArray,
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
+    ArrayMaxSize,
+    ArrayMinSize,
+    IsArray,
+    IsBoolean,
+    IsEnum,
+    IsInt,
+    IsOptional,
+    IsString,
+    Min,
 } from 'class-validator';
+import { itemCategoryEnum } from 'src/config/db/schema';
 
 export class UpdateItemDTO {
   @ApiProperty({
@@ -20,10 +22,11 @@ export class UpdateItemDTO {
 
   @ApiPropertyOptional({
     description: 'An optional category for the item',
-    example: 'Clothes',
+    example: 'clothing',
+    enum: itemCategoryEnum.enumValues,
   })
   @IsOptional()
-  @IsString()
+  @IsEnum(itemCategoryEnum.enumValues)
   category?: string;
 
   @ApiProperty({

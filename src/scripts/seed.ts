@@ -80,7 +80,7 @@ const SEED_ITEMS = [
     ownerIndex: 0,
     title: 'Canon EOS R5 Camera',
     description: 'Professional grade mirrorless camera. Perfect for photo shoots and video projects. Comes with a 24-70mm lens.',
-    category: 'Electronics',
+    category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=800&q=80',
@@ -92,7 +92,7 @@ const SEED_ITEMS = [
     ownerIndex: 0,
     title: 'MacBook Pro M1 16"',
     description: 'High performance laptop for editing and coding. M1 Max chip, 32GB RAM.',
-    category: 'Electronics',
+    category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=800&q=80',
@@ -103,7 +103,7 @@ const SEED_ITEMS = [
     ownerIndex: 0,
     title: 'Cordless Power Drill Set',
     description: 'DeWalt cordless drill with two batteries and a set of drill bits. Great for home projects.',
-    category: 'Tools',
+    category: 'tools',
     photos: [
       'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80',
     ],
@@ -115,7 +115,7 @@ const SEED_ITEMS = [
     ownerIndex: 1,
     title: 'Harry Potter Box Set',
     description: 'Complete set of Harry Potter books. Hardcover edition. Great condition.',
-    category: 'Books',
+    category: 'books',
     photos: [
       'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=800&q=80',
     ],
@@ -126,7 +126,7 @@ const SEED_ITEMS = [
     ownerIndex: 1,
     title: 'Gardening Tool Kit',
     description: 'Includes shovel, rake, pruning shears, and gloves. Everything you need for your garden.',
-    category: 'Home & Garden',
+    category: 'home_garden',
     photos: [
       'https://images.unsplash.com/photo-1617576683096-00fc8eecb3af?auto=format&fit=crop&w=800&q=80',
     ],
@@ -136,7 +136,7 @@ const SEED_ITEMS = [
     ownerIndex: 1,
     title: '2-Person Camping Tent',
     description: 'Lightweight and easy to set up. Perfect for a weekend getaway.',
-    category: 'Sports',
+    category: 'sports_outdoors',
     photos: [
       'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80',
     ],
@@ -148,7 +148,7 @@ const SEED_ITEMS = [
     ownerIndex: 2,
     title: 'Heavy Duty Ladder',
     description: 'Extension ladder, reaches up to 20 feet. Sturdy and safe.',
-    category: 'Tools',
+    category: 'tools',
     photos: [
       'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80', // Placeholder for ladder
     ],
@@ -158,7 +158,7 @@ const SEED_ITEMS = [
     ownerIndex: 2,
     title: 'Circular Saw',
     description: 'Electric circular saw for cutting wood. Safety goggles included.',
-    category: 'Tools',
+    category: 'tools',
     photos: [
       'https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?auto=format&fit=crop&w=800&q=80',
     ],
@@ -170,7 +170,7 @@ const SEED_ITEMS = [
     ownerIndex: 3,
     title: 'GoPro Hero 9',
     description: 'Action camera for capturing your adventures. Waterproof and 4K video.',
-    category: 'Electronics',
+    category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=800&q=80',
     ],
@@ -180,7 +180,7 @@ const SEED_ITEMS = [
     ownerIndex: 3,
     title: 'DJI Mini 2 Drone',
     description: 'Compact drone with 4K camera. Easy to fly and great for aerial shots.',
-    category: 'Electronics',
+    category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&w=800&q=80',
     ],
@@ -192,7 +192,7 @@ const SEED_ITEMS = [
     ownerIndex: 4,
     title: 'Designer Handbag',
     description: 'Luxury handbag for special occasions. Authentic and in pristine condition.',
-    category: 'Fashion',
+    category: 'clothing',
     photos: [
       'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
     ],
@@ -202,7 +202,7 @@ const SEED_ITEMS = [
     ownerIndex: 4,
     title: 'Yoga Mat & Blocks',
     description: 'High quality yoga mat with two foam blocks. Clean and sanitized.',
-    category: 'Sports',
+    category: 'sports_outdoors',
     photos: [
       'https://images.unsplash.com/photo-1592432678016-e910b452f9a9?auto=format&fit=crop&w=800&q=80',
     ],
@@ -295,7 +295,7 @@ async function main() {
           ownerId: owner.id,
           title: itemData.title,
           description: itemData.description,
-          category: itemData.category,
+          category: itemData.category as any,
           photos: itemData.photos,
           isPermanentGive: itemData.isPermanentGive || false,
           isAvailable: true,

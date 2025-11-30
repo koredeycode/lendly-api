@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsBoolean,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
+    IsBoolean,
+    IsEnum,
+    IsInt,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Min,
 } from 'class-validator';
+import { itemCategoryEnum } from 'src/config/db/schema';
 
 export class SearchItemsDTO {
   @ApiProperty({
@@ -35,9 +37,10 @@ export class SearchItemsDTO {
 
   @ApiProperty({
     description: 'The item category',
-    example: 'clothes',
+    example: 'clothing',
+    enum: itemCategoryEnum.enumValues,
   })
-  @IsString()
+  @IsEnum(itemCategoryEnum.enumValues)
   @IsOptional()
   category?: string;
 

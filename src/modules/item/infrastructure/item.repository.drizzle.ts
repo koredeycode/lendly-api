@@ -23,6 +23,7 @@ export class DrizzleItemRepository implements ItemRepository {
         ...rest,
         location,
         ownerId,
+        category: rest.category as any,
       })
       .returning();
     return item;
@@ -96,7 +97,7 @@ export class DrizzleItemRepository implements ItemRepository {
           isNull(items.deletedAt),
           onlyAvailable ? eq(items.isAvailable, true) : undefined,
           onlyFree ? eq(items.dailyRentalPriceCents, 0) : undefined,
-          category ? eq(items.category, category) : undefined,
+          category ? eq(items.category, category as any) : undefined,
           search
             ? sql`to_tsvector('english', ${items.title} || ' ' || ${items.description}) @@ plainto_tsquery('english', ${search})`
             : undefined,
@@ -129,7 +130,7 @@ export class DrizzleItemRepository implements ItemRepository {
     // }
     const [item] = await this.db
       .update(items)
-      .set({ ...updatedData })
+      .set({ ...updatedData, category: updatedData.category as any })
       .where(eq(items.id, id))
       .returning();
     return item;
