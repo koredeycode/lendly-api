@@ -1,6 +1,7 @@
-// booking-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { ItemDataDTO } from '../../../item/application/dto/item-response.dto';
+import { UserDataDTO } from '../../../user/application/dto/user-response.dto';
 
 export class BookingDataDTO {
   @ApiProperty({
@@ -65,6 +66,14 @@ export class BookingDataDTO {
   })
   @Expose()
   updatedAt: Date;
+
+  @ApiProperty({ type: ItemDataDTO })
+  @Expose()
+  item: ItemDataDTO;
+
+  @ApiProperty({ type: UserDataDTO })
+  @Expose()
+  borrower: UserDataDTO;
 }
 
 export class BookingResponseDTO {

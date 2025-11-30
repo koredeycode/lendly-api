@@ -25,7 +25,7 @@ export class BookingService {
     await this.bookingRepo.deleteBooking(id);
   }
 
-  async getUserBookings(userId: string, type: 'borrower' | 'owner') {
+  async getUserBookings(userId: string, type?: 'borrower' | 'owner') {
     return await this.bookingRepo.getBookingsForUser(userId, type);
   }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { desc, eq, sql } from 'drizzle-orm';
+import { aliasedTable, desc, eq, or, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { bookings, bookingStatusEnum, items } from 'src/config/db/schema';
+import { bookings, bookingStatusEnum, items, users } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 import { BookingRepository } from '../domain/booking.repository';
@@ -29,34 +29,73 @@ export class DrizzleBookingRepository implements BookingRepository {
   }
 
   async findBookingById(id: string) {
+    const owner = aliasedTable(users, 'owner');
+    const borrower = aliasedTable(users, 'borrower');
+
     const result = await db
-      .select()
+      .select({
+        booking: bookings,
+        item: items,
+        owner: owner,
+        borrower: borrower,
+      })
       .from(bookings)
+      .innerJoin(items, eq(bookings.itemId, items.id))
+      .innerJoin(owner, eq(items.ownerId, owner.id))
+      .innerJoin(borrower, eq(bookings.borrowerId, borrower.id))
       .where(eq(bookings.id, id))
       .limit(1);
-    return result[0] ?? null;
+
+    if (result.length === 0) return null;
+
+    const row = result[0];
+    return {
+      ...row.booking,
+      item: {
+        ...row.item,
+        owner: row.owner,
+      },
+      borrower: row.borrower,
+    };
   }
 
-  async getBookingsForUser(userId: string, type: 'borrower' | 'owner') {
-    if (type === 'borrower') {
-      return await db
-        .select()
-        .from(bookings)
-        .where(eq(bookings.borrowerId, userId))
-        .orderBy(desc(bookings.createdAt));
-    } else {
-      // Join with items to find bookings for items owned by user
-      const result = await db
-        .select({
-          booking: bookings,
-        })
-        .from(bookings)
-        .innerJoin(items, eq(bookings.itemId, items.id))
-        .where(eq(items.ownerId, userId))
-        .orderBy(desc(bookings.createdAt));
+  async getBookingsForUser(userId: string, type?: 'borrower' | 'owner') {
+    const owner = aliasedTable(users, 'owner');
+    const borrower = aliasedTable(users, 'borrower');
 
-      return result.map((r) => r.booking);
+    const query = db
+      .select({
+        booking: bookings,
+        item: items,
+        owner: owner,
+        borrower: borrower,
+      })
+      .from(bookings)
+      .innerJoin(items, eq(bookings.itemId, items.id))
+      .innerJoin(owner, eq(items.ownerId, owner.id))
+      .innerJoin(borrower, eq(bookings.borrowerId, borrower.id))
+      .orderBy(desc(bookings.createdAt));
+
+    if (type === 'borrower') {
+      query.where(eq(bookings.borrowerId, userId));
+    } else if (type === 'owner') {
+      query.where(eq(items.ownerId, userId));
+    } else {
+      query.where(
+        or(eq(bookings.borrowerId, userId), eq(items.ownerId, userId)),
+      );
     }
+
+    const result = await query;
+
+    return result.map((row) => ({
+      ...row.booking,
+      item: {
+        ...row.item,
+        owner: row.owner,
+      },
+      borrower: row.borrower,
+    }));
   }
 
   async deleteBooking(id: string) {

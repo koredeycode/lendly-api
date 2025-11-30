@@ -24,6 +24,13 @@ export class ProfileDataDTO {
   })
   @Expose()
   email: string;
+
+  @ApiProperty({
+    description: 'User avatar URL',
+    example: 'https://example.com/avatar.jpg',
+  })
+  @Expose()
+  avatarUrl: string;
 }
 
 export class ProfileResponseDTO {

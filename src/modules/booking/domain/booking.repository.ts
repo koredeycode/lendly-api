@@ -1,5 +1,10 @@
-import { Booking, bookingStatusEnum } from 'src/config/db/schema';
+import { Booking, bookingStatusEnum, Item, User } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
+
+export type BookingWithDetails = Booking & {
+  item: Item & { owner: User };
+  borrower: User;
+};
 
 export abstract class BookingRepository {
   abstract createBooking(
@@ -8,8 +13,11 @@ export abstract class BookingRepository {
     data: CreateBookingDTO,
     tx?: any,
   ): Promise<Booking>;
-  abstract findBookingById(id: string): Promise<Booking | null>;
-  abstract getBookingsForUser(userId, type: string): Promise<Booking[]>;
+  abstract findBookingById(id: string): Promise<BookingWithDetails | null>;
+  abstract getBookingsForUser(
+    userId: string,
+    type?: string,
+  ): Promise<BookingWithDetails[]>;
   abstract acceptBooking(
     id: string,
     tipAmount?: number,

@@ -90,7 +90,13 @@ export class AuthController {
   })
   @ApiBearerAuth()
   async profile(@Request() req: AuthenticatedRequest) {
-    const data = await this.profileUseCase.execute(req.user.id);
+    const user = await this.profileUseCase.execute(req.user.id);
+    const data = {
+      id: user!.id,
+      name: user!.name,
+      email: user!.email,
+      avatarUrl: user!.avatarUrl,
+    };
 
     return { message: 'Profile retrieved successfully', data };
   }

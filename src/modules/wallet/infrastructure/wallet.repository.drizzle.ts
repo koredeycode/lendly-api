@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import {
@@ -76,7 +80,7 @@ export class DrizzleWalletRepository implements WalletRepository {
       .limit(1);
 
     if (!wallet || wallet.availableBalanceCents < amountCents) {
-      throw new Error('Insufficient funds');
+      throw new BadRequestException('Insufficient funds');
     }
 
     console.log('Wallet found', wallet);
@@ -114,7 +118,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     const database = tx || db;
     const wallet = await this.getWallet(userId);
     if (!wallet) {
-      throw new Error('Wallet not found');
+      throw new NotFoundException('Wallet not found');
     }
 
     await database
@@ -166,7 +170,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     const toWallet = await this.getWallet(toUserId);
 
     if (!fromWallet || !toWallet) {
-      throw new Error('One or both wallets not found during transfer');
+      throw new NotFoundException('One or both wallets not found during transfer');
     }
 
     await this.addWalletTransaction({
@@ -208,7 +212,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     await db.transaction(async (tx) => {
       const wallet = await this.getWallet(userId);
       if (wallet.availableBalanceCents < amountCents) {
-        throw new Error('Insufficient funds');
+        throw new BadRequestException('Insufficient funds');
       }
 
       await tx

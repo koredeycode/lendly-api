@@ -6,9 +6,8 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Request,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -74,11 +73,8 @@ export class UserController {
     type: [BookingResponseDTO],
   })
   @Get('/bookings')
-  async getUserBookings(
-    @Request() req: AuthenticatedRequest,
-    @Query('type') type: 'borrower' | 'owner',
-  ) {
-    const data = await this.bookingService.getUserBookings(req.user.id, type);
+  async getUserBookings(@Request() req: AuthenticatedRequest) {
+    const data = await this.bookingService.getUserBookings(req.user.id);
     return { message: 'User bookings retrieved successfully', data };
   }
 

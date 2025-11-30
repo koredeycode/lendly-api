@@ -26,7 +26,7 @@ export class SignupUseCase {
     // Create new user
     const user = await this.userRepo.createUser(
       {
-        name: dto.email,
+        name: dto.name,
         email: dto.email,
         password: '',
       },
