@@ -38,4 +38,10 @@ export abstract class BookingRepository {
     to: Date,
   ): Promise<boolean>;
   abstract deleteBooking(id: string): Promise<void>;
+  abstract createChatMessage(
+    bookingId: string,
+    senderId: string,
+    message: string,
+    tx?: any,
+  ): Promise<void>;
 }

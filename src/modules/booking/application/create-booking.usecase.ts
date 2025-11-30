@@ -53,11 +53,30 @@ export class CreateBookingUseCase {
         const borrower = await this.userRepo.findUserById(borrowerId);
 
         if (owner && borrower) {
+          // 4. Create chat message if provided
+          if (data.message) {
+            await this.bookingRepo.createChatMessage(
+              booking.id,
+              borrowerId,
+              data.message,
+              // Note: Chat message creation is outside the transaction to avoid locking issues if possible, 
+              // or we can pass tx if we want it atomic. 
+              // Since the method signature in repo supports tx, let's pass it if we were inside transaction block.
+              // BUT we are inside the try/catch block which is AFTER the transaction committed?
+              // Wait, line 23 `db.transaction` wraps everything.
+              // So we are inside the transaction.
+              // However, the `bookingRepo.createChatMessage` implementation I added accepts `tx`.
+              // Let's pass `tx` to ensure atomicity.
+              tx
+            );
+          }
+
           await this.emailJobService.sendBookingRequestedEmail({
             email: owner.email,
             ownerName: owner.name,
             borrowerName: borrower.name,
             itemName: item.title,
+            message: data.message,
           });
         }
 

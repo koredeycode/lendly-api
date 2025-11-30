@@ -31,9 +31,10 @@ export class EmailProcessor {
     ownerName: string;
     borrowerName: string;
     itemName: string;
+    message?: string;
   }) {
     console.log(
-      `[EmailProcessor] Sending booking requested email to owner ${data.email}. Borrower: ${data.borrowerName}, Item: ${data.itemName}`,
+      `[EmailProcessor] Sending booking requested email to owner ${data.email}. Borrower: ${data.borrowerName}, Item: ${data.itemName}${data.message ? `, Message: ${data.message}` : ''}`,
     );
   }
 

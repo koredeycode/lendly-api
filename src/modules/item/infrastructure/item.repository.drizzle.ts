@@ -76,8 +76,17 @@ export class DrizzleItemRepository implements ItemRepository {
       //   ST_Point(${lng}, ${lat})::geography
       // ) / 1000`,
       // }
-      .select()
+      .select({
+        ...getTableColumns(items),
+        owner: {
+          id: users.id,
+          name: users.name,
+          trustScore: users.trustScore,
+          avatarUrl: users.avatarUrl,
+        },
+      })
       .from(items)
+      .innerJoin(users, eq(items.ownerId, users.id))
       .where(
         and(
           isNull(items.deletedAt),

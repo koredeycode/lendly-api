@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { aliasedTable, desc, eq, or, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
-import { bookings, bookingStatusEnum, items, users } from 'src/config/db/schema';
+import { bookings, bookingStatusEnum, chatMessages, items, users } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 import { BookingRepository } from '../domain/booking.repository';
@@ -172,5 +172,20 @@ export class DrizzleBookingRepository implements BookingRepository {
       );
 
     return result.count === 0;
+  }
+
+  async createChatMessage(
+    bookingId: string,
+    senderId: string,
+    message: string,
+    tx?: any,
+  ) {
+    const database = tx || db;
+    await database.insert(chatMessages).values({
+      bookingId,
+      senderId,
+      message,
+      isRead: false,
+    });
   }
 }

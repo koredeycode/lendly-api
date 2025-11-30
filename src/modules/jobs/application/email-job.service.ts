@@ -17,6 +17,7 @@ export class EmailJobService {
     ownerName: string;
     borrowerName: string;
     itemName: string;
+    message?: string;
   }) {
     await this.queue.add('sendBookingRequestedEmail', data, {
       attempts: 3,
