@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { JobsModule } from '../../jobs/presentation/job.module';
+import { UserRepository } from '../../user/domain/user.repository';
+import { DrizzleUserRepository } from '../../user/infrastructure/user.repository.drizzle';
 import { WalletModule } from '../../wallet/presentation/wallet.module';
 import { PaymentService } from '../application/payment.service';
 import { PaymentRepository } from '../domain/payment.repository';
@@ -12,7 +15,7 @@ import { StripeProvider } from '../infrastructure/providers/stripe.provider';
 import { PaymentController } from './payment.controller';
 
 @Module({
-  imports: [ConfigModule, WalletModule],
+  imports: [ConfigModule, WalletModule, JobsModule],
   controllers: [PaymentController],
   providers: [
     PaymentService,
@@ -24,6 +27,10 @@ import { PaymentController } from './payment.controller';
     {
       provide: PaymentRepository,
       useClass: DrizzlePaymentRepository,
+    },
+    {
+      provide: UserRepository,
+      useClass: DrizzleUserRepository,
     },
   ],
   exports: [PaymentService],

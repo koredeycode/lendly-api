@@ -3,7 +3,14 @@ import * as nodemailer from 'nodemailer';
 import { bookingApprovedTemplate } from './templates/booking-approved.template';
 import { bookingRejectedTemplate } from './templates/booking-rejected.template';
 import { bookingRequestTemplate } from './templates/booking-request.template';
+import { fundsHeldTemplate } from './templates/funds-held.template';
+import { fundsReleasedTemplate } from './templates/funds-released.template';
+import { paymentFailedTemplate } from './templates/payment-failed.template';
+import { paymentSuccessTemplate } from './templates/payment-success.template';
+import { payoutReceivedTemplate } from './templates/payout-received.template';
 import { welcomeTemplate } from './templates/welcome.template';
+import { withdrawalFailedTemplate } from './templates/withdrawal-failed.template';
+import { withdrawalSuccessTemplate } from './templates/withdrawal-success.template';
 
 @Injectable()
 export class EmailService {
@@ -106,6 +113,105 @@ export class EmailService {
   async sendWelcomeEmail(to: string, name: string) {
     const html = welcomeTemplate({ name });
     const subject = 'Welcome to Lendly! 🚀';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendPaymentSuccessEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      transactionId: string;
+      date: string;
+    },
+  ) {
+    const html = paymentSuccessTemplate(data);
+    const subject = 'Payment Successful';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendPaymentFailedEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      reason?: string;
+      date: string;
+    },
+  ) {
+    const html = paymentFailedTemplate(data);
+    const subject = 'Payment Failed';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendWithdrawalSuccessEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      bankName: string;
+      accountNumber: string;
+      date: string;
+    },
+  ) {
+    const html = withdrawalSuccessTemplate(data);
+    const subject = 'Withdrawal Successful';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendWithdrawalFailedEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      reason?: string;
+      date: string;
+    },
+  ) {
+    const html = withdrawalFailedTemplate(data);
+    const subject = 'Withdrawal Failed';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendFundsHeldEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      itemName: string;
+      bookingId: string;
+    },
+  ) {
+    const html = fundsHeldTemplate(data);
+    const subject = 'Funds Held for Booking';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendFundsReleasedEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      itemName: string;
+      reason?: string;
+    },
+  ) {
+    const html = fundsReleasedTemplate(data);
+    const subject = 'Funds Released';
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendPayoutReceivedEmail(
+    to: string,
+    data: {
+      name: string;
+      amount: string;
+      itemName: string;
+      bookingId: string;
+    },
+  ) {
+    const html = payoutReceivedTemplate(data);
+    const subject = 'You\'ve Received a Payment!';
     return this.sendEmail(to, subject, html);
   }
 }

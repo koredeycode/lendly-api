@@ -42,6 +42,24 @@ export class CreateBookingUseCase {
       );
 
       console.log('funds successfully held');
+
+      // Send funds held email to borrower
+      const borrower = await this.userRepo.findUserById(borrowerId);
+      const item = await this.itemRepo.findItemById(itemId);
+      
+      if (borrower && item) {
+         await this.emailJobService.sendFundsHeldEmail({
+            email: borrower.email,
+            name: borrower.name,
+            amount: (totalAmount / 100).toLocaleString('en-NG', {
+              style: 'currency',
+              currency: 'NGN',
+            }),
+            itemName: item.title,
+            bookingId: booking.id,
+         });
+      }
+
       try {
         // 3. Send email to owner (outside transaction or inside? inside is safer for consistency, but email sending should be async/job)
         // The email job service just adds to queue, so it's fast.

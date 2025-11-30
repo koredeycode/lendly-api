@@ -49,6 +49,21 @@ export class ApproveBookingUseCase {
         tx,
       );
 
+      // Send payout received email to owner
+      const owner = await this.userRepo.findUserById(item.ownerId);
+      if (owner) {
+         await this.emailJobService.sendPayoutReceivedEmail({
+            email: owner.email,
+            name: owner.name,
+            amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
+              style: 'currency',
+              currency: 'NGN',
+            }),
+            itemName: item.title,
+            bookingId: bookingId,
+         });
+      }
+
       // Update status
       await this.bookingRepo.acceptBooking(
         bookingId,

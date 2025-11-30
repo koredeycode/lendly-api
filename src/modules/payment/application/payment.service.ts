@@ -1,5 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { NewPaymentTransaction } from 'src/config/db/schema';
+import { EmailJobService } from '../../jobs/application/email-job.service';
+import { UserRepository } from '../../user/domain/user.repository';
 import { WalletService } from '../../wallet/application/wallet.service';
 import { PaymentRepository } from '../domain/payment.repository';
 import { PaymentFactory } from '../infrastructure/providers/payment.factory';
@@ -12,6 +14,8 @@ export class PaymentService {
     private readonly paymentRepository: PaymentRepository,
     private readonly paymentFactory: PaymentFactory,
     private readonly walletService: WalletService,
+    private readonly emailJobService: EmailJobService,
+    private readonly userRepository: UserRepository,
   ) {}
 
   private getDefaultProvider(): string {
@@ -98,11 +102,39 @@ export class PaymentService {
         transaction.userId,
         transaction.amountCents,
       );
+
+      const user = await this.userRepository.findUserById(transaction.userId);
+      if (user) {
+        await this.emailJobService.sendPaymentSuccessEmail({
+          email: user.email,
+          name: user.name,
+          amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+          }),
+          transactionId: transaction.id,
+          date: new Date().toLocaleDateString(),
+        });
+      }
     } else if (verification.status === 'failed') {
       await this.paymentRepository.updateTransaction(transaction.id, {
         status: 'failed',
         metadata: verification.metadata,
       });
+
+      const user = await this.userRepository.findUserById(transaction.userId);
+      if (user) {
+        await this.emailJobService.sendPaymentFailedEmail({
+          email: user.email,
+          name: user.name,
+          amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+          }),
+          reason: verification.metadata?.message || 'Payment verification failed',
+          date: new Date().toLocaleDateString(),
+        });
+      }
     }
 
     return transaction;
@@ -153,6 +185,31 @@ export class PaymentService {
         externalId: response.externalId,
       });
 
+      const user = await this.userRepository.findUserById(userId);
+      if (user) {
+        if (response.status === 'success' || response.status === 'pending') {
+           // For pending, we might want to wait for webhook, but let's send success for now as request is successful
+           // Or maybe we should send "Withdrawal Initiated" email?
+           // The template says "Withdrawal Successful", so let's use it for success.
+           // If it's pending, we might want to wait. But let's assume success for now if provider returns success/pending.
+           // Actually, if it's pending, we should probably wait for webhook.
+           // But let's send it here if status is success.
+           if (response.status === 'success') {
+             await this.emailJobService.sendWithdrawalSuccessEmail({
+                email: user.email,
+                name: user.name,
+                amount: (amountCents / 100).toLocaleString('en-NG', {
+                  style: 'currency',
+                  currency: 'NGN',
+                }),
+                bankName: accountDetails.bankCode, // We might need to map bank code to name
+                accountNumber: accountDetails.accountNumber,
+                date: new Date().toLocaleDateString(),
+             });
+           }
+        }
+      }
+
       return transaction;
     } catch (error) {
       // Refund
@@ -161,6 +218,20 @@ export class PaymentService {
         status: 'failed',
         metadata: { error: error.message },
       });
+
+      const user = await this.userRepository.findUserById(userId);
+      if (user) {
+        await this.emailJobService.sendWithdrawalFailedEmail({
+          email: user.email,
+          name: user.name,
+          amount: (amountCents / 100).toLocaleString('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+          }),
+          reason: error.message,
+          date: new Date().toLocaleDateString(),
+        });
+      }
       throw error;
     }
   }
@@ -203,6 +274,21 @@ export class PaymentService {
             externalId: event.externalId,
             metadata: event.metadata,
           });
+
+          const user = await this.userRepository.findUserById(transaction.userId);
+          if (user) {
+             await this.emailJobService.sendWithdrawalSuccessEmail({
+                email: user.email,
+                name: user.name,
+                amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
+                  style: 'currency',
+                  currency: 'NGN',
+                }),
+                bankName: 'Bank', // We might not have bank name here easily unless we store it in metadata or fetch from provider
+                accountNumber: '****', // Same for account number
+                date: new Date().toLocaleDateString(),
+             });
+          }
         } else if (event.status === 'failed') {
           await this.paymentRepository.updateTransaction(transaction.id, {
             status: 'failed',
@@ -214,6 +300,20 @@ export class PaymentService {
             transaction.userId,
             transaction.amountCents,
           );
+
+          const user = await this.userRepository.findUserById(transaction.userId);
+          if (user) {
+            await this.emailJobService.sendWithdrawalFailedEmail({
+              email: user.email,
+              name: user.name,
+              amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+              }),
+              reason: event.metadata?.message || 'Withdrawal failed',
+              date: new Date().toLocaleDateString(),
+            });
+          }
         }
       } else {
         this.logger.warn(

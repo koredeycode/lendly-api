@@ -1,8 +1,8 @@
 import {
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -50,6 +50,21 @@ export class RejectBookingUseCase {
         bookingId,
         tx,
       );
+
+      // Send funds released email to borrower
+      const borrower = await this.userRepo.findUserById(booking.borrowerId);
+      if (borrower) {
+         await this.emailJobService.sendFundsReleasedEmail({
+            email: borrower.email,
+            name: borrower.name,
+            amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
+              style: 'currency',
+              currency: 'NGN',
+            }),
+            itemName: item.title,
+            reason: 'Booking rejected/cancelled',
+         });
+      }
 
       // Update status
       const updatedBooking = await this.bookingRepo.updateBookingStatus(
