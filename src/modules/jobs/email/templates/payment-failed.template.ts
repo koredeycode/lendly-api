@@ -1,42 +1,43 @@
+import { baseTemplate } from './base.template';
+
 export const paymentFailedTemplate = (data: {
   name: string;
   amount: string;
   reason?: string;
   date: string;
-}) => `
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #f44336; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-        .content { padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
-        .details { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Payment Failed</h1>
-        </div>
-        <div class="content">
-            <p>Hi ${data.name},</p>
-            <p>We were unable to process your payment. No funds have been added to your wallet.</p>
-            
-            <div class="details">
-                <p><strong>Amount:</strong> ${data.amount}</p>
-                <p><strong>Date:</strong> ${data.date}</p>
-                ${data.reason ? `<p><strong>Reason:</strong> ${data.reason}</p>` : ''}
-            </div>
-
-            <p>Please check your payment details and try again. If the issue persists, contact your bank or our support team.</p>
-        </div>
-        <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Lendly. All rights reserved.</p>
-        </div>
+}) => {
+  const content = `
+    <h2 style="color: #EF4444;">Payment Failed ❌</h2>
+    <p>Hi ${data.name},</p>
+    <p>We were unable to process your payment. No funds have been added to your wallet.</p>
+    
+    <div style="background-color: #1E293B; padding: 16px; border-radius: 8px; margin: 24px 0; border: 1px solid #334155;">
+      <div class="info-row">
+        <div class="info-label">Amount</div>
+        <div class="info-value">${data.amount}</div>
+      </div>
+      <div class="info-row" style="border-bottom: none;">
+        <div class="info-label">Date</div>
+        <div class="info-value">${data.date}</div>
+      </div>
+      ${
+        data.reason
+          ? `
+      <div class="info-row" style="border-top: 1px solid #334155; padding-top: 16px; border-bottom: none;">
+        <div class="info-label">Reason</div>
+        <div class="info-value" style="color: #EF4444;">${data.reason}</div>
+      </div>
+      `
+          : ''
+      }
     </div>
-</body>
-</html>
-`;
+
+    <p>Please check your payment details and try again. If the issue persists, contact your bank or our support team.</p>
+    
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="https://lendly.app/wallet" class="button">Try Again</a>
+    </div>
+  `;
+
+  return baseTemplate(content);
+};

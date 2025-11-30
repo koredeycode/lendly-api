@@ -21,7 +21,7 @@ export class EmailJobService {
     endDate: string;
     totalPrice: string;
     message?: string;
-    bookingUrl: string;
+    bookingId: string;
   }) {
     await this.queue.add('sendBookingRequestedEmail', data, {
       attempts: 3,
@@ -33,6 +33,7 @@ export class EmailJobService {
     email: string;
     borrowerName: string;
     itemName: string;
+    bookingId: string;
   }) {
     await this.queue.add('sendBookingApprovedEmail', data, {
       attempts: 3,
@@ -44,6 +45,7 @@ export class EmailJobService {
     email: string;
     borrowerName: string;
     itemName: string;
+    bookingId: string;
   }) {
     await this.queue.add('sendBookingRejectedEmail', data, {
       attempts: 3,

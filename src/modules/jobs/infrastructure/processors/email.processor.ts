@@ -61,7 +61,7 @@ export class EmailProcessor {
     endDate: string;
     totalPrice: string;
     message?: string;
-    bookingUrl: string;
+    bookingId: string;
   }) {
     console.log(
       `[EmailProcessor] Sending booking requested email to owner ${data.email}. Borrower: ${data.borrowerName}, Item: ${data.itemName}`,
@@ -74,7 +74,7 @@ export class EmailProcessor {
       endDate: data.endDate,
       totalPrice: data.totalPrice,
       message: data.message,
-      bookingUrl: data.bookingUrl,
+      bookingId: data.bookingId,
     });
   }
 
@@ -82,6 +82,7 @@ export class EmailProcessor {
     email: string;
     borrowerName: string;
     itemName: string;
+    bookingId: string;
   }) {
     console.log(
       `[EmailProcessor] Sending booking approved email to borrower ${data.email}. Item: ${data.itemName}`,
@@ -89,7 +90,7 @@ export class EmailProcessor {
     await this.emailService.sendBookingApprovedEmail(data.email, {
       borrowerName: data.borrowerName,
       itemName: data.itemName,
-      bookingUrl: 'https://lendly.app/bookings', // TODO: Add specific booking URL
+      bookingId: data.bookingId,
     });
   }
 
@@ -97,6 +98,7 @@ export class EmailProcessor {
     email: string;
     borrowerName: string;
     itemName: string;
+    bookingId: string;
   }) {
     console.log(
       `[EmailProcessor] Sending booking rejected email to borrower ${data.email}. Item: ${data.itemName}`,
@@ -104,6 +106,7 @@ export class EmailProcessor {
     await this.emailService.sendBookingRejectedEmail(data.email, {
       borrowerName: data.borrowerName,
       itemName: data.itemName,
+      bookingId: data.bookingId,
     });
   }
 

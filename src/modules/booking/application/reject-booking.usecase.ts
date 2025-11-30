@@ -81,6 +81,7 @@ export class RejectBookingUseCase {
             email: borrower.email,
             borrowerName: borrower.name,
             itemName: item.title,
+            bookingId: bookingId,
           });
         }
       }

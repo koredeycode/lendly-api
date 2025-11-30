@@ -77,7 +77,7 @@ export class EmailService {
       endDate: string;
       totalPrice: string;
       message?: string;
-      bookingUrl: string;
+      bookingId: string;
     },
   ) {
     const html = bookingRequestTemplate(data);
@@ -90,7 +90,7 @@ export class EmailService {
     data: {
       borrowerName: string;
       itemName: string;
-      bookingUrl?: string;
+      bookingId: string;
     },
   ) {
     const html = bookingApprovedTemplate(data);
@@ -103,6 +103,7 @@ export class EmailService {
     data: {
       borrowerName: string;
       itemName: string;
+      bookingId: string;
     },
   ) {
     const html = bookingRejectedTemplate(data);

@@ -78,6 +78,7 @@ export class ApproveBookingUseCase {
           email: borrower.email,
           borrowerName: borrower.name,
           itemName: item.title,
+          bookingId: bookingId,
         });
       }
     });

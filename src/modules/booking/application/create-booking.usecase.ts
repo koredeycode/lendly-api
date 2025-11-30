@@ -109,7 +109,7 @@ export class CreateBookingUseCase {
             endDate,
             totalPrice,
             message: data.message,
-            bookingUrl: `https://lendly.app/bookings/${booking.id}`,
+            bookingId: booking.id,
           });
         }
 

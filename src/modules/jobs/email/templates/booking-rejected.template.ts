@@ -3,7 +3,11 @@ import { baseTemplate } from './base.template';
 export const bookingRejectedTemplate = (data: {
   borrowerName: string;
   itemName: string;
+  bookingId: string;
 }) => {
+  const webUrl = `https://lendly.app/bookings/${data.bookingId}`;
+  const appUrl = `lendly://bookings/${data.bookingId}`;
+
   const content = `
     <h2>Booking Update</h2>
     <p>Hi ${data.borrowerName},</p>
@@ -14,7 +18,8 @@ export const bookingRejectedTemplate = (data: {
     <p>Don't worry, there are plenty of other items available on Lendly!</p>
     
     <div style="text-align: center; margin-top: 24px;">
-      <a href="https://lendly.app" class="button">Browse Other Items</a>
+      <a href="${appUrl}" class="button" style="margin-right: 10px;">View Booking</a>
+      <a href="https://lendly.app" class="button" style="background-color: transparent; color: #22C55E; border: 1px solid #22C55E;">Browse Items</a>
     </div>
   `;
 
