@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { db } from 'src/config/db/drizzle/client';
 import {
   wallets,
@@ -47,14 +47,6 @@ export class DrizzleWalletRepository implements WalletRepository {
         .values(data)
         .returning();
 
-      await transaction
-        .update(wallets)
-        .set({
-          availableBalanceCents: sql`${wallets.availableBalanceCents} + ${data.amountCents}`,
-          updatedAt: new Date(),
-        })
-        .where(eq(wallets.userId, data.walletId));
-
       return txRecord;
     };
 
@@ -83,16 +75,33 @@ export class DrizzleWalletRepository implements WalletRepository {
       throw new BadRequestException('Insufficient funds');
     }
 
-    console.log('Wallet found', wallet);
+    const amount = Number(amountCents);
+    console.log('Holding funds:', {
+      userId,
+      amount,
+      type: typeof amountCents,
+      currentAvailable: wallet.availableBalanceCents,
+      currentFrozen: wallet.frozenBalanceCents,
+    });
 
-    await database
+    const [updatedWallet] = await database
       .update(wallets)
       .set({
-        availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amountCents}`,
-        frozenBalanceCents: sql`${wallets.frozenBalanceCents} + ${amountCents}`,
+        availableBalanceCents: sql`${wallets.availableBalanceCents} - ${amount}`,
+        frozenBalanceCents: sql`${wallets.frozenBalanceCents} + ${amount}`,
         updatedAt: new Date(),
       })
-      .where(eq(wallets.userId, userId));
+      .where(
+        and(
+          eq(wallets.userId, userId),
+          gte(wallets.availableBalanceCents, amount),
+        ),
+      )
+      .returning();
+
+    if (!updatedWallet) {
+      throw new BadRequestException('Insufficient funds');
+    }
 
     console.log('Funds held successfully', wallet);
 
