@@ -3,11 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +25,7 @@ import { ItemsResponseDTO } from 'src/modules/item/application/dto/item-response
 import { ItemService } from 'src/modules/item/application/item.service';
 import { WalletResponseDTO } from 'src/modules/wallet/application/dto/wallet-response.dto';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
+import { PublicUserResponseDTO } from '../application/dto/public-user-response.dto';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserResponseDTO } from '../application/dto/user-response.dto';
 import { UserService } from '../application/user.service';
@@ -82,14 +84,28 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User details',
-    type: UserResponseDTO,
+    type: PublicUserResponseDTO,
   })
   @Get('/:id')
   async getUserDetails(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
-    const data = await this.userService.findUserById(id);
+    const user = await this.userService.findUserById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const data = {
+      id: user.id,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      trustScore: user.trustScore,
+      createdAt: user.createdAt,
+    };
+
     return { message: 'User details retrieved successfully', data };
   }
 

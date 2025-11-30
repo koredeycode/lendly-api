@@ -23,6 +23,13 @@ export class ItemOwnerDTO {
   })
   @Expose()
   trustScore: number;
+
+  @ApiProperty({
+    description: 'Owner Avatar URL',
+    example: 'https://example.com/avatar.jpg',
+  })
+  @Expose()
+  avatarUrl: string;
 }
 
 export class ItemDataDTO {
