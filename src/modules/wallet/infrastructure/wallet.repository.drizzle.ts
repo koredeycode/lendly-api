@@ -1,21 +1,26 @@
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
+    BadRequestException,
+    Inject,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { and, desc, eq, gte, sql } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
 import {
-  wallets,
-  walletTransactions,
-  walletTransactionTypeEnum,
+    wallets,
+    walletTransactions,
+    walletTransactionTypeEnum,
 } from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { WalletRepository } from '../domain/wallet.repository';
 
 @Injectable()
 export class DrizzleWalletRepository implements WalletRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async getWallet(userId: string) {
-    const [wallet] = await db
+    const [wallet] = await this.db
       .select()
       .from(wallets)
       .where(eq(wallets.userId, userId))
@@ -24,7 +29,7 @@ export class DrizzleWalletRepository implements WalletRepository {
   }
 
   async createWalletIfNotExists(userId: string) {
-    return await db
+    return await this.db
       .insert(wallets)
       .values({ userId })
       .onConflictDoNothing()
@@ -53,7 +58,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     if (tx) {
       return await runInTransaction(tx);
     } else {
-      return await db.transaction(runInTransaction);
+      return await this.db.transaction(runInTransaction);
     }
   }
 
@@ -64,7 +69,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     tx?: any,
   ) {
     console.log('Holding funds for user', userId);
-    const database = tx || db;
+    const database = tx || this.db;
     const [wallet] = await database
       .select()
       .from(wallets)
@@ -124,7 +129,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     bookingId: string | null,
     tx?: any,
   ) {
-    const database = tx || db;
+    const database = tx || this.db;
     const wallet = await this.getWallet(userId);
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
@@ -155,7 +160,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     bookingId: string,
     tx?: any,
   ) {
-    const database = tx || db;
+    const database = tx || this.db;
     // Deduct from sender's frozen balance
     await database
       .update(wallets)
@@ -201,7 +206,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     });
   }
   async topUp(userId: string, amountCents: number) {
-    await db.transaction(async (tx) => {
+    await this.db.transaction(async (tx) => {
       await tx
         .update(wallets)
         .set({
@@ -220,7 +225,7 @@ export class DrizzleWalletRepository implements WalletRepository {
   }
 
   async withdraw(userId: string, amountCents: number) {
-    await db.transaction(async (tx) => {
+    await this.db.transaction(async (tx) => {
       const wallet = await this.getWallet(userId);
       if (wallet.availableBalanceCents < amountCents) {
         throw new BadRequestException('Insufficient funds');
@@ -243,7 +248,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     });
   }
   async getTransactions(userId: string) {
-    return await db
+    return await this.db
       .select()
       .from(walletTransactions)
       .where(eq(walletTransactions.walletId, userId))

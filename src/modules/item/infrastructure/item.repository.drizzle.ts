@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, getTableColumns, isNull, sql } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
 import { items, users } from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
@@ -9,11 +11,13 @@ import { ItemRepository } from '../domain/item.repository';
 
 @Injectable()
 export class DrizzleItemRepository implements ItemRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async createItem(ownerId: string, data: CreateItemDTO) {
     const { location, ...rest } = data;
     // const locationSql = sql`POINT(${location[0]}, ${location[1]})`;
     // const locationSql = sql`ST_Point(${location[0]}, ${location[0]})::geography`;
-    const [item] = await db
+    const [item] = await this.db
       .insert(items)
       .values({
         ...rest,
@@ -25,7 +29,7 @@ export class DrizzleItemRepository implements ItemRepository {
   }
 
   async findItemById(id: string) {
-    const result = await db
+    const result = await this.db
       .select({
         ...getTableColumns(items),
         owner: {
@@ -43,7 +47,7 @@ export class DrizzleItemRepository implements ItemRepository {
   }
 
   async findItemsByOwner(ownerId: string, includeDeleted = false) {
-    return await db
+    return await this.db
       .select()
       .from(items)
       .where(
@@ -68,7 +72,7 @@ export class DrizzleItemRepository implements ItemRepository {
   }: SearchItemsDTO) {
     const offset = (page - 1) * limit;
 
-    const itemList = await db
+    const itemList = await this.db
       //   {
       //   item: items,
       //   distance: sql<number>`ST_Distance(
@@ -123,7 +127,7 @@ export class DrizzleItemRepository implements ItemRepository {
     //     number,
     //   ];
     // }
-    const [item] = await db
+    const [item] = await this.db
       .update(items)
       .set({ ...updatedData })
       .where(eq(items.id, id))
@@ -132,7 +136,7 @@ export class DrizzleItemRepository implements ItemRepository {
   }
 
   async softDeleteItem(id: string) {
-    const [item] = await db
+    const [item] = await this.db
       .update(items)
       .set({ deletedAt: new Date(), updatedAt: new Date() })
       .where(eq(items.id, id))

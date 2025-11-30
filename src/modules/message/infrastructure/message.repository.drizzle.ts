@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { and, asc, eq, not } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { chatMessages } from '../../../config/db/schema';
 import { CreateMessageDTO } from '../application/dto/create-message.dto';
 import { UpdateMessageDTO } from '../application/dto/update-message.dto';
@@ -8,8 +10,10 @@ import { MessageRepository } from '../domain/message.repository';
 
 @Injectable()
 export class DrizzleMessageRepository implements MessageRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async getChatMessages(bookingId: string, limit = 50) {
-    return await db
+    return await this.db
       .select()
       .from(chatMessages)
       .where(eq(chatMessages.bookingId, bookingId))
@@ -22,7 +26,7 @@ export class DrizzleMessageRepository implements MessageRepository {
     senderId: string,
     data: CreateMessageDTO,
   ) {
-    const [msg] = await db
+    const [msg] = await this.db
       .insert(chatMessages)
       .values({ senderId, bookingId, ...data })
       .returning();
@@ -30,7 +34,7 @@ export class DrizzleMessageRepository implements MessageRepository {
   }
 
   async updateMessage(id: string, data: UpdateMessageDTO) {
-    const [message] = await db
+    const [message] = await this.db
       .update(chatMessages)
       .set(data)
       .where(eq(chatMessages.id, id))
@@ -39,11 +43,11 @@ export class DrizzleMessageRepository implements MessageRepository {
   }
 
   async deleteMessage(id: string) {
-    await db.delete(chatMessages).where(eq(chatMessages.id, id));
+    await this.db.delete(chatMessages).where(eq(chatMessages.id, id));
   }
 
   async markMessagesAsRead(bookingId: string, userId: string) {
-    await db
+    await this.db
       .update(chatMessages)
       .set({ isRead: true })
       .where(

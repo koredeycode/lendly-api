@@ -1,9 +1,12 @@
 import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
+    Inject,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
 } from '@nestjs/common';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
 import { UserRepository } from 'src/modules/user/domain/user.repository';
@@ -13,6 +16,7 @@ import { BookingRepository } from '../domain/booking.repository';
 @Injectable()
 export class ApproveBookingUseCase {
   constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
     private readonly bookingRepo: BookingRepository,
     private readonly walletService: WalletService,
     private readonly itemRepo: ItemRepository,
@@ -21,7 +25,7 @@ export class ApproveBookingUseCase {
   ) {}
 
   async execute(bookingId: string, userId: string) {
-    return await db.transaction(async (tx) => {
+    return await this.db.transaction(async (tx) => {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 

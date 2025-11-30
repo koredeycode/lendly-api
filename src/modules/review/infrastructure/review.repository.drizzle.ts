@@ -1,20 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { and, asc, count, eq } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
 import { Review, reviews } from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { CreateReviewDTO } from '../application/dto/create-review.dto';
 import { UpdateReviewDTO } from '../application/dto/update-review.dto';
 import { ReviewRepository } from '../domain/review.repository';
 
 @Injectable()
 export class DrizzleReviewRepository implements ReviewRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async createReview(
     bookingId: string,
     reviewerId: string,
     revieweeId: string,
     data: CreateReviewDTO,
   ) {
-    const [review] = await db
+    const [review] = await this.db
       .insert(reviews)
       .values({ bookingId, revieweeId, reviewerId, ...data })
       .returning();
@@ -22,7 +26,7 @@ export class DrizzleReviewRepository implements ReviewRepository {
   }
 
   async getReviews(bookingId: string): Promise<Review[]> {
-    return await db
+    return await this.db
       .select()
       .from(reviews)
       .where(eq(reviews.bookingId, bookingId))
@@ -30,7 +34,7 @@ export class DrizzleReviewRepository implements ReviewRepository {
   }
 
   async updateReview(id: string, data: UpdateReviewDTO) {
-    const [review] = await db
+    const [review] = await this.db
       .update(reviews)
       .set({ ...data })
       .where(eq(reviews.id, id))
@@ -40,11 +44,11 @@ export class DrizzleReviewRepository implements ReviewRepository {
   }
 
   async deleteReview(id: string) {
-    await db.delete(reviews).where(eq(reviews.id, id));
+    await this.db.delete(reviews).where(eq(reviews.id, id));
   }
 
   async hasUserReviewedBooking(bookingId: string, reviewerId: string) {
-    const result = await db
+    const result = await this.db
       .select({ count: count() })
       .from(reviews)
       .where(

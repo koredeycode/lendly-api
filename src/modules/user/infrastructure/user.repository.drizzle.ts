@@ -1,26 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, sql } from 'drizzle-orm';
-
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import {
-  deviceTokens,
-  items,
-  reports,
-  savedItems,
-  userLocations,
-  users,
+    deviceTokens,
+    items,
+    reports,
+    savedItems,
+    userLocations,
+    users,
 } from '../../../config/db/schema';
 import {
-  CreateGoogleUserDTO,
-  CreateUserDTO,
+    CreateGoogleUserDTO,
+    CreateUserDTO,
 } from '../application/dto/create-user.dto';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserRepository } from '../domain/user.repository';
 
 @Injectable()
 export class DrizzleUserRepository implements UserRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async findUserByEmail(email: string) {
-    const result = await db
+    const result = await this.db
       .select()
       .from(users)
       .where(eq(users.email, email))
@@ -33,7 +36,7 @@ export class DrizzleUserRepository implements UserRepository {
   }
 
   async findUserById(id: string) {
-    const result = await db
+    const result = await this.db
       .select()
       .from(users)
       .where(eq(users.id, id))
@@ -46,7 +49,7 @@ export class DrizzleUserRepository implements UserRepository {
   }
 
   async createUser(user: CreateUserDTO, passwordHash: string) {
-    const [newUser] = await db
+    const [newUser] = await this.db
       .insert(users)
       .values({
         // id: user.id,
@@ -59,13 +62,13 @@ export class DrizzleUserRepository implements UserRepository {
   }
 
   async createGoogleUser(data: CreateGoogleUserDTO) {
-    const [newUser] = await db.insert(users).values(data).returning();
+    const [newUser] = await this.db.insert(users).values(data).returning();
 
     return newUser;
   }
 
   async updateUser(id: string, data: UpdateUserDTO) {
-    const [user] = await db
+    const [user] = await this.db
       .update(users)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(users.id, id))
@@ -74,7 +77,7 @@ export class DrizzleUserRepository implements UserRepository {
   }
 
   async upsertUserLocation(userId: string, lat: number, lng: number) {
-    return await db
+    return await this.db
       .insert(userLocations)
       .values({
         userId,
@@ -96,25 +99,25 @@ export class DrizzleUserRepository implements UserRepository {
     reportedItemId?: string;
     reason: string;
   }) {
-    const [report] = await db.insert(reports).values(data).returning();
+    const [report] = await this.db.insert(reports).values(data).returning();
     return report;
   }
 
   async toggleSavedItem(userId: string, itemId: string) {
-    return await db
+    return await this.db
       .insert(savedItems)
       .values({ userId, itemId })
       .onConflictDoNothing();
   }
 
   async unsaveItem(userId: string, itemId: string) {
-    return await db
+    return await this.db
       .delete(savedItems)
       .where(and(eq(savedItems.userId, userId), eq(savedItems.itemId, itemId)));
   }
 
   async getSavedItems(userId: string) {
-    return await db
+    return await this.db
       .select({ item: items })
       .from(savedItems)
       .innerJoin(items, eq(savedItems.itemId, items.id))
@@ -126,7 +129,7 @@ export class DrizzleUserRepository implements UserRepository {
     token: string,
     platform: 'ios' | 'android' | 'web',
   ) {
-    return await db
+    return await this.db
       .insert(deviceTokens)
       .values({ userId, token, platform })
       .onConflictDoUpdate({

@@ -1,22 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
 import {
-  NewPaymentTransaction,
-  PaymentTransaction,
-  paymentTransactions,
+    NewPaymentTransaction,
+    PaymentTransaction,
+    paymentTransactions,
 } from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import {
-  PaymentRepository,
-  UpdatePaymentTransactionDto,
+    PaymentRepository,
+    UpdatePaymentTransactionDto,
 } from '../domain/payment.repository';
 
 @Injectable()
 export class DrizzlePaymentRepository implements PaymentRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async createTransaction(
     data: NewPaymentTransaction,
   ): Promise<PaymentTransaction> {
-    const [tx] = await db.insert(paymentTransactions).values(data).returning();
+    const [tx] = await this.db.insert(paymentTransactions).values(data).returning();
     return tx;
   }
 
@@ -25,7 +29,7 @@ export class DrizzlePaymentRepository implements PaymentRepository {
     data: UpdatePaymentTransactionDto,
   ): Promise<PaymentTransaction> {
     const { metadata, ...rest } = data;
-    const [tx] = await db
+    const [tx] = await this.db
       .update(paymentTransactions)
       .set({
         ...rest,
@@ -40,7 +44,7 @@ export class DrizzlePaymentRepository implements PaymentRepository {
   async getTransactionByReference(
     reference: string,
   ): Promise<PaymentTransaction | null> {
-    const [tx] = await db
+    const [tx] = await this.db
       .select()
       .from(paymentTransactions)
       .where(eq(paymentTransactions.reference, reference))
@@ -49,7 +53,7 @@ export class DrizzlePaymentRepository implements PaymentRepository {
   }
 
   async getTransactionById(id: string): Promise<PaymentTransaction | null> {
-    const [tx] = await db
+    const [tx] = await this.db
       .select()
       .from(paymentTransactions)
       .where(eq(paymentTransactions.id, id))

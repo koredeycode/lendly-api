@@ -11,6 +11,7 @@ import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 import { AuthModule } from './modules/auth/presentation/auth.module';
 import { BookingModule } from './modules/booking/presentation/booking.module';
+import { DatabaseModule } from './modules/database/database.module';
 import { HealthModule } from './modules/health/presentation/health.module';
 import { ItemModule } from './modules/item/presentation/item.module';
 import { JobsModule } from './modules/jobs/presentation/job.module';
@@ -76,6 +77,7 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     ReviewModule,
     HealthModule,
     PaymentModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [

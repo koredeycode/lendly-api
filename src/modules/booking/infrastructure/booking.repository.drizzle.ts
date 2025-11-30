@@ -1,20 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { aliasedTable, desc, eq, or, sql } from 'drizzle-orm';
-import { db } from 'src/config/db/drizzle/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from 'src/config/db/schema';
 import { bookings, bookingStatusEnum, chatMessages, items, users } from 'src/config/db/schema';
+import { DRIZZLE } from 'src/modules/database/database.constants';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
-
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
 export class DrizzleBookingRepository implements BookingRepository {
+  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+
   async createBooking(
     itemId: string,
     borrowerId: string,
     data: CreateBookingDTO,
     tx?: any,
   ) {
-    const database = tx || db;
+    const database = tx || this.db;
     const [booking] = await database
       .insert(bookings)
       .values({
@@ -32,7 +35,7 @@ export class DrizzleBookingRepository implements BookingRepository {
     const owner = aliasedTable(users, 'owner');
     const borrower = aliasedTable(users, 'borrower');
 
-    const result = await db
+    const result = await this.db
       .select({
         booking: bookings,
         item: items,
@@ -63,7 +66,7 @@ export class DrizzleBookingRepository implements BookingRepository {
     const owner = aliasedTable(users, 'owner');
     const borrower = aliasedTable(users, 'borrower');
 
-    const query = db
+    const query = this.db
       .select({
         booking: bookings,
         item: items,
@@ -99,11 +102,11 @@ export class DrizzleBookingRepository implements BookingRepository {
   }
 
   async deleteBooking(id: string) {
-    await db.delete(bookings).where(eq(bookings.id, id));
+    await this.db.delete(bookings).where(eq(bookings.id, id));
   }
 
   async acceptBooking(id: string, tipAmount = 0, tx?: any) {
-    const database = tx || db;
+    const database = tx || this.db;
     const [booking] = await database
       .update(bookings)
       .set({
@@ -121,7 +124,7 @@ export class DrizzleBookingRepository implements BookingRepository {
     bookingId: string,
     status: (typeof bookingStatusEnum.enumValues)[number],
   ) {
-    const [booking] = await db
+    const [booking] = await this.db
       .update(bookings)
       .set({
         status,
@@ -133,7 +136,7 @@ export class DrizzleBookingRepository implements BookingRepository {
     return booking;
   }
   async findBookingsByItem(itemId: string, status?: any) {
-    const query = db
+    const query = this.db
       .select()
       .from(bookings)
       .where(eq(bookings.itemId, itemId))
@@ -143,7 +146,7 @@ export class DrizzleBookingRepository implements BookingRepository {
       // If status is provided, we filter by it.
       // However, drizzle's where clause needs to be composed differently if we want to add conditions dynamically.
       // Let's rewrite this slightly.
-      return await db
+      return await this.db
         .select()
         .from(bookings)
         .where(
@@ -160,7 +163,7 @@ export class DrizzleBookingRepository implements BookingRepository {
   async checkAvailability(itemId: string, from: Date, to: Date) {
     // Check if there are any overlapping bookings that are accepted or picked_up
     // Overlap logic: (StartA <= EndB) and (EndA >= StartB)
-    const [result] = await db
+    const [result] = await this.db
       .select({ count: sql<number>`count(*)` })
       .from(bookings)
       .where(
@@ -180,7 +183,7 @@ export class DrizzleBookingRepository implements BookingRepository {
     message: string,
     tx?: any,
   ) {
-    const database = tx || db;
+    const database = tx || this.db;
     await database.insert(chatMessages).values({
       bookingId,
       senderId,
