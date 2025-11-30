@@ -144,4 +144,16 @@ export class EmailJobService {
       backoff: 5000,
     });
   }
+  async sendBookingCancelledEmail(data: {
+    email: string;
+    ownerName: string;
+    borrowerName: string;
+    itemName: string;
+    bookingId: string;
+  }) {
+    await this.queue.add('sendBookingCancelledEmail', data, {
+      attempts: 3,
+      backoff: 5000,
+    });
+  }
 }

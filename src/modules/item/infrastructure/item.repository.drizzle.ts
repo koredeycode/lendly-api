@@ -117,7 +117,8 @@ export class DrizzleItemRepository implements ItemRepository {
     return itemList;
   }
 
-  async updateItem(id: string, data: UpdateItemDTO) {
+  async updateItem(id: string, data: UpdateItemDTO, tx?: any) {
+    const database = tx || this.db;
     const updatedData = { ...data, updatedAt: new Date() };
 
     // if (data.location) {
@@ -128,7 +129,7 @@ export class DrizzleItemRepository implements ItemRepository {
     //     number,
     //   ];
     // }
-    const [item] = await this.db
+    const [item] = await database
       .update(items)
       .set({ ...updatedData, category: updatedData.category as any })
       .where(eq(items.id, id))

@@ -35,6 +35,9 @@ import { BookingService } from '../application/booking.service';
 import { BookingResponseDTO } from '../application/dto/booking-response.dto';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
+import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
+import { ReturnBookingUseCase } from '../application/return-booking.usecase';
+
 @ApiTags('Booking')
 @Controller('bookings')
 @ApiBearerAuth()
@@ -47,6 +50,8 @@ export class BookingController {
     private readonly reviewService: ReviewService,
     private readonly approveBookingUseCase: ApproveBookingUseCase,
     private readonly rejectBookingUseCase: RejectBookingUseCase,
+    private readonly cancelBookingUseCase: CancelBookingUseCase,
+    private readonly returnBookingUseCase: ReturnBookingUseCase,
   ) {}
 
   @ApiOperation({ summary: 'Get booking details' })
@@ -98,10 +103,10 @@ export class BookingController {
     return { message: 'Booking approved successfully' };
   }
 
-  @ApiOperation({ summary: 'Reject or cancel a booking request' })
+  @ApiOperation({ summary: 'Reject a booking request' })
   @ApiResponse({
     status: 200,
-    description: 'The booking has been rejected/cancelled',
+    description: 'The booking has been rejected',
   })
   @Post(':id/reject')
   async rejectBookingRequest(
@@ -110,6 +115,34 @@ export class BookingController {
   ) {
     await this.rejectBookingUseCase.execute(id, req.user.id);
     return { message: 'Booking rejected successfully' };
+  }
+
+  @ApiOperation({ summary: 'Cancel a booking request' })
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been cancelled',
+  })
+  @Post(':id/cancel')
+  async cancelBookingRequest(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.cancelBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking cancelled successfully' };
+  }
+
+  @ApiOperation({ summary: 'Confirm item return' })
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been marked as returned',
+  })
+  @Post(':id/return')
+  async returnBooking(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.returnBookingUseCase.execute(id, req.user.id);
+    return { message: 'Item return confirmed successfully' };
   }
 
   @ApiOperation({ summary: 'Get reviews for a booking' })

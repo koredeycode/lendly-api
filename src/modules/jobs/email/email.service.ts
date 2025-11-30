@@ -50,7 +50,7 @@ export class EmailService {
 
     try {
       const info = await this.transporter.sendMail({
-        from: '"Lendly Support" <support@lendly.com>',
+        from: '"Lendly Notifications" <notifications@lendly.com>',
         to,
         subject,
         text: text || 'Please view this email in an HTML compatible client.',

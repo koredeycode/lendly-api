@@ -10,6 +10,6 @@ export abstract class ItemRepository {
   abstract findItemById(id: string): Promise<ItemWithOwner | null>;
   abstract findItemsByOwner(ownerId: string, includeDeleted: boolean);
   abstract searchItems(search: SearchItemsDTO): Promise<Item[]>;
-  abstract updateItem(id: string, data: UpdateItemDTO): Promise<Item>;
+  abstract updateItem(id: string, data: UpdateItemDTO, tx?: any): Promise<Item>;
   abstract softDeleteItem(id: string): Promise<Item>;
 }

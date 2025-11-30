@@ -1,8 +1,8 @@
 import {
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -68,6 +68,13 @@ export class ApproveBookingUseCase {
       await this.bookingRepo.acceptBooking(
         bookingId,
         booking.thankYouTipCents || 0,
+        tx,
+      );
+
+      // Mark item as unavailable
+      await this.itemRepo.updateItem(
+        booking.itemId,
+        { isAvailable: false } as any,
         tx,
       );
 

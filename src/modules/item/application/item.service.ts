@@ -22,4 +22,17 @@ export class ItemService {
   async getUserItems(userId: string) {
     return this.itemRepo.findItemsByOwner(userId, false);
   }
+
+  async toggleAvailability(itemId: string, userId: string) {
+    const item = await this.itemRepo.findItemById(itemId);
+    if (!item) throw new NotFoundException('Item not found');
+
+    if (item.ownerId !== userId) {
+      throw new NotFoundException('You are not the owner of this item');
+    }
+
+    return await this.itemRepo.updateItem(itemId, {
+      isAvailable: !item.isAvailable,
+    } as any);
+  }
 }

@@ -21,6 +21,27 @@ export class CreateBookingUseCase {
   ) {}
 
   async execute(itemId: string, borrowerId: string, data: CreateBookingDTO) {
+    const item = await this.itemRepo.findItemById(itemId);
+
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+
+    if (!item.isAvailable) {
+      throw new NotFoundException('Item is not available for booking');
+    }
+
+    // Check for overlapping bookings
+    const isAvailable = await this.bookingRepo.checkAvailability(
+      itemId,
+      new Date(data.requestedFrom),
+      new Date(data.requestedTo),
+    );
+
+    if (!isAvailable) {
+      throw new NotFoundException('Item is already booked for these dates');
+    }
+
     const totalAmount = data.rentalFeeCents + (data.thankYouTipCents || 0);
 
     return await this.db.transaction(async (tx) => {
@@ -45,33 +66,33 @@ export class CreateBookingUseCase {
 
       // Send funds held email to borrower
       const borrower = await this.userRepo.findUserById(borrowerId);
-      const item = await this.itemRepo.findItemById(itemId);
-      
+      // const item = await this.itemRepo.findItemById(itemId); // Already fetched
+
       if (borrower && item) {
-         await this.emailJobService.sendFundsHeldEmail({
-            email: borrower.email,
-            name: borrower.name,
-            amount: (totalAmount / 100).toLocaleString('en-NG', {
-              style: 'currency',
-              currency: 'NGN',
-            }),
-            itemName: item.title,
-            bookingId: booking.id,
-         });
+        await this.emailJobService.sendFundsHeldEmail({
+          email: borrower.email,
+          name: borrower.name,
+          amount: (totalAmount / 100).toLocaleString('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+          }),
+          itemName: item.title,
+          bookingId: booking.id,
+        });
       }
 
       try {
         // 3. Send email to owner (outside transaction or inside? inside is safer for consistency, but email sending should be async/job)
         // The email job service just adds to queue, so it's fast.
-        const item = await this.itemRepo.findItemById(itemId);
+        // const item = await this.itemRepo.findItemById(itemId); // Already fetched
 
-        if (!item) {
-          throw new NotFoundException('Item not found');
-        }
+        // if (!item) {
+        //   throw new NotFoundException('Item not found');
+        // }
 
         const owner = await this.userRepo.findUserById(item.ownerId);
 
-        const borrower = await this.userRepo.findUserById(borrowerId);
+        // const borrower = await this.userRepo.findUserById(borrowerId); // Already fetched
 
         if (owner && borrower) {
           // 4. Create chat message if provided
@@ -80,15 +101,15 @@ export class CreateBookingUseCase {
               booking.id,
               borrowerId,
               data.message,
-              // Note: Chat message creation is outside the transaction to avoid locking issues if possible, 
-              // or we can pass tx if we want it atomic. 
+              // Note: Chat message creation is outside the transaction to avoid locking issues if possible,
+              // or we can pass tx if we want it atomic.
               // Since the method signature in repo supports tx, let's pass it if we were inside transaction block.
               // BUT we are inside the try/catch block which is AFTER the transaction committed?
               // Wait, line 23 `db.transaction` wraps everything.
               // So we are inside the transaction.
               // However, the `bookingRepo.createChatMessage` implementation I added accepts `tx`.
               // Let's pass `tx` to ensure atomicity.
-              tx
+              tx,
             );
           }
 
@@ -98,7 +119,7 @@ export class CreateBookingUseCase {
           const totalPrice = (totalAmount / 100).toLocaleString('en-NG', {
             style: 'currency',
             currency: 'NGN',
-          }); 
+          });
 
           await this.emailJobService.sendBookingRequestedEmail({
             email: owner.email,

@@ -18,6 +18,9 @@ import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 import { UserModule } from 'src/modules/user/presentation/user.module';
 
 
+import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
+import { ReturnBookingUseCase } from '../application/return-booking.usecase';
+
 @Module({
   imports: [
     JobsModule,
@@ -34,6 +37,8 @@ import { UserModule } from 'src/modules/user/presentation/user.module';
     CreateBookingUseCase,
     ApproveBookingUseCase,
     RejectBookingUseCase,
+    CancelBookingUseCase,
+    ReturnBookingUseCase,
     {
       provide: BookingRepository,
       useClass: DrizzleBookingRepository,

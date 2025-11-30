@@ -160,10 +160,11 @@ export class DrizzleBookingRepository implements BookingRepository {
     return await query;
   }
 
-  async checkAvailability(itemId: string, from: Date, to: Date) {
+  async checkAvailability(itemId: string, from: Date, to: Date, tx?: any) {
+    const database = tx || this.db;
     // Check if there are any overlapping bookings that are accepted or picked_up
     // Overlap logic: (StartA <= EndB) and (EndA >= StartB)
-    const [result] = await this.db
+    const [result] = await database
       .select({ count: sql<number>`count(*)` })
       .from(bookings)
       .where(

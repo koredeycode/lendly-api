@@ -1,30 +1,30 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  Query,
-  Request,
-  UseGuards
+    Body,
+    Controller,
+    Delete,
+    ForbiddenException,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query,
+    Request,
+    UseGuards
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
 } from '@nestjs/swagger';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { CreateBookingUseCase } from 'src/modules/booking/application/create-booking.usecase';
 import {
-  BookingResponseDTO,
-  BookingsResponseDTO,
+    BookingResponseDTO,
+    BookingsResponseDTO,
 } from 'src/modules/booking/application/dto/booking-response.dto';
 import { CreateBookingDTO } from 'src/modules/booking/application/dto/create-booking.dto';
 import { CreateItemUseCase } from '../application/create-item.usecase';
@@ -32,8 +32,8 @@ import { DeleteItemUseCase } from '../application/delete-item.usecase';
 import { AvailabilityResponseDTO } from '../application/dto/availability-response.dto';
 import { CreateItemDTO } from '../application/dto/create-item.dto';
 import {
-  ItemResponseDTO,
-  ItemsResponseDTO,
+    ItemResponseDTO,
+    ItemsResponseDTO,
 } from '../application/dto/item-response.dto';
 import { SearchItemsDTO } from '../application/dto/search-items.dto';
 import { UpdateItemDTO } from '../application/dto/update-item.dto';
@@ -185,6 +185,23 @@ export class ItemController {
     return {
       message: 'Availability checked successfully',
       data: { isAvailable },
+    };
+  }
+
+  @ApiOperation({ summary: 'Toggle item availability' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item availability toggled successfully',
+  })
+  @Post(':id/toggle-availability')
+  async toggleAvailability(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    const item = await this.itemService.toggleAvailability(id, req.user.id);
+    return {
+      message: 'Item availability toggled successfully',
+      data: item,
     };
   }
 }
