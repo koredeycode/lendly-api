@@ -36,9 +36,10 @@ import { BookingResponseDTO } from '../application/dto/booking-response.dto';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
+import { CompleteBookingUseCase } from '../application/complete-booking.usecase';
+import { MarkBookingOverdueUseCase } from '../application/mark-booking-overdue.usecase';
 import { PickupBookingUseCase } from '../application/pickup-booking.usecase';
 import { ReturnBookingUseCase } from '../application/return-booking.usecase';
-import { CompleteBookingUseCase } from '../application/complete-booking.usecase';
 
 @ApiTags('Booking')
 @Controller('bookings')
@@ -56,6 +57,7 @@ export class BookingController {
     private readonly returnBookingUseCase: ReturnBookingUseCase,
     private readonly pickupBookingUseCase: PickupBookingUseCase,
     private readonly completeBookingUseCase: CompleteBookingUseCase,
+    private readonly markBookingOverdueUseCase: MarkBookingOverdueUseCase,
   ) {}
 
   @ApiOperation({ summary: 'Get booking details' })
@@ -231,5 +233,19 @@ export class BookingController {
   ) {
     await this.completeBookingUseCase.execute(id, req.user.id);
     return { message: 'Booking completed successfully' };
+  }
+
+  @ApiOperation({ summary: 'Mark booking as overdue' })
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been marked as overdue',
+  })
+  @Post(':id/overdue')
+  async markBookingOverdue(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.markBookingOverdueUseCase.execute(id, req.user.id);
+    return { message: 'Booking marked as overdue successfully' };
   }
 }

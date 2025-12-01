@@ -53,6 +53,18 @@ export class EmailJobService {
     });
   }
 
+  async sendBookingOverdueEmail(data: {
+    email: string;
+    borrowerName: string;
+    itemName: string;
+    bookingId: string;
+  }) {
+    await this.queue.add('sendBookingOverdueEmail', data, {
+      attempts: 3,
+      backoff: 5000,
+    });
+  }
+
   async sendPaymentSuccessEmail(data: {
     email: string;
     name: string;

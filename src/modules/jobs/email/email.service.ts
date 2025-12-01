@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { bookingApprovedTemplate } from './templates/booking-approved.template';
+import { bookingOverdueTemplate } from './templates/booking-overdue.template';
 import { bookingRejectedTemplate } from './templates/booking-rejected.template';
 import { bookingRequestTemplate } from './templates/booking-request.template';
 import { fundsHeldTemplate } from './templates/funds-held.template';
@@ -108,6 +109,19 @@ export class EmailService {
   ) {
     const html = bookingRejectedTemplate(data);
     const subject = `Booking Update: ${data.itemName}`;
+    return this.sendEmail(to, subject, html);
+  }
+
+  async sendBookingOverdueEmail(
+    to: string,
+    data: {
+      borrowerName: string;
+      itemName: string;
+      bookingId: string;
+    },
+  ) {
+    const html = bookingOverdueTemplate(data);
+    const subject = `Action Required: Booking Overdue - ${data.itemName}`;
     return this.sendEmail(to, subject, html);
   }
 

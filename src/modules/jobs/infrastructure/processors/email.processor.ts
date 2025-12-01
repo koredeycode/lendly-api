@@ -20,6 +20,9 @@ export class EmailProcessor {
       case 'sendBookingRejectedEmail':
         await this.handleBookingRejectedEmail(job.data);
         break;
+      case 'sendBookingOverdueEmail':
+        await this.handleBookingOverdueEmail(job.data);
+        break;
       case 'sendPaymentSuccessEmail':
         await this.handlePaymentSuccessEmail(job.data);
         break;
@@ -104,6 +107,22 @@ export class EmailProcessor {
       `[EmailProcessor] Sending booking rejected email to borrower ${data.email}. Item: ${data.itemName}`,
     );
     await this.emailService.sendBookingRejectedEmail(data.email, {
+      borrowerName: data.borrowerName,
+      itemName: data.itemName,
+      bookingId: data.bookingId,
+    });
+  }
+
+  private async handleBookingOverdueEmail(data: {
+    email: string;
+    borrowerName: string;
+    itemName: string;
+    bookingId: string;
+  }) {
+    console.log(
+      `[EmailProcessor] Sending booking overdue email to borrower ${data.email}. Item: ${data.itemName}`,
+    );
+    await this.emailService.sendBookingOverdueEmail(data.email, {
       borrowerName: data.borrowerName,
       itemName: data.itemName,
       bookingId: data.bookingId,
