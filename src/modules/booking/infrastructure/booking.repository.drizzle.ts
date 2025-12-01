@@ -2,14 +2,22 @@ import { Inject, Injectable } from '@nestjs/common';
 import { aliasedTable, desc, eq, or, sql } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
-import { bookings, bookingStatusEnum, chatMessages, items, users } from 'src/config/db/schema';
+import {
+  bookings,
+  bookingStatusEnum,
+  chatMessages,
+  items,
+  users,
+} from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
 export class DrizzleBookingRepository implements BookingRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async createBooking(
     itemId: string,
@@ -174,6 +182,9 @@ export class DrizzleBookingRepository implements BookingRepository {
           AND tstzrange(${bookings.requestedFrom}, ${bookings.requestedTo}, '[)') && tstzrange(${from}, ${to}, '[)')
         `,
       );
+
+    console.log('Availability check result:', result);
+    console.log(result.count);
 
     return result.count === 0;
   }

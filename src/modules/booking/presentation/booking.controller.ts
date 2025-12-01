@@ -36,6 +36,7 @@ import { BookingResponseDTO } from '../application/dto/booking-response.dto';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
+import { PickupBookingUseCase } from '../application/pickup-booking.usecase';
 import { ReturnBookingUseCase } from '../application/return-booking.usecase';
 
 @ApiTags('Booking')
@@ -52,6 +53,7 @@ export class BookingController {
     private readonly rejectBookingUseCase: RejectBookingUseCase,
     private readonly cancelBookingUseCase: CancelBookingUseCase,
     private readonly returnBookingUseCase: ReturnBookingUseCase,
+    private readonly pickupBookingUseCase: PickupBookingUseCase,
   ) {}
 
   @ApiOperation({ summary: 'Get booking details' })
@@ -143,6 +145,20 @@ export class BookingController {
   ) {
     await this.returnBookingUseCase.execute(id, req.user.id);
     return { message: 'Item return confirmed successfully' };
+  }
+
+  @ApiOperation({ summary: 'Mark booking as picked up' })
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been marked as picked up',
+  })
+  @Post(':id/pickup')
+  async pickupBooking(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.pickupBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking picked up successfully' };
   }
 
   @ApiOperation({ summary: 'Get reviews for a booking' })
