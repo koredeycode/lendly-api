@@ -1,9 +1,9 @@
 import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -59,7 +59,9 @@ export class CancelBookingUseCase {
             booking.borrowerId,
             booking.totalChargedCents,
             booking.id,
-            tx
+            tx,
+            'booking cancelled',
+            booking.item.title,
         );
       }
 

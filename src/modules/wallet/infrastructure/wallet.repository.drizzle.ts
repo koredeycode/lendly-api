@@ -1,16 +1,16 @@
 import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    NotFoundException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
 import {
-    wallets,
-    walletTransactions,
-    walletTransactionTypeEnum,
+  wallets,
+  walletTransactions,
+  walletTransactionTypeEnum,
 } from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
 import { WalletRepository } from '../domain/wallet.repository';
@@ -128,6 +128,8 @@ export class DrizzleWalletRepository implements WalletRepository {
     amountCents: number,
     bookingId: string | null,
     tx?: any,
+    reason?: string,
+    itemTitle?: string,
   ) {
     const database = tx || this.db;
     const wallet = await this.getWallet(userId);
@@ -144,12 +146,20 @@ export class DrizzleWalletRepository implements WalletRepository {
       })
       .where(eq(wallets.userId, userId));
 
+    let description = 'Funds released from hold';
+    if (itemTitle) {
+      description += ` for ${itemTitle}`;
+    }
+    if (reason) {
+      description += ` (${reason})`;
+    }
+
     await this.addWalletTransaction({
       walletId: userId,
       amountCents,
       type: 'release',
       bookingId,
-      description: 'Funds released from hold',
+      description,
     });
   }
 
@@ -159,6 +169,7 @@ export class DrizzleWalletRepository implements WalletRepository {
     amountCents: number,
     bookingId: string,
     tx?: any,
+    itemTitle?: string,
   ) {
     const database = tx || this.db;
     // Deduct from sender's frozen balance
@@ -189,12 +200,16 @@ export class DrizzleWalletRepository implements WalletRepository {
       );
     }
 
+    const description = itemTitle
+      ? `Payment for booking: ${itemTitle}`
+      : 'Payment for booking';
+
     await this.addWalletTransaction({
       walletId: fromUserId,
       amountCents: -amountCents,
       type: 'rental_payment',
       bookingId,
-      description: 'Payment for booking',
+      description,
     });
 
     await this.addWalletTransaction({
@@ -202,7 +217,9 @@ export class DrizzleWalletRepository implements WalletRepository {
       amountCents,
       type: 'rental_receive',
       bookingId,
-      description: 'Payment received for booking',
+      description: itemTitle
+        ? `Payment received for booking: ${itemTitle}`
+        : 'Payment received for booking',
     });
   }
   async topUp(userId: string, amountCents: number) {

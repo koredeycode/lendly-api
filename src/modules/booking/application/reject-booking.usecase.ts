@@ -1,8 +1,8 @@
 import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
+    Inject,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -29,11 +29,8 @@ export class RejectBookingUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-      const item = await this.itemRepo.findItemById(booking.itemId);
-      if (!item) throw new NotFoundException('Item not found');
-
       // Only owner or borrower can reject/cancel
-      if (item.ownerId !== userId && booking.borrowerId !== userId) {
+      if (booking.item.ownerId !== userId && booking.borrowerId !== userId) {
         throw new UnauthorizedException(
           'Not authorized to reject this booking',
         );
@@ -49,6 +46,8 @@ export class RejectBookingUseCase {
         booking.totalChargedCents,
         bookingId,
         tx,
+        'booking rejected',
+        booking.item.title,
       );
 
       // Send funds released email to borrower
@@ -61,7 +60,7 @@ export class RejectBookingUseCase {
               style: 'currency',
               currency: 'NGN',
             }),
-            itemName: item.title,
+            itemName: booking.item.title,
             reason: 'Booking rejected/cancelled',
          });
       }
@@ -74,13 +73,13 @@ export class RejectBookingUseCase {
       );
 
       // Send email to borrower (if rejected by owner)
-      if (item.ownerId === userId) {
+      if (booking.item.ownerId === userId) {
         const borrower = await this.userRepo.findUserById(booking.borrowerId);
         if (borrower) {
           await this.emailJobService.sendBookingRejectedEmail({
             email: borrower.email,
             borrowerName: borrower.name,
-            itemName: item.title,
+            itemName: booking.item.title,
             bookingId: bookingId,
           });
         }

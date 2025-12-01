@@ -30,8 +30,17 @@ export class WalletService {
     amountCents: number,
     bookingId: string | null,
     tx?: any,
+    reason?: string,
+    itemTitle?: string,
   ) {
-    await this.walletRepo.releaseFunds(userId, amountCents, bookingId, tx);
+    await this.walletRepo.releaseFunds(
+      userId,
+      amountCents,
+      bookingId,
+      tx,
+      reason,
+      itemTitle,
+    );
   }
 
   async transferFunds(
@@ -40,6 +49,7 @@ export class WalletService {
     amountCents: number,
     bookingId: string,
     tx?: any,
+    itemTitle?: string,
   ) {
     await this.walletRepo.transferFunds(
       fromUserId,
@@ -47,6 +57,7 @@ export class WalletService {
       amountCents,
       bookingId,
       tx,
+      itemTitle,
     );
   }
   async topUp(userId: string, amountCents: number) {

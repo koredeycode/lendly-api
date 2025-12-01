@@ -23,6 +23,8 @@ export abstract class WalletRepository {
     amountCents: number,
     bookingId: string | null,
     tx?: any,
+    reason?: string,
+    itemTitle?: string,
   ): Promise<void>;
 
   abstract transferFunds(
@@ -31,6 +33,7 @@ export abstract class WalletRepository {
     amountCents: number,
     bookingId: string,
     tx?: any,
+    itemTitle?: string,
   ): Promise<void>;
 
   abstract topUp(userId: string, amountCents: number): Promise<void>;

@@ -1,9 +1,9 @@
 import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -28,11 +28,8 @@ export class MarkBookingOverdueUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-      const item = await this.itemRepo.findItemById(booking.itemId);
-      if (!item) throw new NotFoundException('Item not found');
-
       // Only owner can mark as overdue
-      if (item.ownerId !== userId) {
+      if (booking.item.ownerId !== userId) {
         throw new UnauthorizedException(
           'Only the item owner can mark booking as overdue',
         );
@@ -63,7 +60,7 @@ export class MarkBookingOverdueUseCase {
         await this.emailJobService.sendBookingOverdueEmail({
           email: borrower.email,
           borrowerName: borrower.name,
-          itemName: item.title,
+          itemName: booking.item.title,
           bookingId: bookingId,
         });
       }
