@@ -30,7 +30,7 @@ import {
   ReviewsResponseDTO,
 } from 'src/modules/review/application/dto/review-response.dto';
 import { ReviewService } from 'src/modules/review/application/review.service';
-import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
+import { AcceptBookingUseCase } from '../application/accept-booking.usecase';
 import { BookingService } from '../application/booking.service';
 import { BookingResponseDTO } from '../application/dto/booking-response.dto';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
@@ -51,7 +51,7 @@ export class BookingController {
     private readonly bookingService: BookingService,
     private readonly messageService: MessageService,
     private readonly reviewService: ReviewService,
-    private readonly approveBookingUseCase: ApproveBookingUseCase,
+    private readonly acceptBookingUseCase: AcceptBookingUseCase,
     private readonly rejectBookingUseCase: RejectBookingUseCase,
     private readonly cancelBookingUseCase: CancelBookingUseCase,
     private readonly returnBookingUseCase: ReturnBookingUseCase,
@@ -95,18 +95,18 @@ export class BookingController {
     return { message: 'Booking deleted successfully' };
   }
 
-  @ApiOperation({ summary: 'Approve a booking request' })
+  @ApiOperation({ summary: 'Accept a booking request' })
   @ApiResponse({
     status: 200,
     description: 'The booking has been accepted',
   })
-  @Post(':id/approve')
-  async approveBookingRequest(
+  @Post(':id/accept')
+  async acceptBookingRequest(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
-    await this.approveBookingUseCase.execute(id, req.user.id);
-    return { message: 'Booking approved successfully' };
+    await this.acceptBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking accepted successfully' };
   }
 
   @ApiOperation({ summary: 'Reject a booking request' })

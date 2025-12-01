@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
     Inject,
     Injectable,
     NotFoundException,
@@ -28,7 +29,7 @@ export class PickupBookingUseCase {
       }
 
       if (booking.status !== 'accepted') {
-        throw new Error('Booking is not in accepted state');
+        throw new BadRequestException('Booking is not in accepted state');
       }
 
       // Update status

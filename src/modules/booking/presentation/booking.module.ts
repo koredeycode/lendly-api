@@ -12,7 +12,7 @@ import { BookingController } from './booking.controller';
 
 import { ItemModule } from 'src/modules/item/presentation/item.module';
 import { WalletModule } from 'src/modules/wallet/presentation/wallet.module';
-import { ApproveBookingUseCase } from '../application/approve-booking.usecase';
+import { AcceptBookingUseCase } from '../application/accept-booking.usecase';
 import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 import { UserModule } from 'src/modules/user/presentation/user.module';
@@ -38,7 +38,7 @@ import { ReturnBookingUseCase } from '../application/return-booking.usecase';
   providers: [
     BookingService,
     CreateBookingUseCase,
-    ApproveBookingUseCase,
+    AcceptBookingUseCase,
     RejectBookingUseCase,
     CancelBookingUseCase,
     ReturnBookingUseCase,

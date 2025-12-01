@@ -68,7 +68,7 @@ export class CancelBookingUseCase {
       // 3. Send email notification (optional but good)
       // Maybe notify the owner that the request was cancelled?
       // And notify borrower that funds are released.
-      if (booking.item.owner) {
+      
         await this.emailJobService.sendBookingCancelledEmail({
           email: booking.item.owner.email,
           ownerName: booking.item.owner.name,
@@ -76,7 +76,18 @@ export class CancelBookingUseCase {
           itemName: booking.item.title,
           bookingId: booking.id,
         });
-      }
+      
+
+      await this.emailJobService.sendFundsReleasedEmail({
+        email: booking.borrower.email,
+        name: booking.borrower.name,
+        amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
+          style: 'currency',
+          currency: 'NGN',
+        }),
+        itemName: booking.item.title,
+        reason: 'Booking cancelled',
+      });
 
       // For now, let's just return the updated booking.
       return updatedBooking;

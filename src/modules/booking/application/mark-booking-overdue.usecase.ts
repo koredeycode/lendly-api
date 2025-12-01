@@ -8,9 +8,7 @@ import {
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
-import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
-import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
@@ -18,8 +16,6 @@ export class MarkBookingOverdueUseCase {
   constructor(
     @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
     private readonly bookingRepo: BookingRepository,
-    private readonly itemRepo: ItemRepository,
-    private readonly userRepo: UserRepository,
     private readonly emailJobService: EmailJobService,
   ) {}
 
@@ -55,15 +51,13 @@ export class MarkBookingOverdueUseCase {
       );
 
       // Send email to borrower
-      const borrower = await this.userRepo.findUserById(booking.borrowerId);
-      if (borrower) {
-        await this.emailJobService.sendBookingOverdueEmail({
-          email: borrower.email,
-          borrowerName: borrower.name,
-          itemName: booking.item.title,
+      await this.emailJobService.sendBookingOverdueEmail({
+        email: booking.borrower.email,
+        borrowerName: booking.borrower.name,
+        itemName: booking.item.title,
           bookingId: bookingId,
         });
-      }
+        
 
       return updatedBooking;
     });

@@ -1,15 +1,14 @@
 import {
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
-import { ItemRepository } from 'src/modules/item/domain/item.repository';
 import { EmailJobService } from 'src/modules/jobs/application/email-job.service';
-import { UserRepository } from 'src/modules/user/domain/user.repository';
 import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { BookingRepository } from '../domain/booking.repository';
 
@@ -19,8 +18,6 @@ export class RejectBookingUseCase {
     @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
     private readonly bookingRepo: BookingRepository,
     private readonly walletService: WalletService,
-    private readonly itemRepo: ItemRepository,
-    private readonly userRepo: UserRepository,
     private readonly emailJobService: EmailJobService,
   ) {}
 
@@ -29,15 +26,15 @@ export class RejectBookingUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-      // Only owner or borrower can reject/cancel
-      if (booking.item.ownerId !== userId && booking.borrowerId !== userId) {
+      // Only owner can reject
+      if (booking.item.owner.id !== userId) {
         throw new UnauthorizedException(
           'Not authorized to reject this booking',
         );
       }
 
       if (booking.status !== 'pending') {
-        throw new Error('Booking is not pending');
+        throw new BadRequestException('Booking is not pending');
       }
 
       // Release funds
@@ -50,20 +47,19 @@ export class RejectBookingUseCase {
         booking.item.title,
       );
 
+      
       // Send funds released email to borrower
-      const borrower = await this.userRepo.findUserById(booking.borrowerId);
-      if (borrower) {
-         await this.emailJobService.sendFundsReleasedEmail({
-            email: borrower.email,
-            name: borrower.name,
-            amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
-              style: 'currency',
-              currency: 'NGN',
-            }),
-            itemName: booking.item.title,
-            reason: 'Booking rejected/cancelled',
-         });
-      }
+      await this.emailJobService.sendFundsReleasedEmail({
+        email: booking.borrower.email,
+        name: booking.borrower.name,
+        amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
+          style: 'currency',
+          currency: 'NGN',
+        }),
+        itemName: booking.item.title,
+        reason: 'Booking rejected',
+      });
+
 
       // Update status
       const updatedBooking = await this.bookingRepo.updateBookingStatus(
@@ -72,19 +68,14 @@ export class RejectBookingUseCase {
         tx,
       );
 
-      // Send email to borrower (if rejected by owner)
-      if (booking.item.ownerId === userId) {
-        const borrower = await this.userRepo.findUserById(booking.borrowerId);
-        if (borrower) {
-          await this.emailJobService.sendBookingRejectedEmail({
-            email: borrower.email,
-            borrowerName: borrower.name,
-            itemName: booking.item.title,
-            bookingId: bookingId,
-          });
-        }
-      }
-
+      // Send email to borrower
+      await this.emailJobService.sendBookingRejectedEmail({
+        email: booking.borrower.email,
+        borrowerName: booking.borrower.name,
+          itemName: booking.item.title,
+          bookingId: bookingId,
+        });
+     
       return updatedBooking;
     });
   }

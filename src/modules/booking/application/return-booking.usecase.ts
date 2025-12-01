@@ -26,8 +26,8 @@ export class ReturnBookingUseCase {
       throw new NotFoundException('Booking not found');
     }
 
-    if (booking.item.ownerId !== userId) {
-      throw new UnauthorizedException('Only the owner can confirm return');
+    if (booking.borrowerId !== userId) {
+      throw new UnauthorizedException('Only the borrower can confirm return');
     }
 
     if (

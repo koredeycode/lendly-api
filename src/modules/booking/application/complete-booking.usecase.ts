@@ -1,8 +1,8 @@
 import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BookingRepository } from '../domain/booking.repository';
 
@@ -17,8 +17,8 @@ export class CompleteBookingUseCase {
       throw new NotFoundException('Booking not found');
     }
 
-    // Check if user is authorized (borrower or owner)
-    if (booking.borrowerId !== userId && booking.item.ownerId !== userId) {
+    // Check if user is authorized (owner)  
+    if (booking.item.owner.id !== userId) {
       throw new UnauthorizedException(
         'You are not authorized to complete this booking',
       );

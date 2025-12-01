@@ -44,6 +44,9 @@ export class EmailProcessor {
       case 'sendPayoutReceivedEmail':
         await this.handlePayoutReceivedEmail(job.data);
         break;
+      case 'sendBookingCancelledEmail':
+        await this.handleBookingCancelledEmail(job.data);
+        break;
       default:
         console.log('Unknown job:', job.name);
     }
@@ -176,5 +179,23 @@ export class EmailProcessor {
       `[EmailProcessor] Sending payout received email to ${data.email}`,
     );
     await this.emailService.sendPayoutReceivedEmail(data.email, data);
+  }
+
+  private async handleBookingCancelledEmail(data: {
+    email: string;
+    ownerName: string;
+    borrowerName: string;
+    itemName: string;
+    bookingId: string;
+  }) {
+    console.log(
+      `[EmailProcessor] Sending booking cancelled email to owner ${data.email}. Borrower: ${data.borrowerName}, Item: ${data.itemName}`,
+    );
+    await this.emailService.sendBookingCancelledEmail(data.email, {
+      ownerName: data.ownerName,
+      borrowerName: data.borrowerName,
+      itemName: data.itemName,
+      bookingId: data.bookingId,
+    });
   }
 }

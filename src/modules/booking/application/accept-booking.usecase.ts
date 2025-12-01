@@ -1,8 +1,9 @@
 import {
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
@@ -14,7 +15,7 @@ import { WalletService } from 'src/modules/wallet/application/wallet.service';
 import { BookingRepository } from '../domain/booking.repository';
 
 @Injectable()
-export class ApproveBookingUseCase {
+export class AcceptBookingUseCase {
   constructor(
     @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
     private readonly bookingRepo: BookingRepository,
@@ -29,41 +30,37 @@ export class ApproveBookingUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-      const item = await this.itemRepo.findItemById(booking.itemId);
-      if (!item) throw new NotFoundException('Item not found');
 
-      if (item.ownerId !== userId) {
+      if (booking.item.owner.id !== userId) {
         throw new UnauthorizedException('Only the owner can approve bookings');
       }
 
       if (booking.status !== 'pending') {
-        throw new Error('Booking is not pending');
+        throw new BadRequestException('Booking is not pending');
       }
 
       // Transfer funds
       await this.walletService.transferFunds(
         booking.borrowerId,
-        item.ownerId,
+        booking.item.owner.id,
         booking.totalChargedCents,
         bookingId,
         tx,
-        item.title,
+        booking.item.title,
       );
 
       // Send payout received email to owner
-      const owner = await this.userRepo.findUserById(item.ownerId);
-      if (owner) {
-         await this.emailJobService.sendPayoutReceivedEmail({
-            email: owner.email,
-            name: owner.name,
+       await this.emailJobService.sendPayoutReceivedEmail({
+            email: booking.item.owner.email,
+            name: booking.item.owner.name,
             amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
               style: 'currency',
               currency: 'NGN',
             }),
-            itemName: item.title,
+            itemName: booking.item.title,
             bookingId: bookingId,
          });
-      }
+      
 
       // Update status
       await this.bookingRepo.acceptBooking(
@@ -74,21 +71,18 @@ export class ApproveBookingUseCase {
 
       // Mark item as unavailable
       await this.itemRepo.updateItem(
-        booking.itemId,
+        booking.item.id,
         { isAvailable: false } as any,
         tx,
       );
 
       // Send email to borrower
-      const borrower = await this.userRepo.findUserById(booking.borrowerId);
-      if (borrower) {
-        await this.emailJobService.sendBookingApprovedEmail({
-          email: borrower.email,
-          borrowerName: borrower.name,
-          itemName: item.title,
-          bookingId: bookingId,
-        });
-      }
+      await this.emailJobService.sendBookingApprovedEmail({
+        email: booking.borrower.email,
+        borrowerName: booking.borrower.name,
+        itemName: booking.item.title,
+        bookingId: bookingId,
+      });
     });
   }
 }
