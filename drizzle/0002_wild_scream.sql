@@ -1,2 +1,0 @@
-CREATE TYPE "public"."item_category" AS ENUM('electronics', 'tools', 'clothing', 'books', 'sports_outdoors', 'home_garden', 'toys_games', 'automotive', 'baby_kids', 'health_beauty', 'musical_instruments', 'office_supplies', 'pet_supplies', 'art_collectibles', 'others');--> statement-breakpoint
-ALTER TABLE "items" ALTER COLUMN "category" SET DATA TYPE "public"."item_category" USING "category"::"public"."item_category";
