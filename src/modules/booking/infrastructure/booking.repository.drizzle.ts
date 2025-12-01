@@ -183,10 +183,33 @@ export class DrizzleBookingRepository implements BookingRepository {
         `,
       );
 
-    console.log('Availability check result:', result);
-    console.log(result.count);
+    return Number(result.count) === 0;
+  }
 
-    return result.count === 0;
+  async checkUserAvailability(
+    userId: string,
+    itemId: string,
+    from: Date,
+    to: Date,
+    tx?: any,
+  ) {
+    const database = tx || this.db;
+    // Check if the user has any overlapping bookings for this item (pending, accepted, or picked_up)
+    const [result] = await database
+      .select({ count: sql<number>`count(*)` })
+      .from(bookings)
+      .where(
+        sql`
+          ${bookings.itemId} = ${itemId}
+          AND ${bookings.borrowerId} = ${userId}
+          AND ${bookings.status} IN ('pending', 'accepted', 'picked_up')
+          `,
+          // AND tstzrange(${bookings.requestedFrom}, ${bookings.requestedTo}, '[)') && tstzrange(${from}, ${to}, '[)')
+      );  
+
+    console.log({ result });
+
+    return Number(result.count) === 0;
   }
 
   async createChatMessage(

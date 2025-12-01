@@ -69,7 +69,7 @@ export class RejectBookingUseCase {
       // Update status
       const updatedBooking = await this.bookingRepo.updateBookingStatus(
         bookingId,
-        'cancelled',
+        'rejected',
         tx,
       );
 

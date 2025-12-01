@@ -32,16 +32,28 @@ export class CreateBookingUseCase {
     }
 
     // Check for overlapping bookings
-    // TODO: verify availability logic
-    // const isAvailable = await this.bookingRepo.checkAvailability(
-    //   itemId,
-    //   new Date(data.requestedFrom),
-    //   new Date(data.requestedTo),
-    // );
+    const isAvailable = await this.bookingRepo.checkAvailability(
+      itemId,
+      new Date(data.requestedFrom),
+      new Date(data.requestedTo),
+    );
 
-    // if (!isAvailable) {
-    //   throw new NotFoundException('Item is already booked for these dates');
-    // }
+    if (!isAvailable) {
+      throw new NotFoundException('Item is already booked for these dates');
+    }
+
+    const isUserAvailable = await this.bookingRepo.checkUserAvailability(
+      borrowerId,
+      itemId,
+      new Date(data.requestedFrom),
+      new Date(data.requestedTo),
+    );
+
+    if (!isUserAvailable) {
+      throw new NotFoundException(
+        'You already have a booking for this item',
+      );
+    }
 
     const totalAmount = data.rentalFeeCents + (data.thankYouTipCents || 0);
 

@@ -3,16 +3,16 @@ import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/db/drizzle/client';
 import {
-  bookings,
-  chatMessages,
-  itemCategoryEnum,
-  items,
-  reviews,
-  users,
-  wallets,
-  walletTransactions,
-  type Item,
-  type User,
+    bookings,
+    chatMessages,
+    itemCategoryEnum,
+    items,
+    reviews,
+    users,
+    wallets,
+    walletTransactions,
+    type Item,
+    type User,
 } from '../config/db/schema';
 
 // Target location: 7.9001865, 4.6571689
@@ -641,6 +641,41 @@ async function main() {
       });
     }
 
+    // Scenario 5: Charlie rejects Alice's request (Rejected)
+    const charlie2 = createdUsers[3];
+    const alice2 = createdUsers[1];
+    const gopro = createdItems.find(i => i.title === 'GoPro Hero 9');
+
+    if (gopro) {
+      const rentalFee = gopro.dailyRentalPriceCents * 2;
+      const [booking] = await db.insert(bookings).values({
+        itemId: gopro.id,
+        borrowerId: alice2.id,
+        status: 'rejected',
+        requestedFrom: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        requestedTo: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        rentalFeeCents: rentalFee,
+        totalChargedCents: 0,
+      }).returning();
+
+      await db.insert(chatMessages).values([
+        {
+          bookingId: booking.id,
+          senderId: alice2.id,
+          message: 'Hi Charlie, can I rent the GoPro for my trip?',
+          isRead: true,
+          createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+        },
+        {
+          bookingId: booking.id,
+          senderId: charlie2.id,
+          message: 'Sorry Alice, I need it myself for those dates.',
+          isRead: true,
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        }
+      ]);
+    }
+
 
 
     // Generate random bookings
@@ -651,7 +686,7 @@ async function main() {
     for (let i = 0; i < bookingsNeeded; i++) {
       const item = faker.helpers.arrayElement(createdItems);
       const borrower = faker.helpers.arrayElement(createdUsers.filter(u => u.id !== item.ownerId));
-      const status = faker.helpers.arrayElement(['completed', 'accepted', 'pending', 'cancelled']);
+      const status = faker.helpers.arrayElement(['completed', 'accepted', 'pending', 'cancelled', 'rejected']);
       const days = faker.number.int({ min: 1, max: 7 });
       const rentalFee = item.dailyRentalPriceCents * days;
       

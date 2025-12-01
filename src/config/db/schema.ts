@@ -29,6 +29,7 @@ export const bookingStatusEnum = pgEnum('booking_status', [
   'completed', // final state for permanent giveaways after pickup
   'cancelled',
   'overdue',
+  'rejected',
 ]);
 
 export const photoTypeEnum = pgEnum('photo_type', ['before', 'after']);

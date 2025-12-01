@@ -19,6 +19,7 @@ import { UserModule } from 'src/modules/user/presentation/user.module';
 
 
 import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
+import { CompleteBookingUseCase } from '../application/complete-booking.usecase';
 import { PickupBookingUseCase } from '../application/pickup-booking.usecase';
 import { ReturnBookingUseCase } from '../application/return-booking.usecase';
 
@@ -41,6 +42,7 @@ import { ReturnBookingUseCase } from '../application/return-booking.usecase';
     CancelBookingUseCase,
     ReturnBookingUseCase,
     PickupBookingUseCase,
+    CompleteBookingUseCase,
     {
       provide: BookingRepository,
       useClass: DrizzleBookingRepository,

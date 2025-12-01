@@ -38,6 +38,7 @@ import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
 import { PickupBookingUseCase } from '../application/pickup-booking.usecase';
 import { ReturnBookingUseCase } from '../application/return-booking.usecase';
+import { CompleteBookingUseCase } from '../application/complete-booking.usecase';
 
 @ApiTags('Booking')
 @Controller('bookings')
@@ -54,6 +55,7 @@ export class BookingController {
     private readonly cancelBookingUseCase: CancelBookingUseCase,
     private readonly returnBookingUseCase: ReturnBookingUseCase,
     private readonly pickupBookingUseCase: PickupBookingUseCase,
+    private readonly completeBookingUseCase: CompleteBookingUseCase,
   ) {}
 
   @ApiOperation({ summary: 'Get booking details' })
@@ -215,5 +217,19 @@ export class BookingController {
   ) {
     const data = await this.messageService.createMessage(id, req.user.id, body);
     return { message: 'Message sent successfully', data };
+  }
+
+  @ApiOperation({ summary: 'Mark booking as completed' })
+  @ApiResponse({
+    status: 200,
+    description: 'The booking has been marked as completed',
+  })
+  @Post(':id/complete')
+  async completeBooking(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    await this.completeBookingUseCase.execute(id, req.user.id);
+    return { message: 'Booking completed successfully' };
   }
 }
