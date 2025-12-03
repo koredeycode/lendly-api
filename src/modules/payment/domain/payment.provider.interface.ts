@@ -3,7 +3,7 @@ export interface InitializePaymentDto {
   email: string;
   currency: string;
   metadata?: any;
-  callbackUrl?: string;
+  platform?: 'ios' | 'android' | 'web';
 }
 
 export interface PaymentInitializationResponse {

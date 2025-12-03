@@ -41,7 +41,7 @@ export class FlutterwaveProvider implements IPaymentProvider {
         // For this "experiment", I'll assume amount passed to provider is what provider expects or I convert.
         // Standard is usually major units for Flutterwave.
         currency: dto.currency,
-        redirect_url: dto.callbackUrl,
+        redirect_url: `${this.configService.get<string>('APP_URL')}/payments/callback?platform=${dto.platform}`,
         customer: {
           email: dto.email,
         },

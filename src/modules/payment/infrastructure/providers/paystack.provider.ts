@@ -37,7 +37,7 @@ export class PaystackProvider implements IPaymentProvider {
         amount: dto.amountCents, // Paystack takes amount in kobo (cents)
         currency: dto.currency,
         metadata: dto.metadata,
-        callback_url: dto.callbackUrl,
+        callback_url: `${this.configService.get<string>('APP_URL')}/payments/callback?platform=${dto.platform}`,
       }),
     });
 
@@ -45,7 +45,7 @@ export class PaystackProvider implements IPaymentProvider {
     if (!data.status) {
       throw new Error(`Paystack initialization failed: ${data.message}`);
     }
-
+    console.log({paystackResponse: data})
     return {
       reference: data.data.reference,
       authorizationUrl: data.data.authorization_url,
@@ -157,6 +157,8 @@ export class PaystackProvider implements IPaymentProvider {
     if (!this.validateWebhook(payload, signature)) {
       return null;
     }
+
+    console.dir(payload, { depth: null });
 
     const event = payload.event;
     const data = payload.data;

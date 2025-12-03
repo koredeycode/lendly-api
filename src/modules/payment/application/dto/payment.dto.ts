@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -21,13 +22,43 @@ export class TopUpDto {
   @IsEmail()
   email: string;
 
+  // @ApiProperty({
+  //   description: 'Callback URL for payment redirection',
+  //   example: 'https://lendly.app/payment/callback',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // callbackUrl: string;
+  
   @ApiProperty({
-    description: 'Callback URL for payment redirection',
-    example: 'https://lendly.app/payment/callback',
+    description: 'Platform initiating the request',
+    enum: ['ios', 'android', 'web'],
+    example: 'ios',
   })
   @IsString()
   @IsNotEmpty()
-  callbackUrl: string;
+  @IsEnum(['ios', 'android', 'web'])
+  platform: 'ios' | 'android' | 'web';
+}
+
+export class PaymentCallbackDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  reference?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  trxref?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: ['ios', 'android', 'web'],
+  })
+  @IsOptional()
+  @IsEnum(['ios', 'android', 'web'])
+  platform?: 'ios' | 'android' | 'web';
 }
 
 export class AccountDetailsDto {

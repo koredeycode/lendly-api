@@ -77,7 +77,7 @@ export class MonnifyProvider implements IPaymentProvider {
           paymentDescription: 'Wallet Top-up',
           currencyCode: dto.currency,
           contractCode: this.contractCode,
-          redirectUrl: dto.callbackUrl,
+          redirectUrl: `${this.configService.get<string>('APP_URL')}/payments/callback?platform=${dto.platform}`,
           metaData: dto.metadata,
         }),
       },

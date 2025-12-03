@@ -1,5 +1,5 @@
 {
-  "id": "1c1c36be-2ff4-42e9-844b-888dc0a597c6",
+  "id": "6032ea03-5d44-4a0c-a788-14be694663f1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -874,12 +874,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "reviewee_id": {
-          "name": "reviewee_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "rating": {
           "name": "rating",
           "type": "smallint",
@@ -921,19 +915,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "reviewer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "reviews_reviewee_id_users_id_fk": {
-          "name": "reviews_reviewee_id_users_id_fk",
-          "tableFrom": "reviews",
-          "tableTo": "users",
-          "columnsFrom": [
-            "reviewee_id"
           ],
           "columnsTo": [
             "id"

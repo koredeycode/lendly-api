@@ -43,8 +43,8 @@ export class StripeProvider implements IPaymentProvider {
           },
         ],
         mode: 'payment',
-        success_url: `${dto.callbackUrl}{CHECKOUT_SESSION_ID}`,
-        cancel_url: `${dto.callbackUrl}cancel`,
+        success_url: `${this.configService.get<string>('APP_URL')}/payments/callback?platform=${dto.platform}&reference={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${this.configService.get<string>('APP_URL')}/payments/callback?platform=${dto.platform}&reference=cancel`,
         metadata: dto.metadata,
         customer_email: dto.email,
       });

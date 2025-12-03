@@ -26,7 +26,7 @@ export class PaymentService {
     userId: string,
     amountCents: number,
     email: string,
-    callbackUrl: string,
+    platform: 'ios' | 'android' | 'web',
   ) {
     const providerName = this.getDefaultProvider();
     const provider = this.paymentFactory.getProvider(providerName);
@@ -47,8 +47,8 @@ export class PaymentService {
         amountCents,
         email,
         currency: 'NGN',
-        metadata: { transactionId: transaction.id, userId },
-        callbackUrl: callbackUrl,
+        metadata: { transactionId: transaction.id, userId, platform },
+        platform,
       });
 
       await this.paymentRepository.updateTransaction(transaction.id, {

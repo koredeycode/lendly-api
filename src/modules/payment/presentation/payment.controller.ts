@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -13,15 +15,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import {
+  PaymentCallbackDto,
   TopUpDto,
   TopUpResponseDto,
   VerifyPaymentDto,
   VerifyResponseDto,
   WithdrawDto,
-  WithdrawResponseDto,
+  WithdrawResponseDto
 } from '../application/dto/payment.dto';
 import { PaymentService } from '../application/payment.service';
 
@@ -44,7 +48,7 @@ export class PaymentController {
       req.user.id,
       body.amountCents,
       body.email,
-      body.callbackUrl,
+      body.platform,
     );
     return { message: 'Top-up initialized', data: response };
   }
@@ -84,5 +88,44 @@ export class PaymentController {
       body.accountDetails,
     );
     return { message: 'Withdrawal requested', data: transaction };
+  }
+  
+  @ApiOperation({ summary: 'Handle payment webhook' })
+  @ApiResponse({
+    status: 200,
+    description: 'Webhook handled',
+  })
+  @Post('webhook/:provider')
+  async handleWebhook(
+    @Param('provider') provider: string,
+    @Body() body: any,
+    @Request() req: any,
+  ) {
+    const signature =
+      req.headers['x-paystack-signature'] || req.headers['stripe-signature'];
+    return await this.paymentService.handleWebhook(provider, body, signature);
+  }
+  
+  @ApiOperation({ summary: 'Handle payment callback' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirect to app',
+  })
+  @Get('callback')
+  @Get('callback')
+  async handleCallback(@Query() query: PaymentCallbackDto, @Res() res: Response) {
+    const { reference, trxref, platform } = query;
+    const ref = reference || trxref;
+
+    if (platform === 'web') {
+      // Redirect to web frontend
+      const webUrl = `${process.env.WEB_URL || 'https://lendly.app'}/payment/callback?reference=${ref}`;
+      return res.redirect(webUrl);
+    } else {
+      // Redirect to mobile app (ios/android)
+      // We can differentiate ios/android if needed, but for now both use same scheme
+      const appUrl = `lendy://wallet?reference=${ref}`;
+      return res.redirect(appUrl);
+    }
   }
 }
