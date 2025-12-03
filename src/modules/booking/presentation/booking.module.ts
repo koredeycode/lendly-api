@@ -1,6 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
-import { MessageService } from 'src/modules/message/application/message.service';
 import { MessageModule } from 'src/modules/message/presentation/message.module';
 import { ReviewModule } from 'src/modules/review/presentation/review.module';
 import { BookingService } from '../application/booking.service';
@@ -46,8 +45,6 @@ import { ReturnBookingUseCase } from '../application/return-booking.usecase';
       provide: BookingRepository,
       useClass: DrizzleBookingRepository,
     },
-    MessageService,
-
   ],
   exports: [BookingRepository, BookingService, CreateBookingUseCase],
 })
