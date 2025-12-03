@@ -7,6 +7,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
+import { RedisModule } from './common/redis/redis.module';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 import { AuthModule } from './modules/auth/presentation/auth.module';
@@ -78,6 +79,7 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     HealthModule,
     PaymentModule,
     DatabaseModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

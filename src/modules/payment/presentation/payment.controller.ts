@@ -11,11 +11,13 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { IdempotencyGuard } from 'src/common/guards/idempotency.guard';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import {
@@ -41,7 +43,12 @@ export class PaymentController {
     type: TopUpResponseDto,
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    description: 'Unique key for idempotency',
+    required: true,
+  })
+  @UseGuards(JwtAuthGuard, IdempotencyGuard)
   @Post('top-up')
   async topUp(@Request() req: AuthenticatedRequest, @Body() body: TopUpDto) {
     const response = await this.paymentService.initializeTopUp(
@@ -76,7 +83,12 @@ export class PaymentController {
     type: WithdrawResponseDto,
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    description: 'Unique key for idempotency',
+    required: true,
+  })
+  @UseGuards(JwtAuthGuard, IdempotencyGuard)
   @Post('withdraw')
   async withdraw(
     @Request() req: AuthenticatedRequest,
