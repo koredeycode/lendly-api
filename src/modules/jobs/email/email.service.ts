@@ -227,7 +227,7 @@ export class EmailService {
     },
   ) {
     const html = payoutReceivedTemplate(data);
-    const subject = 'You\'ve Received a Payment!';
+    const subject = "You've Received a Payment!";
     return this.sendEmail(to, subject, html);
   }
 

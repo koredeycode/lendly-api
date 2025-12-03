@@ -11,7 +11,9 @@ import { ItemRepository } from '../domain/item.repository';
 
 @Injectable()
 export class DrizzleItemRepository implements ItemRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async createItem(ownerId: string, data: CreateItemDTO) {
     const { location, ...rest } = data;

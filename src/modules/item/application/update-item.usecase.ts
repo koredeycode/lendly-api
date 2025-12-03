@@ -1,7 +1,7 @@
 import {
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { ItemRepository } from '../domain/item.repository';
 import { UpdateItemDTO } from './dto/update-item.dto';

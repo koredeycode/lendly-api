@@ -47,7 +47,6 @@ export class RejectBookingUseCase {
         booking.item.title,
       );
 
-      
       // Send funds released email to borrower
       await this.emailJobService.sendFundsReleasedEmail({
         email: booking.borrower.email,
@@ -60,7 +59,6 @@ export class RejectBookingUseCase {
         reason: 'Booking rejected',
       });
 
-
       // Update status
       const updatedBooking = await this.bookingRepo.updateBookingStatus(
         bookingId,
@@ -72,10 +70,10 @@ export class RejectBookingUseCase {
       await this.emailJobService.sendBookingRejectedEmail({
         email: booking.borrower.email,
         borrowerName: booking.borrower.name,
-          itemName: booking.item.title,
-          bookingId: bookingId,
-        });
-     
+        itemName: booking.item.title,
+        bookingId: bookingId,
+      });
+
       return updatedBooking;
     });
   }

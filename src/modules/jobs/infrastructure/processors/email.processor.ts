@@ -55,7 +55,6 @@ export class EmailProcessor {
   private async handleWelcomeEmail(data: { email: string; name: string }) {
     console.log('[EmailProcessor] Sending welcome email to:', data.email);
     await this.emailService.sendWelcomeEmail(data.email, data.name);
-    
   }
 
   private async handleBookingRequestedEmail(data: {
@@ -161,9 +160,7 @@ export class EmailProcessor {
   }
 
   private async handleFundsHeldEmail(data: any) {
-    console.log(
-      `[EmailProcessor] Sending funds held email to ${data.email}`,
-    );
+    console.log(`[EmailProcessor] Sending funds held email to ${data.email}`);
     await this.emailService.sendFundsHeldEmail(data.email, data);
   }
 

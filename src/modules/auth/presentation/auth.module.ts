@@ -19,7 +19,9 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: (process.env.ACCESS_EXPIRES_IN as any) || '30d' },
+      signOptions: {
+        expiresIn: (process.env.ACCESS_EXPIRES_IN as any) || '30d',
+      },
     }),
     JobsModule,
     UserModule,

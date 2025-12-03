@@ -17,7 +17,9 @@ import { WalletRepository } from '../domain/wallet.repository';
 
 @Injectable()
 export class DrizzleWalletRepository implements WalletRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async getWallet(userId: string) {
     const [wallet] = await this.db

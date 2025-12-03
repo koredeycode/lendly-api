@@ -3,16 +3,16 @@ import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/db/drizzle/client';
 import {
-    bookings,
-    chatMessages,
-    itemCategoryEnum,
-    items,
-    reviews,
-    users,
-    wallets,
-    walletTransactions,
-    type Item,
-    type User,
+  bookings,
+  chatMessages,
+  itemCategoryEnum,
+  items,
+  reviews,
+  users,
+  wallets,
+  walletTransactions,
+  type Item,
+  type User,
 } from '../config/db/schema';
 
 // Target location: 7.9001865, 4.6571689
@@ -117,35 +117,40 @@ const SEED_USERS = [
     name: 'Yusuf Yusuf',
     bio: 'Living life, love to lend! Tech enthusiast and community helper.',
     phone: '+23412345678',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
   },
   {
     email: 'alice@example.com',
     name: 'Alice Johnson',
     bio: 'Avid reader and gardener. Always happy to share tools and books.',
     phone: '+23412345679',
-    avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80',
   },
   {
     email: 'bob@example.com',
     name: 'Bob Smith',
     bio: 'DIY expert. If you need a tool, I probably have it.',
     phone: '+23412345680',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
   },
   {
     email: 'charlie@example.com',
     name: 'Charlie Brown',
     bio: 'Photography and gadgets. Rent my gear for your next shoot!',
     phone: '+23412345681',
-    avatarUrl: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=200&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=200&q=80',
   },
   {
     email: 'diana@example.com',
     name: 'Diana Prince',
     bio: 'Fashion lover. Refreshing my wardrobe often, so renting out the rest.',
     phone: '+23412345682',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    avatarUrl:
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
   },
 ];
 
@@ -154,7 +159,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 0,
     title: 'Canon EOS R5 Camera',
-    description: 'Professional grade mirrorless camera. Perfect for photo shoots and video projects. Comes with a 24-70mm lens.',
+    description:
+      'Professional grade mirrorless camera. Perfect for photo shoots and video projects. Comes with a 24-70mm lens.',
     category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1624138784181-dc7f5b75e52e?auto=format&fit=crop&w=800&q=80',
@@ -166,7 +172,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 0,
     title: 'MacBook Pro M1 16"',
-    description: 'High performance laptop for editing and coding. M1 Max chip, 32GB RAM.',
+    description:
+      'High performance laptop for editing and coding. M1 Max chip, 32GB RAM.',
     category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&w=800&q=80',
@@ -177,7 +184,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 0,
     title: 'Cordless Power Drill Set',
-    description: 'DeWalt cordless drill with two batteries and a set of drill bits. Great for home projects.',
+    description:
+      'DeWalt cordless drill with two batteries and a set of drill bits. Great for home projects.',
     category: 'tools',
     photos: [
       'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=800&q=80',
@@ -189,7 +197,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 1,
     title: 'Harry Potter Box Set',
-    description: 'Complete set of Harry Potter books. Hardcover edition. Great condition.',
+    description:
+      'Complete set of Harry Potter books. Hardcover edition. Great condition.',
     category: 'books',
     photos: [
       'https://images.unsplash.com/photo-1618666012174-83b441c0bc76?auto=format&fit=crop&w=800&q=80',
@@ -200,7 +209,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 1,
     title: 'Gardening Tool Kit',
-    description: 'Includes shovel, rake, pruning shears, and gloves. Everything you need for your garden.',
+    description:
+      'Includes shovel, rake, pruning shears, and gloves. Everything you need for your garden.',
     category: 'home_garden',
     photos: [
       'https://images.unsplash.com/photo-1617576683096-00fc8eecb3af?auto=format&fit=crop&w=800&q=80',
@@ -210,7 +220,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 1,
     title: '2-Person Camping Tent',
-    description: 'Lightweight and easy to set up. Perfect for a weekend getaway.',
+    description:
+      'Lightweight and easy to set up. Perfect for a weekend getaway.',
     category: 'sports_outdoors',
     photos: [
       'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80',
@@ -232,7 +243,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 2,
     title: 'Circular Saw',
-    description: 'Electric circular saw for cutting wood. Safety goggles included.',
+    description:
+      'Electric circular saw for cutting wood. Safety goggles included.',
     category: 'tools',
     photos: [
       'https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?auto=format&fit=crop&w=800&q=80',
@@ -244,7 +256,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 3,
     title: 'GoPro Hero 9',
-    description: 'Action camera for capturing your adventures. Waterproof and 4K video.',
+    description:
+      'Action camera for capturing your adventures. Waterproof and 4K video.',
     category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=800&q=80',
@@ -254,7 +267,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 3,
     title: 'DJI Mini 2 Drone',
-    description: 'Compact drone with 4K camera. Easy to fly and great for aerial shots.',
+    description:
+      'Compact drone with 4K camera. Easy to fly and great for aerial shots.',
     category: 'electronics',
     photos: [
       'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&w=800&q=80',
@@ -266,7 +280,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 4,
     title: 'Designer Handbag',
-    description: 'Luxury handbag for special occasions. Authentic and in pristine condition.',
+    description:
+      'Luxury handbag for special occasions. Authentic and in pristine condition.',
     category: 'clothing',
     photos: [
       'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
@@ -276,7 +291,8 @@ const SEED_ITEMS = [
   {
     ownerIndex: 4,
     title: 'Yoga Mat & Blocks',
-    description: 'High quality yoga mat with two foam blocks. Clean and sanitized.',
+    description:
+      'High quality yoga mat with two foam blocks. Clean and sanitized.',
     category: 'sports_outdoors',
     photos: [
       'https://images.unsplash.com/photo-1592432678016-e910b452f9a9?auto=format&fit=crop&w=800&q=80',
@@ -324,7 +340,10 @@ async function main() {
         .insert(users)
         .values({
           email: userData.email,
-          passwordHash: userData.email === 'koredey4u@gmail.com' ? passwordHash : defaultPasswordHash,
+          passwordHash:
+            userData.email === 'koredey4u@gmail.com'
+              ? passwordHash
+              : defaultPasswordHash,
           name: userData.name,
           avatarUrl: userData.avatarUrl,
           bio: userData.bio,
@@ -339,7 +358,7 @@ async function main() {
     // Generate random users
     const TOTAL_USERS = 16;
     const usersNeeded = TOTAL_USERS - createdUsers.length;
-    
+
     console.log(`Creating ${usersNeeded} random users...`);
     for (let i = 0; i < usersNeeded; i++) {
       const [user] = await db
@@ -416,7 +435,7 @@ async function main() {
       const owner = faker.helpers.arrayElement(createdUsers);
       const [lat, lng] = getRandomLocationNear(TARGET_LAT, TARGET_LNG);
       const category = faker.helpers.arrayElement(categories);
-      
+
       const [item] = await db
         .insert(items)
         .values({
@@ -427,7 +446,10 @@ async function main() {
           photos: [getRandomImageForCategory(category as string)],
           isPermanentGive: faker.datatype.boolean(0.1), // 10% chance
           isAvailable: true,
-          dailyRentalPriceCents: faker.number.int({ min: 100000, max: 1000000 }), // 1k - 10k
+          dailyRentalPriceCents: faker.number.int({
+            min: 100000,
+            max: 1000000,
+          }), // 1k - 10k
           location: [lat, lng],
           locationText: faker.location.streetAddress(),
           suggestedTip: faker.datatype.boolean() ? 'Thanks!' : null,
@@ -440,23 +462,26 @@ async function main() {
     // 4. Create Bookings & Interactions
     console.log('Creating bookings...');
     const createdBookings: any[] = [];
-    
+
     // Scenario 1: Alice rents Yusuf's Camera (Completed)
     const yusuf = createdUsers[0];
     const alice = createdUsers[1];
-    const camera = createdItems.find(i => i.title === 'Canon EOS R5 Camera');
+    const camera = createdItems.find((i) => i.title === 'Canon EOS R5 Camera');
 
     if (camera) {
       const rentalFee = camera.dailyRentalPriceCents * 3; // 3 days
-      const [booking] = await db.insert(bookings).values({
-        itemId: camera.id,
-        borrowerId: alice.id,
-        status: 'completed',
-        requestedFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-        requestedTo: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
-        rentalFeeCents: rentalFee,
-        totalChargedCents: rentalFee,
-      }).returning();
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: camera.id,
+          borrowerId: alice.id,
+          status: 'completed',
+          requestedFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+          requestedTo: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+          rentalFeeCents: rentalFee,
+          totalChargedCents: rentalFee,
+        })
+        .returning();
 
       // Transactions
       await db.insert(walletTransactions).values([
@@ -473,7 +498,7 @@ async function main() {
           type: 'rental_receive',
           bookingId: booking.id,
           description: `Rental income for ${camera.title}`,
-        }
+        },
       ]);
 
       // Review
@@ -482,7 +507,8 @@ async function main() {
         reviewerId: alice.id,
         revieweeId: yusuf.id,
         rating: 5,
-        comment: 'Great camera! Yusuf was very helpful and flexible with pickup.',
+        comment:
+          'Great camera! Yusuf was very helpful and flexible with pickup.',
       });
 
       // Chat
@@ -500,25 +526,28 @@ async function main() {
           message: 'Yes it is! You can pick it up on Friday.',
           isRead: true,
           createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000 + 3600000),
-        }
+        },
       ]);
     }
 
     // Scenario 2: Yusuf rents Charlie's Drone (Completed)
     const charlie = createdUsers[3];
-    const drone = createdItems.find(i => i.title === 'DJI Mini 2 Drone');
+    const drone = createdItems.find((i) => i.title === 'DJI Mini 2 Drone');
 
     if (drone) {
       const rentalFee = drone.dailyRentalPriceCents * 2; // 2 days
-      const [booking] = await db.insert(bookings).values({
-        itemId: drone.id,
-        borrowerId: yusuf.id,
-        status: 'completed',
-        requestedFrom: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-        requestedTo: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
-        rentalFeeCents: rentalFee,
-        totalChargedCents: rentalFee,
-      }).returning();
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: drone.id,
+          borrowerId: yusuf.id,
+          status: 'completed',
+          requestedFrom: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+          requestedTo: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
+          rentalFeeCents: rentalFee,
+          totalChargedCents: rentalFee,
+        })
+        .returning();
 
       // Transactions
       await db.insert(walletTransactions).values([
@@ -535,7 +564,7 @@ async function main() {
           type: 'rental_receive',
           bookingId: booking.id,
           description: `Rental income for ${drone.title}`,
-        }
+        },
       ]);
 
       // Review
@@ -550,35 +579,41 @@ async function main() {
 
     // Scenario 3: Bob rents Yusuf's Drill (Pending/Accepted)
     const bob = createdUsers[2];
-    const drill = createdItems.find(i => i.title === 'Cordless Power Drill Set');
+    const drill = createdItems.find(
+      (i) => i.title === 'Cordless Power Drill Set',
+    );
 
     if (drill) {
       const rentalFee = drill.dailyRentalPriceCents * 1;
-      const [booking] = await db.insert(bookings).values({
-        itemId: drill.id,
-        borrowerId: bob.id,
-        status: 'accepted',
-        requestedFrom: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Tomorrow
-        requestedTo: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-        rentalFeeCents: rentalFee,
-        totalChargedCents: 0,
-      }).returning();
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: drill.id,
+          borrowerId: bob.id,
+          status: 'accepted',
+          requestedFrom: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Tomorrow
+          requestedTo: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+          rentalFeeCents: rentalFee,
+          totalChargedCents: 0,
+        })
+        .returning();
 
       await db.insert(chatMessages).values([
         {
           bookingId: booking.id,
           senderId: bob.id,
-          message: 'Hey Yusuf, need this for a quick fix at home. Available tomorrow?',
+          message:
+            'Hey Yusuf, need this for a quick fix at home. Available tomorrow?',
           isRead: true,
           createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
         },
         {
           bookingId: booking.id,
           senderId: yusuf.id,
-          message: 'Hi Bob, sure thing! It\'s fully charged and ready to go.',
+          message: "Hi Bob, sure thing! It's fully charged and ready to go.",
           isRead: false,
           createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-        }
+        },
       ]);
 
       // Hold funds for Bob
@@ -593,25 +628,31 @@ async function main() {
 
     // Scenario 4: Diana rents Alice's Gardening Kit (Pending)
     const diana = createdUsers[4];
-    const gardeningKit = createdItems.find(i => i.title === 'Gardening Tool Kit');
+    const gardeningKit = createdItems.find(
+      (i) => i.title === 'Gardening Tool Kit',
+    );
 
     if (gardeningKit) {
       const rentalFee = gardeningKit.dailyRentalPriceCents * 2; // 2 days
-      const [booking] = await db.insert(bookings).values({
-        itemId: gardeningKit.id,
-        borrowerId: diana.id,
-        status: 'pending',
-        requestedFrom: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Next week
-        requestedTo: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        rentalFeeCents: rentalFee,
-        totalChargedCents: 0,
-      }).returning();
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: gardeningKit.id,
+          borrowerId: diana.id,
+          status: 'pending',
+          requestedFrom: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Next week
+          requestedTo: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          rentalFeeCents: rentalFee,
+          totalChargedCents: 0,
+        })
+        .returning();
 
       await db.insert(chatMessages).values([
         {
           bookingId: booking.id,
           senderId: diana.id,
-          message: 'Hi Alice, planning a garden revamp this weekend. Is the kit available?',
+          message:
+            'Hi Alice, planning a garden revamp this weekend. Is the kit available?',
           isRead: true,
           createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
         },
@@ -625,10 +666,10 @@ async function main() {
         {
           bookingId: booking.id,
           senderId: diana.id,
-          message: 'Wonderful! I\'ve sent the request.',
+          message: "Wonderful! I've sent the request.",
           isRead: false,
           createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-        }
+        },
       ]);
 
       // Hold funds for Diana
@@ -644,19 +685,22 @@ async function main() {
     // Scenario 5: Charlie rejects Alice's request (Rejected)
     const charlie2 = createdUsers[3];
     const alice2 = createdUsers[1];
-    const gopro = createdItems.find(i => i.title === 'GoPro Hero 9');
+    const gopro = createdItems.find((i) => i.title === 'GoPro Hero 9');
 
     if (gopro) {
       const rentalFee = gopro.dailyRentalPriceCents * 2;
-      const [booking] = await db.insert(bookings).values({
-        itemId: gopro.id,
-        borrowerId: alice2.id,
-        status: 'rejected',
-        requestedFrom: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        requestedTo: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        rentalFeeCents: rentalFee,
-        totalChargedCents: 0,
-      }).returning();
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: gopro.id,
+          borrowerId: alice2.id,
+          status: 'rejected',
+          requestedFrom: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          requestedTo: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          rentalFeeCents: rentalFee,
+          totalChargedCents: 0,
+        })
+        .returning();
 
       await db.insert(chatMessages).values([
         {
@@ -672,11 +716,9 @@ async function main() {
           message: 'Sorry Alice, I need it myself for those dates.',
           isRead: true,
           createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        }
+        },
       ]);
     }
-
-
 
     // Generate random bookings
     const TOTAL_BOOKINGS = 60;
@@ -685,23 +727,36 @@ async function main() {
     console.log(`Creating ${bookingsNeeded} random bookings...`);
     for (let i = 0; i < bookingsNeeded; i++) {
       const item = faker.helpers.arrayElement(createdItems);
-      const borrower = faker.helpers.arrayElement(createdUsers.filter(u => u.id !== item.ownerId));
-      const status = faker.helpers.arrayElement(['completed', 'accepted', 'pending', 'cancelled', 'rejected']);
+      const borrower = faker.helpers.arrayElement(
+        createdUsers.filter((u) => u.id !== item.ownerId),
+      );
+      const status = faker.helpers.arrayElement([
+        'completed',
+        'accepted',
+        'pending',
+        'cancelled',
+        'rejected',
+      ]);
       const days = faker.number.int({ min: 1, max: 7 });
       const rentalFee = item.dailyRentalPriceCents * days;
-      
-      const requestedFrom = faker.date.recent({ days: 30 });
-      const requestedTo = new Date(requestedFrom.getTime() + days * 24 * 60 * 60 * 1000);
 
-      const [booking] = await db.insert(bookings).values({
-        itemId: item.id,
-        borrowerId: borrower.id,
-        status: status as any,
-        requestedFrom,
-        requestedTo,
-        rentalFeeCents: rentalFee,
-        totalChargedCents: status === 'completed' ? rentalFee : 0,
-      }).returning();
+      const requestedFrom = faker.date.recent({ days: 30 });
+      const requestedTo = new Date(
+        requestedFrom.getTime() + days * 24 * 60 * 60 * 1000,
+      );
+
+      const [booking] = await db
+        .insert(bookings)
+        .values({
+          itemId: item.id,
+          borrowerId: borrower.id,
+          status: status as any,
+          requestedFrom,
+          requestedTo,
+          rentalFeeCents: rentalFee,
+          totalChargedCents: status === 'completed' ? rentalFee : 0,
+        })
+        .returning();
       createdBookings.push(booking);
 
       // Add transactions for completed bookings
@@ -720,7 +775,7 @@ async function main() {
             type: 'rental_receive',
             bookingId: booking.id,
             description: `Rental income for ${item.title}`,
-          }
+          },
         ]);
       }
     }
@@ -732,11 +787,11 @@ async function main() {
       if (booking.status === 'completed') {
         // 70% chance of review
         if (faker.datatype.boolean(0.7)) {
-           // Get item to find owner
-           const item = createdItems.find(i => i.id === booking.itemId);
-           if (!item) continue;
+          // Get item to find owner
+          const item = createdItems.find((i) => i.id === booking.itemId);
+          if (!item) continue;
 
-           await db.insert(reviews).values({
+          await db.insert(reviews).values({
             bookingId: booking.id,
             reviewerId: booking.borrowerId,
             revieweeId: item.ownerId,
@@ -751,23 +806,23 @@ async function main() {
     // Create messages
     console.log('Creating messages...');
     for (const booking of createdBookings) {
-        // 50% chance of messages if not one of the specific scenarios (which already have messages)
-        // We can check if messages exist, but easier to just add random ones for random bookings
-        // The specific scenarios were added before, so we can just add to others or add more.
-        // Let's just add to random bookings that don't have messages yet (simplified by probability)
-        
-        if (faker.datatype.boolean(0.5)) {
-            const item = createdItems.find(i => i.id === booking.itemId);
-            if (!item) continue;
+      // 50% chance of messages if not one of the specific scenarios (which already have messages)
+      // We can check if messages exist, but easier to just add random ones for random bookings
+      // The specific scenarios were added before, so we can just add to others or add more.
+      // Let's just add to random bookings that don't have messages yet (simplified by probability)
 
-            await db.insert(chatMessages).values({
-                bookingId: booking.id,
-                senderId: booking.borrowerId,
-                message: faker.lorem.sentence(),
-                isRead: faker.datatype.boolean(),
-                createdAt: booking.createdAt,
-            });
-        }
+      if (faker.datatype.boolean(0.5)) {
+        const item = createdItems.find((i) => i.id === booking.itemId);
+        if (!item) continue;
+
+        await db.insert(chatMessages).values({
+          bookingId: booking.id,
+          senderId: booking.borrowerId,
+          message: faker.lorem.sentence(),
+          isRead: faker.datatype.boolean(),
+          createdAt: booking.createdAt,
+        });
+      }
     }
     console.log('✅ Created chat messages.');
 

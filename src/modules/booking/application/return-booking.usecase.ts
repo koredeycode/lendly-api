@@ -30,10 +30,7 @@ export class ReturnBookingUseCase {
       throw new UnauthorizedException('Only the borrower can confirm return');
     }
 
-    if (
-      booking.status !== 'picked_up' &&
-      booking.status !== 'accepted'
-    ) {
+    if (booking.status !== 'picked_up' && booking.status !== 'accepted') {
       throw new BadRequestException(
         'Booking must be picked up or accepted before it can be returned',
       );
@@ -51,9 +48,9 @@ export class ReturnBookingUseCase {
       await this.itemRepo.updateItem(
         booking.itemId,
         { isAvailable: true } as any, // Cast to any to avoid partial DTO issue or use Partial<UpdateItemDTO> if repo supports it
-        tx
+        tx,
       );
-      
+
       return updatedBooking;
     });
   }

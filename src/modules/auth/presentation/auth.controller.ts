@@ -97,7 +97,8 @@ export class AuthController {
       email: user!.email,
       avatarUrl: user!.avatarUrl,
       trustScore: user!.trustScore,
-      phone: user?.phone, bio: user!.bio
+      phone: user?.phone,
+      bio: user!.bio,
     };
 
     return { message: 'Profile retrieved successfully', data };

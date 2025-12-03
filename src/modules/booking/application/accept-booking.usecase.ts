@@ -30,7 +30,6 @@ export class AcceptBookingUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-
       if (booking.item.owner.id !== userId) {
         throw new UnauthorizedException('Only the owner can approve bookings');
       }
@@ -50,17 +49,16 @@ export class AcceptBookingUseCase {
       );
 
       // Send payout received email to owner
-       await this.emailJobService.sendPayoutReceivedEmail({
-            email: booking.item.owner.email,
-            name: booking.item.owner.name,
-            amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
-              style: 'currency',
-              currency: 'NGN',
-            }),
-            itemName: booking.item.title,
-            bookingId: bookingId,
-         });
-      
+      await this.emailJobService.sendPayoutReceivedEmail({
+        email: booking.item.owner.email,
+        name: booking.item.owner.name,
+        amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
+          style: 'currency',
+          currency: 'NGN',
+        }),
+        itemName: booking.item.title,
+        bookingId: bookingId,
+      });
 
       // Update status
       await this.bookingRepo.acceptBooking(

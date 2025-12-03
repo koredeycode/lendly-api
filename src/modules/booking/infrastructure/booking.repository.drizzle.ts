@@ -204,8 +204,8 @@ export class DrizzleBookingRepository implements BookingRepository {
           AND ${bookings.borrowerId} = ${userId}
           AND ${bookings.status} IN ('pending', 'accepted', 'picked_up')
           `,
-          // AND tstzrange(${bookings.requestedFrom}, ${bookings.requestedTo}, '[)') && tstzrange(${from}, ${to}, '[)')
-      );  
+        // AND tstzrange(${bookings.requestedFrom}, ${bookings.requestedTo}, '[)') && tstzrange(${from}, ${to}, '[)')
+      );
 
     console.log({ result });
 

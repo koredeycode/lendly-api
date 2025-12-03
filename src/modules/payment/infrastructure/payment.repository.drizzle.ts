@@ -3,24 +3,29 @@ import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
 import {
-    NewPaymentTransaction,
-    PaymentTransaction,
-    paymentTransactions,
+  NewPaymentTransaction,
+  PaymentTransaction,
+  paymentTransactions,
 } from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
 import {
-    PaymentRepository,
-    UpdatePaymentTransactionDto,
+  PaymentRepository,
+  UpdatePaymentTransactionDto,
 } from '../domain/payment.repository';
 
 @Injectable()
 export class DrizzlePaymentRepository implements PaymentRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async createTransaction(
     data: NewPaymentTransaction,
   ): Promise<PaymentTransaction> {
-    const [tx] = await this.db.insert(paymentTransactions).values(data).returning();
+    const [tx] = await this.db
+      .insert(paymentTransactions)
+      .values(data)
+      .returning();
     return tx;
   }
 

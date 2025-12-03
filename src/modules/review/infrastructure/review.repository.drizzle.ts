@@ -10,7 +10,9 @@ import { ReviewRepository } from '../domain/review.repository';
 
 @Injectable()
 export class DrizzleReviewRepository implements ReviewRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async createReview(
     bookingId: string,

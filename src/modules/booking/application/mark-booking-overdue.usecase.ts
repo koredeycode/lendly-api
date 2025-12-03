@@ -55,9 +55,8 @@ export class MarkBookingOverdueUseCase {
         email: booking.borrower.email,
         borrowerName: booking.borrower.name,
         itemName: booking.item.title,
-          bookingId: bookingId,
-        });
-        
+        bookingId: bookingId,
+      });
 
       return updatedBooking;
     });

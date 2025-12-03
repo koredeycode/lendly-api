@@ -4,23 +4,25 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from 'src/config/db/schema';
 import { DRIZZLE } from 'src/modules/database/database.constants';
 import {
-    deviceTokens,
-    items,
-    reports,
-    savedItems,
-    userLocations,
-    users,
+  deviceTokens,
+  items,
+  reports,
+  savedItems,
+  userLocations,
+  users,
 } from '../../../config/db/schema';
 import {
-    CreateGoogleUserDTO,
-    CreateUserDTO,
+  CreateGoogleUserDTO,
+  CreateUserDTO,
 } from '../application/dto/create-user.dto';
 import { UpdateUserDTO } from '../application/dto/update-user.dto';
 import { UserRepository } from '../domain/user.repository';
 
 @Injectable()
 export class DrizzleUserRepository implements UserRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async findUserByEmail(email: string) {
     const result = await this.db

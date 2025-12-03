@@ -17,7 +17,6 @@ import { RejectBookingUseCase } from '../application/reject-booking.usecase';
 
 import { UserModule } from 'src/modules/user/presentation/user.module';
 
-
 import { CancelBookingUseCase } from '../application/cancel-booking.usecase';
 import { CompleteBookingUseCase } from '../application/complete-booking.usecase';
 import { MarkBookingOverdueUseCase } from '../application/mark-booking-overdue.usecase';
@@ -32,7 +31,6 @@ import { ReturnBookingUseCase } from '../application/return-booking.usecase';
     WalletModule,
     forwardRef(() => ItemModule),
     forwardRef(() => UserModule),
-
   ],
   controllers: [BookingController],
   providers: [
@@ -51,7 +49,6 @@ import { ReturnBookingUseCase } from '../application/return-booking.usecase';
     },
     MessageService,
     ReviewService,
-
   ],
   exports: [BookingRepository, BookingService, CreateBookingUseCase],
 })

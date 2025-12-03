@@ -131,7 +131,8 @@ export class PaymentService {
             style: 'currency',
             currency: 'NGN',
           }),
-          reason: verification.metadata?.message || 'Payment verification failed',
+          reason:
+            verification.metadata?.message || 'Payment verification failed',
           date: new Date().toLocaleDateString(),
         });
       }
@@ -188,25 +189,25 @@ export class PaymentService {
       const user = await this.userRepository.findUserById(userId);
       if (user) {
         if (response.status === 'success' || response.status === 'pending') {
-           // For pending, we might want to wait for webhook, but let's send success for now as request is successful
-           // Or maybe we should send "Withdrawal Initiated" email?
-           // The template says "Withdrawal Successful", so let's use it for success.
-           // If it's pending, we might want to wait. But let's assume success for now if provider returns success/pending.
-           // Actually, if it's pending, we should probably wait for webhook.
-           // But let's send it here if status is success.
-           if (response.status === 'success') {
-             await this.emailJobService.sendWithdrawalSuccessEmail({
-                email: user.email,
-                name: user.name,
-                amount: (amountCents / 100).toLocaleString('en-NG', {
-                  style: 'currency',
-                  currency: 'NGN',
-                }),
-                bankName: accountDetails.bankCode, // We might need to map bank code to name
-                accountNumber: accountDetails.accountNumber,
-                date: new Date().toLocaleDateString(),
-             });
-           }
+          // For pending, we might want to wait for webhook, but let's send success for now as request is successful
+          // Or maybe we should send "Withdrawal Initiated" email?
+          // The template says "Withdrawal Successful", so let's use it for success.
+          // If it's pending, we might want to wait. But let's assume success for now if provider returns success/pending.
+          // Actually, if it's pending, we should probably wait for webhook.
+          // But let's send it here if status is success.
+          if (response.status === 'success') {
+            await this.emailJobService.sendWithdrawalSuccessEmail({
+              email: user.email,
+              name: user.name,
+              amount: (amountCents / 100).toLocaleString('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+              }),
+              bankName: accountDetails.bankCode, // We might need to map bank code to name
+              accountNumber: accountDetails.accountNumber,
+              date: new Date().toLocaleDateString(),
+            });
+          }
         }
       }
 
@@ -275,19 +276,21 @@ export class PaymentService {
             metadata: event.metadata,
           });
 
-          const user = await this.userRepository.findUserById(transaction.userId);
+          const user = await this.userRepository.findUserById(
+            transaction.userId,
+          );
           if (user) {
-             await this.emailJobService.sendWithdrawalSuccessEmail({
-                email: user.email,
-                name: user.name,
-                amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
-                  style: 'currency',
-                  currency: 'NGN',
-                }),
-                bankName: 'Bank', // We might not have bank name here easily unless we store it in metadata or fetch from provider
-                accountNumber: '****', // Same for account number
-                date: new Date().toLocaleDateString(),
-             });
+            await this.emailJobService.sendWithdrawalSuccessEmail({
+              email: user.email,
+              name: user.name,
+              amount: (transaction.amountCents / 100).toLocaleString('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+              }),
+              bankName: 'Bank', // We might not have bank name here easily unless we store it in metadata or fetch from provider
+              accountNumber: '****', // Same for account number
+              date: new Date().toLocaleDateString(),
+            });
           }
         } else if (event.status === 'failed') {
           await this.paymentRepository.updateTransaction(transaction.id, {
@@ -301,7 +304,9 @@ export class PaymentService {
             transaction.amountCents,
           );
 
-          const user = await this.userRepository.findUserById(transaction.userId);
+          const user = await this.userRepository.findUserById(
+            transaction.userId,
+          );
           if (user) {
             await this.emailJobService.sendWithdrawalFailedEmail({
               email: user.email,

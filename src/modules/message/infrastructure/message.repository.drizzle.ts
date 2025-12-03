@@ -10,7 +10,9 @@ import { MessageRepository } from '../domain/message.repository';
 
 @Injectable()
 export class DrizzleMessageRepository implements MessageRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   async getChatMessages(bookingId: string, limit = 50) {
     return await this.db

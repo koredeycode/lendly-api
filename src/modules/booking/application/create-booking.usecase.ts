@@ -50,9 +50,7 @@ export class CreateBookingUseCase {
     );
 
     if (!isUserAvailable) {
-      throw new NotFoundException(
-        'You already have a booking for this item',
-      );
+      throw new NotFoundException('You already have a booking for this item');
     }
 
     const totalAmount = data.rentalFeeCents + (data.thankYouTipCents || 0);

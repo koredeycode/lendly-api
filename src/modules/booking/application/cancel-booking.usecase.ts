@@ -53,30 +53,29 @@ export class CancelBookingUseCase {
       // Wait, `createBooking` sets `totalChargedCents`.
       // And `holdFunds` uses `totalAmount`.
       // So `booking.totalChargedCents` should be correct.
-      
+
       if (booking.totalChargedCents > 0) {
         await this.walletService.releaseFunds(
-            booking.borrowerId,
-            booking.totalChargedCents,
-            booking.id,
-            tx,
-            'booking cancelled',
-            booking.item.title,
+          booking.borrowerId,
+          booking.totalChargedCents,
+          booking.id,
+          tx,
+          'booking cancelled',
+          booking.item.title,
         );
       }
 
       // 3. Send email notification (optional but good)
       // Maybe notify the owner that the request was cancelled?
       // And notify borrower that funds are released.
-      
-        await this.emailJobService.sendBookingCancelledEmail({
-          email: booking.item.owner.email,
-          ownerName: booking.item.owner.name,
-          borrowerName: booking.borrower.name,
-          itemName: booking.item.title,
-          bookingId: booking.id,
-        });
-      
+
+      await this.emailJobService.sendBookingCancelledEmail({
+        email: booking.item.owner.email,
+        ownerName: booking.item.owner.name,
+        borrowerName: booking.borrower.name,
+        itemName: booking.item.title,
+        bookingId: booking.id,
+      });
 
       await this.emailJobService.sendFundsReleasedEmail({
         email: booking.borrower.email,
