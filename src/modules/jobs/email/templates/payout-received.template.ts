@@ -6,6 +6,9 @@ export const payoutReceivedTemplate = (data: {
   itemName: string;
   bookingId: string;
 }) => {
+  const appUrl = `lendly://bookings/${data.bookingId}`;
+  const webUrl = `https://lendly.app/bookings/${data.bookingId}`;
+
   const content = `
     <h2>You've Received a Payment! 💵</h2>
     <p>Hi ${data.name},</p>
@@ -29,7 +32,9 @@ export const payoutReceivedTemplate = (data: {
     <p>The funds have been added to your Lendly wallet.</p>
     
     <div style="text-align: center; margin-top: 24px;">
-      <a href="https://lendly.app/wallet" class="button">View Wallet</a>
+      <a href="${appUrl}" class="button" style="margin-right: 10px;">View Booking (App)</a>
+      <a href="${webUrl}" class="button" style="background-color: transparent; color: #22C55E; border: 1px solid #22C55E; margin-right: 10px;">View Booking (Web)</a>
+      <a href="https://lendly.app/wallet" class="button" style="background-color: #334155;">View Wallet</a>
     </div>
   `;
 

@@ -18,8 +18,11 @@ export const bookingRejectedTemplate = (data: {
     <p>Don't worry, there are plenty of other items available on Lendly!</p>
     
     <div style="text-align: center; margin-top: 24px;">
-      <a href="${appUrl}" class="button" style="margin-right: 10px;">View Booking</a>
-      <a href="https://lendly.app" class="button" style="background-color: transparent; color: #22C55E; border: 1px solid #22C55E;">Browse Items</a>
+      <a href="${appUrl}" class="button" style="margin-right: 10px;">View on App</a>
+      <a href="${webUrl}" class="button" style="background-color: transparent; color: #22C55E; border: 1px solid #22C55E;">View on Web</a>
+      <div style="margin-top: 12px;">
+        <a href="https://lendly.app" style="color: #64748B; text-decoration: none; font-size: 14px;">Browse other items</a>
+      </div>
     </div>
   `;
 

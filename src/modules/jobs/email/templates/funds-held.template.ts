@@ -6,6 +6,9 @@ export const fundsHeldTemplate = (data: {
   itemName: string;
   bookingId: string;
 }) => {
+  const appUrl = `lendly://bookings/${data.bookingId}`;
+  const webUrl = `https://lendly.app/bookings/${data.bookingId}`;
+
   const content = `
     <h2>Funds Held for Booking 🔒</h2>
     <p>Hi ${data.name},</p>
@@ -29,7 +32,8 @@ export const fundsHeldTemplate = (data: {
     <p>These funds will be transferred to the owner once the booking is approved. If the booking is rejected or cancelled, the funds will be released back to your available balance.</p>
     
     <div style="text-align: center; margin-top: 24px;">
-      <a href="https://lendly.app/bookings/${data.bookingId}" class="button">View Booking</a>
+      <a href="${appUrl}" class="button" style="margin-right: 10px;">View on App</a>
+      <a href="${webUrl}" class="button" style="background-color: transparent; color: #22C55E; border: 1px solid #22C55E;">View on Web</a>
     </div>
   `;
 
