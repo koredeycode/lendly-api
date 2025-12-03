@@ -3,16 +3,16 @@ import * as bcrypt from 'bcrypt';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/db/drizzle/client';
 import {
-  bookings,
-  chatMessages,
-  itemCategoryEnum,
-  items,
-  reviews,
-  users,
-  wallets,
-  walletTransactions,
-  type Item,
-  type User,
+    bookings,
+    chatMessages,
+    itemCategoryEnum,
+    items,
+    reviews,
+    users,
+    wallets,
+    walletTransactions,
+    type Item,
+    type User,
 } from '../config/db/schema';
 
 // Target location: 7.9001865, 4.6571689
@@ -505,7 +505,6 @@ async function main() {
       await db.insert(reviews).values({
         bookingId: booking.id,
         reviewerId: alice.id,
-        revieweeId: yusuf.id,
         rating: 5,
         comment:
           'Great camera! Yusuf was very helpful and flexible with pickup.',
@@ -571,7 +570,7 @@ async function main() {
       await db.insert(reviews).values({
         bookingId: booking.id,
         reviewerId: yusuf.id,
-        revieweeId: charlie.id,
+        // revieweeId: charlie.id, // Removed
         rating: 5,
         comment: 'Amazing drone, captured stunning footage. Thanks Charlie!',
       });
@@ -794,9 +793,8 @@ async function main() {
           await db.insert(reviews).values({
             bookingId: booking.id,
             reviewerId: booking.borrowerId,
-            revieweeId: item.ownerId,
-            rating: faker.number.int({ min: 3, max: 5 }) as any,
-            comment: faker.lorem.sentence(),
+            rating: 5,
+            comment: 'Great item, thanks!',
           });
         }
       }

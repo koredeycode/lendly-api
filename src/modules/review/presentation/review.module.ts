@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
+import { BookingModule } from 'src/modules/booking/presentation/booking.module';
 import { JobsModule } from 'src/modules/jobs/presentation/job.module';
 import { CreateReviewUseCase } from '../application/create-review.usecase';
 import { DeleteReviewUseCase } from '../application/delete-review.usecase';
@@ -9,7 +10,7 @@ import { DrizzleReviewRepository } from '../infrastructure/review.repository.dri
 import { ReviewController } from './review.controller';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, forwardRef(() => BookingModule)],
   controllers: [ReviewController],
   providers: [
     ReviewService,
@@ -21,6 +22,6 @@ import { ReviewController } from './review.controller';
       useClass: DrizzleReviewRepository,
     },
   ],
-  exports: [ReviewRepository],
+  exports: [ReviewRepository, ReviewService],
 })
 export class ReviewModule {}

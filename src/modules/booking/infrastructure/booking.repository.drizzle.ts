@@ -49,17 +49,22 @@ export class DrizzleBookingRepository implements BookingRepository {
         item: items,
         owner: owner,
         borrower: borrower,
+        review: schema.reviews,
       })
       .from(bookings)
       .innerJoin(items, eq(bookings.itemId, items.id))
       .innerJoin(owner, eq(items.ownerId, owner.id))
       .innerJoin(borrower, eq(bookings.borrowerId, borrower.id))
-      .where(eq(bookings.id, id))
-      .limit(1);
+      .leftJoin(schema.reviews, eq(bookings.id, schema.reviews.bookingId))
+      .where(eq(bookings.id, id));
 
     if (result.length === 0) return null;
 
     const row = result[0];
+    const reviews = result
+      .map((r) => r.review)
+      .filter((r): r is schema.Review => r !== null);
+
     return {
       ...row.booking,
       item: {
@@ -67,6 +72,7 @@ export class DrizzleBookingRepository implements BookingRepository {
         owner: row.owner,
       },
       borrower: row.borrower,
+      reviews,
     };
   }
 
@@ -80,11 +86,13 @@ export class DrizzleBookingRepository implements BookingRepository {
         item: items,
         owner: owner,
         borrower: borrower,
+        review: schema.reviews,
       })
       .from(bookings)
       .innerJoin(items, eq(bookings.itemId, items.id))
       .innerJoin(owner, eq(items.ownerId, owner.id))
       .innerJoin(borrower, eq(bookings.borrowerId, borrower.id))
+      .leftJoin(schema.reviews, eq(bookings.id, schema.reviews.bookingId))
       .orderBy(desc(bookings.createdAt));
 
     if (type === 'borrower') {
@@ -97,16 +105,30 @@ export class DrizzleBookingRepository implements BookingRepository {
       );
     }
 
-    const result = await query;
+    const rows = await query;
 
-    return result.map((row) => ({
-      ...row.booking,
-      item: {
-        ...row.item,
-        owner: row.owner,
-      },
-      borrower: row.borrower,
-    }));
+    // Aggregate results manually
+    const bookingsMap = new Map<string, any>();
+
+    for (const row of rows) {
+      if (!bookingsMap.has(row.booking.id)) {
+        bookingsMap.set(row.booking.id, {
+          ...row.booking,
+          item: {
+            ...row.item,
+            owner: row.owner,
+          },
+          borrower: row.borrower,
+          reviews: [],
+        });
+      }
+
+      if (row.review) {
+        bookingsMap.get(row.booking.id).reviews.push(row.review);
+      }
+    }
+
+    return Array.from(bookingsMap.values());
   }
 
   async deleteBooking(id: string) {

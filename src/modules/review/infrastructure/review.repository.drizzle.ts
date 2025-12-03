@@ -17,12 +17,11 @@ export class DrizzleReviewRepository implements ReviewRepository {
   async createReview(
     bookingId: string,
     reviewerId: string,
-    revieweeId: string,
     data: CreateReviewDTO,
   ) {
     const [review] = await this.db
       .insert(reviews)
-      .values({ bookingId, revieweeId, reviewerId, ...data })
+      .values({ bookingId, reviewerId, ...data })
       .returning();
     return review;
   }

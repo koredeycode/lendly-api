@@ -6,7 +6,6 @@ export abstract class ReviewRepository {
   abstract createReview(
     bookingId: string,
     reviewerId: string,
-    revieweeId: string,
     data: CreateReviewDTO,
   ): Promise<Review>;
   abstract getReviews(bookingId: string): Promise<Review[]>;

@@ -142,9 +142,39 @@ export class DrizzleItemRepository implements ItemRepository {
   async softDeleteItem(id: string) {
     const [item] = await this.db
       .update(items)
-      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .set({ deletedAt: new Date() })
       .where(eq(items.id, id))
       .returning();
     return item;
+  }
+
+  async saveItem(userId: string, itemId: string) {
+    await this.db
+      .insert(schema.savedItems)
+      .values({ userId, itemId })
+      .onConflictDoNothing();
+  }
+
+  async unsaveItem(userId: string, itemId: string) {
+    await this.db
+      .delete(schema.savedItems)
+      .where(
+        and(
+          eq(schema.savedItems.userId, userId),
+          eq(schema.savedItems.itemId, itemId),
+        ),
+      );
+  }
+
+  async getSavedItems(userId: string) {
+    const results = await this.db
+      .select({
+        item: items,
+      })
+      .from(schema.savedItems)
+      .innerJoin(items, eq(items.id, schema.savedItems.itemId))
+      .where(eq(schema.savedItems.userId, userId));
+
+    return results.map((r) => r.item);
   }
 }

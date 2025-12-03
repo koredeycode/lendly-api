@@ -1,9 +1,10 @@
-import { Booking, bookingStatusEnum, Item, User } from 'src/config/db/schema';
+import { Booking, bookingStatusEnum, Item, Review, User } from 'src/config/db/schema';
 import { CreateBookingDTO } from '../application/dto/create-booking.dto';
 
 export type BookingWithDetails = Booking & {
   item: Item & { owner: User };
   borrower: User;
+  reviews: Review[];
 };
 
 export abstract class BookingRepository {

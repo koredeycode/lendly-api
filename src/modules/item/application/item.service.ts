@@ -1,8 +1,8 @@
 import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BookingRepository } from 'src/modules/booking/domain/booking.repository';
 import { ItemRepository } from '../domain/item.repository';
@@ -30,6 +30,33 @@ export class ItemService {
 
   async getUserItems(userId: string) {
     return this.itemRepo.findItemsByOwner(userId, false);
+  }
+
+  async softDeleteItem(id: string, userId: string) {
+    const item = await this.itemRepo.findItemById(id);
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+    if (item.ownerId !== userId) {
+      throw new UnauthorizedException('You are not authorized to delete this item');
+    }
+    return await this.itemRepo.softDeleteItem(id);
+  }
+
+  async saveItem(userId: string, itemId: string) {
+    const item = await this.itemRepo.findItemById(itemId);
+    if (!item) {
+      throw new NotFoundException('Item not found');
+    }
+    await this.itemRepo.saveItem(userId, itemId);
+  }
+
+  async unsaveItem(userId: string, itemId: string) {
+    await this.itemRepo.unsaveItem(userId, itemId);
+  }
+
+  async getSavedItems(userId: string) {
+    return await this.itemRepo.getSavedItems(userId);
   }
 
   async toggleAvailability(itemId: string, userId: string) {

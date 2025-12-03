@@ -12,4 +12,7 @@ export abstract class ItemRepository {
   abstract searchItems(search: SearchItemsDTO): Promise<Item[]>;
   abstract updateItem(id: string, data: UpdateItemDTO, tx?: any): Promise<Item>;
   abstract softDeleteItem(id: string): Promise<Item>;
+  abstract saveItem(userId: string, itemId: string): Promise<void>;
+  abstract unsaveItem(userId: string, itemId: string): Promise<void>;
+  abstract getSavedItems(userId: string): Promise<Item[]>;
 }

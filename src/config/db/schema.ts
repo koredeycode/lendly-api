@@ -260,10 +260,7 @@ export const reviews = pgTable(
     reviewerId: uuid('reviewer_id')
       .notNull()
       .references(() => users.id),
-    //TODO: might not be necessary
-    revieweeId: uuid('reviewee_id')
-      .notNull()
-      .references(() => users.id),
+    // revieweeId removed as it can be derived from booking
     rating: smallint('rating').notNull().$type<1 | 2 | 3 | 4 | 5>(),
     comment: text('comment'),
     createdAt: timestamp('created_at').defaultNow().notNull(),

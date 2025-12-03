@@ -21,6 +21,7 @@ import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-r
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
 import { BookingResponseDTO } from 'src/modules/booking/application/dto/booking-response.dto';
+import { CreateSavedItemDTO } from 'src/modules/item/application/dto/create-saved-item.dto';
 import { ItemsResponseDTO } from 'src/modules/item/application/dto/item-response.dto';
 import { ItemService } from 'src/modules/item/application/item.service';
 import { WalletResponseDTO } from 'src/modules/wallet/application/dto/wallet-response.dto';
@@ -147,7 +148,8 @@ export class UserController {
   })
   @Get('/saved-items')
   async getUserSavedItems(@Request() req: AuthenticatedRequest) {
-    return { message: 'User saved items retrieved successfully' };
+    const data = await this.itemService.getSavedItems(req.user.id);
+    return { message: 'User saved items retrieved successfully', data };
   }
 
   @ApiOperation({ summary: 'Save an item' })
@@ -157,7 +159,11 @@ export class UserController {
     type: SuccessResponseDTO,
   })
   @Post('/saved-items')
-  async createUserSavedItem(@Request() req: AuthenticatedRequest) {
+  async createUserSavedItem(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: CreateSavedItemDTO,
+  ) {
+    await this.itemService.saveItem(req.user.id, body.itemId);
     return { message: 'User saved item created successfully' };
   }
 
@@ -172,6 +178,7 @@ export class UserController {
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
+    await this.itemService.unsaveItem(req.user.id, id);
     return { message: 'User saved item deleted successfully' };
   }
 }

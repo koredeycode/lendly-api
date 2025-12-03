@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+    BadRequestException, Injectable, NotFoundException,
+    UnauthorizedException
+} from '@nestjs/common';
+import { BookingRepository } from '../../booking/domain/booking.repository';
 import { ReviewRepository } from '../domain/review.repository';
 import { CreateReviewDTO } from './dto/create-review.dto';
 import { UpdateReviewDTO } from './dto/update-review.dto';
@@ -7,8 +11,7 @@ import { UpdateReviewDTO } from './dto/update-review.dto';
 export class ReviewService {
   constructor(
     private readonly reviewRepo: ReviewRepository,
-    // private readonly bookingRepo: BookingRepository,
-    // private readonly itemRepo: ItemRepository,
+    private readonly bookingRepo: BookingRepository,
   ) {}
 
   async createReview(
@@ -16,26 +19,26 @@ export class ReviewService {
     reviewerId: string,
     data: CreateReviewDTO,
   ) {
-    //Todo: might just remove revieweeId from the table, the other party can be gotten
-    //TODO: notify the other party of the review via email
-    const revieweeId: string = '';
-    // const booking = await this.bookingRepo.findBookingById(bookingId);
-    // const item = await this.itemRepo.findItemById(booking?.itemId || '');
+    const booking = await this.bookingRepo.findBookingById(bookingId);
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
 
-    // if (booking === null || item === null) {
-    //   return;
-    // }
-    // if (item.ownerId === reviewerId) {
-    //   revieweeId = booking.borrowerId;
-    // } else {
-    //   revieweeId = item.ownerId;
-    // }
-    return await this.reviewRepo.createReview(
+    if (booking.borrowerId !== reviewerId && booking.item.ownerId !== reviewerId) {
+      throw new UnauthorizedException(
+        'You are not authorized to review this booking',
+      );
+    }
+
+    const hasReviewed = await this.reviewRepo.hasUserReviewedBooking(
       bookingId,
       reviewerId,
-      revieweeId,
-      data,
     );
+    if (hasReviewed) {
+      throw new BadRequestException('You have already reviewed this booking');
+    }
+
+    return await this.reviewRepo.createReview(bookingId, reviewerId, data);
   }
 
   async getReviews(bookingId: string) {

@@ -4,7 +4,7 @@ import {
   Delete,
   Param,
   Patch,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
