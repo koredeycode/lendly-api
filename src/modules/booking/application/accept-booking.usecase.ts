@@ -30,47 +30,38 @@ export class AcceptBookingUseCase {
       const booking = await this.bookingRepo.findBookingById(bookingId);
       if (!booking) throw new NotFoundException('Booking not found');
 
-      if (booking.item.owner.id !== userId) {
+      if (booking.item.ownerId !== userId) {
         throw new UnauthorizedException('Only the owner can approve bookings');
+      }
+
+      if (!booking.item.isAvailable) {
+        throw new BadRequestException(
+          'Item is marked as unavailable by owner. Please make it available before accepting bookings.',
+        );
       }
 
       if (booking.status !== 'pending') {
         throw new BadRequestException('Booking is not pending');
       }
 
-      // Transfer funds
-      await this.walletService.transferFunds(
-        booking.borrowerId,
-        booking.item.owner.id,
-        booking.totalChargedCents,
-        bookingId,
+      // Check for overlapping bookings before accepting
+      const isAvailable = await this.bookingRepo.checkAvailability(
+        booking.itemId,
+        new Date(booking.requestedFrom),
+        new Date(booking.requestedTo),
         tx,
-        booking.item.title,
       );
 
-      // Send payout received email to owner
-      await this.emailJobService.sendPayoutReceivedEmail({
-        email: booking.item.owner.email,
-        name: booking.item.owner.name,
-        amount: (booking.totalChargedCents / 100).toLocaleString('en-NG', {
-          style: 'currency',
-          currency: 'NGN',
-        }),
-        itemName: booking.item.title,
-        bookingId: bookingId,
-      });
+      if (!isAvailable) {
+        throw new BadRequestException(
+          'Item is no longer available for these dates',
+        );
+      }
 
       // Update status
       await this.bookingRepo.acceptBooking(
         bookingId,
         booking.thankYouTipCents || 0,
-        tx,
-      );
-
-      // Mark item as unavailable
-      await this.itemRepo.updateItem(
-        booking.item.id,
-        { isAvailable: false } as any,
         tx,
       );
 

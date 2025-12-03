@@ -29,13 +29,11 @@ export class CancelBookingUseCase {
     }
 
     if (booking.borrowerId !== userId) {
-      throw new UnauthorizedException('You can only cancel your own bookings');
+      throw new UnauthorizedException('You are not authorized to cancel this booking');
     }
 
     if (booking.status !== 'pending') {
-      throw new BadRequestException(
-        'Only pending bookings can be cancelled by the borrower',
-      );
+      throw new BadRequestException('Booking is not in pending state');
     }
 
     return await this.db.transaction(async (tx) => {

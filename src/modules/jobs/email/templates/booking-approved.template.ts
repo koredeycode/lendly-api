@@ -13,7 +13,7 @@ export const bookingApprovedTemplate = (data: {
     <p>Hi ${data.borrowerName},</p>
     <p>Great news! Your booking request for <strong>${data.itemName}</strong> has been approved by the owner.</p>
     
-    <p>Your held funds will be released to the owner.</p>
+    <p>Your funds remain held and will be released to the owner when you pick up the item.</p>
 
     <div style="text-align: center; margin-top: 24px;">
       <a href="${appUrl}" class="button" style="margin-right: 10px;">View on App</a>

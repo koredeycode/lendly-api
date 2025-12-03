@@ -9,7 +9,7 @@ export const payoutReceivedTemplate = (data: {
   const content = `
     <h2>You've Received a Payment! 💵</h2>
     <p>Hi ${data.name},</p>
-    <p>Great news! You have received a payment for your rental.</p>
+    <p>Great news! The borrower has picked up the item, and your payment has been released.</p>
     
     <div style="background-color: #1E293B; padding: 16px; border-radius: 8px; margin: 24px 0; border: 1px solid #334155;">
       <div class="info-row">

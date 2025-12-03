@@ -18,7 +18,7 @@ export class CompleteBookingUseCase {
     }
 
     // Check if user is authorized (owner)
-    if (booking.item.owner.id !== userId) {
+    if (booking.item.ownerId !== userId) {
       throw new UnauthorizedException(
         'You are not authorized to complete this booking',
       );

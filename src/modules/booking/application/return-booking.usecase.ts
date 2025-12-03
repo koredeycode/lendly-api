@@ -26,8 +26,8 @@ export class ReturnBookingUseCase {
       throw new NotFoundException('Booking not found');
     }
 
-    if (booking.borrowerId !== userId) {
-      throw new UnauthorizedException('Only the borrower can confirm return');
+    if (booking.item.ownerId !== userId) {
+      throw new UnauthorizedException('You are not authorized to mark this booking as returned');
     }
 
     if (booking.status !== 'picked_up' && booking.status !== 'accepted') {
@@ -44,12 +44,12 @@ export class ReturnBookingUseCase {
         tx,
       );
 
-      // 2. Mark item as available
-      await this.itemRepo.updateItem(
-        booking.itemId,
-        { isAvailable: true } as any, // Cast to any to avoid partial DTO issue or use Partial<UpdateItemDTO> if repo supports it
-        tx,
-      );
+      // 2. Mark item as available - REMOVED as per new logic
+      // await this.itemRepo.updateItem(
+      //   booking.itemId,
+      //   { isAvailable: true } as any,
+      //   tx,
+      // );
 
       return updatedBooking;
     });
