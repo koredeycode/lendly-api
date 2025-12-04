@@ -81,6 +81,48 @@ export class UserController {
     return { message: 'User bookings retrieved successfully', data };
   }
 
+  @ApiOperation({ summary: 'Get user saved items' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get user saved items',
+    type: SuccessResponseDTO,
+  })
+  @Get('/saved-items')
+  async getUserSavedItems(@Request() req: AuthenticatedRequest) {
+    const data = await this.itemService.getSavedItems(req.user.id);
+    return { message: 'User saved items retrieved successfully', data };
+  }
+
+  @ApiOperation({ summary: 'Save an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get user saved items',
+    type: SuccessResponseDTO,
+  })
+  @Post('/saved-items')
+  async createUserSavedItem(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: CreateSavedItemDTO,
+  ) {
+    await this.itemService.saveItem(req.user.id, body.itemId);
+    return { message: 'User saved item created successfully' };
+  }
+
+  @ApiOperation({ summary: 'Remove a saved item' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete user saved item',
+    type: SuccessResponseDTO,
+  })
+  @Delete('/saved-items')
+  async deleteUserSavedItem(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: CreateSavedItemDTO,
+  ) {
+    await this.itemService.unsaveItem(req.user.id, body.itemId);
+    return { message: 'User saved item deleted successfully' };
+  }
+
   @ApiOperation({ summary: 'Get user details by ID' })
   @ApiResponse({
     status: 200,
@@ -138,47 +180,5 @@ export class UserController {
   ) {
     const data = await this.itemService.getUserItems(id);
     return { message: 'User items retrieved successfully', data };
-  }
-
-  @ApiOperation({ summary: 'Get user saved items' })
-  @ApiResponse({
-    status: 200,
-    description: 'Get user saved items',
-    type: SuccessResponseDTO,
-  })
-  @Get('/saved-items')
-  async getUserSavedItems(@Request() req: AuthenticatedRequest) {
-    const data = await this.itemService.getSavedItems(req.user.id);
-    return { message: 'User saved items retrieved successfully', data };
-  }
-
-  @ApiOperation({ summary: 'Save an item' })
-  @ApiResponse({
-    status: 200,
-    description: 'Get user saved items',
-    type: SuccessResponseDTO,
-  })
-  @Post('/saved-items')
-  async createUserSavedItem(
-    @Request() req: AuthenticatedRequest,
-    @Body() body: CreateSavedItemDTO,
-  ) {
-    await this.itemService.saveItem(req.user.id, body.itemId);
-    return { message: 'User saved item created successfully' };
-  }
-
-  @ApiOperation({ summary: 'Remove a saved item' })
-  @ApiResponse({
-    status: 200,
-    description: 'Delete user saved item',
-    type: SuccessResponseDTO,
-  })
-  @Delete('/saved-items/:id')
-  async deleteUserSavedItem(
-    @Request() req: AuthenticatedRequest,
-    @Param('id') id: string,
-  ) {
-    await this.itemService.unsaveItem(req.user.id, id);
-    return { message: 'User saved item deleted successfully' };
   }
 }

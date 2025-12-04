@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateMessageDTO {
   @ApiProperty({
@@ -14,6 +20,7 @@ export class UpdateMessageDTO {
     example: ['res.cloudinary'],
   })
   @IsArray()
+  @IsOptional()
   @ArrayMinSize(1)
   @ArrayMaxSize(3)
   photos: string[];
