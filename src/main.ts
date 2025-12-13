@@ -5,6 +5,7 @@ import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import './instrumentation';
 import { QueueMonitorService } from './modules/queue-monitor/queue-monitor.service';
 
 async function bootstrap() {
