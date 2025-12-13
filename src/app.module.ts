@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -34,7 +35,8 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     LoggerModule.forRoot({
       pinoHttp: {
         serializers: {
-          req: (req: Request) => ({
+          req: (req: any) => ({
+            id: req.id,
             method: req.method,
             url: req.url,
           }),
@@ -42,17 +44,31 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
             statusCode: res.status,
           }),
         },
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? {
-                target: 'pino-pretty',
-                options: {
-                  singleLine: true,
-                },
-              }
-            : undefined,
+        transport: {
+          targets: [
+            {
+              target: 'pino-roll',
+              options: {
+                file: './logs/app.log',
+                frequency: 'daily',
+                mkdir: true,
+              },
+            },
+            ...(process.env.NODE_ENV !== 'production'
+              ? [
+                  {
+                    target: 'pino-pretty',
+                    options: {
+                      singleLine: true,
+                    },
+                  },
+                ]
+              : []),
+          ],
+        },
       },
     }),
+    PrometheusModule.register(),
 
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],

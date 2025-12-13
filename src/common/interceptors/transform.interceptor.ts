@@ -1,8 +1,8 @@
 import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
+    CallHandler,
+    ExecutionContext,
+    Injectable,
+    NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -21,6 +21,10 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
+    const request = context.switchToHttp().getRequest();
+    if (request.url.includes('/metrics')) {
+      return next.handle();
+    }
     return next.handle().pipe(
       map((data) => {
         // If the response is already formatted (e.g. from a controller that does it manually), use it.

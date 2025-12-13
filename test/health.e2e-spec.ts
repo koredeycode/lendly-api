@@ -13,6 +13,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
     await app.init();
   });
 
@@ -21,7 +22,12 @@ describe('AppController (e2e)', () => {
       .get('/api/health')
       .expect(200);
 
-    expect(res.body.status).toBe('OK');
-    expect(res.body).toHaveProperty('timestamp');
+    expect(res.body.status).toBe('ok');
+    expect(res.body).toHaveProperty('info');
+    expect(res.body).toHaveProperty('details');
+    expect(res.body.info).toHaveProperty('database');
+    expect(res.body.info.database.status).toBe('up');
+    expect(res.body.info).toHaveProperty('memory_heap');
+    expect(res.body.info.memory_heap.status).toBe('up');
   });
 });
