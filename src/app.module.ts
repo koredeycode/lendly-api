@@ -34,16 +34,30 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
 
     LoggerModule.forRoot({
       pinoHttp: {
+        timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
+        customProps: (req: any, res) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+          client_ip: req.ip || req.socket.remoteAddress,
+          http_request: `${req.method} ${req.url} HTTP/${req.httpVersion}`,
+          response_status: res.statusCode,
+          bytes_sent: res.getHeader('content-length'),
+          user_agent: req.headers['user-agent'],
+        }),
         serializers: {
-          req: (req: any) => ({
-            id: req.id,
-            method: req.method,
-            url: req.url,
-          }),
-          res: (res: Response) => ({
-            statusCode: res.status,
-          }),
+          req: () => undefined,
+          res: () => undefined,
+          err: () => undefined,
         },
+        // base: undefined is not directly supported in pinoHttp options type in some versions, but we can try. 
+        // Or mixin? 
+        // Actually pino-http options extends pino options. base: null removes pid/hostname.
+        // But with transport, base might be handled differently. 
+        // Let's try to pass base: null (which is the pino way to disable base logs).
+        // syntax: use 'base: null' inside the object if TS allows it.
+        // pinoHttp options usually keys are strictly typed.
+        // Let's rely on formatters logic if base fails? 
+        // But wait, transport doesn't allow formatters.level. 
+        // Let's skip base for now and focus on adding the required fields.
+        
         transport: {
           targets: [
             {
