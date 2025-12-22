@@ -1,6 +1,8 @@
 # Lendly API
 
-Lendly API is a robust backend service built with **NestJS**, designed to power the Lendly platform. It follows a **Clean Architecture** pattern and uses modern technologies for scalability and maintainability.
+Lendly API is a robust backend service built with **NestJS**, designed to power the Lendly platform—a peer-to-peer (P2P) marketplace for renting and giving away items. It facilitates secure transactions, item management, and user interactions, allowing users to monetize their belongings or help others in their community.
+
+The system follows a **Clean Architecture** pattern and uses modern technologies for scalability, maintainability, and developer productivity.
 
 ## 🚀 Technologies
 
@@ -9,18 +11,38 @@ Lendly API is a robust backend service built with **NestJS**, designed to power 
 - **Database**: PostgreSQL
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
 - **Queue**: [BullMQ](https://bullmq.io/) (Redis)
+- **Real-time**: Socket.IO (WebSockets)
 - **Logging**: [Pino](https://github.com/pinojs/pino)
 - **Validation**: Zod & class-validator
 - **Documentation**: Swagger (OpenAPI)
 
+## ✨ Key Features
+
+- **Item Management**: Users can list items for rent (with daily rates) or for temporary/permanent giveaway.
+- **Booking System**: Comprehensive flow for requesting, approving, and managing item rentals.
+- **Wallet & Payments**: Integrated wallet system for handling rental fees, tips, and withdrawals (using Stripe/Payment Gateways).
+- **User Profiles**: User authentication, profile management, and reputation tracking.
+- **Messaging**: Real-time chat between lenders and borrowers to coordinate exchanges.
+- **Reviews**: Reputation system allowing users to rate and review transactions.
+
 ## 🏗 Architecture
 
-The project is structured into modular features located in `src/modules`. Each module follows a layered architecture:
+The project is structured into modular features located in `src/modules`. Each module follows a layered architecture to separate concerns:
 
-- **Presentation**: Controllers and API endpoints.
+- **Presentation**: Controllers and API endpoints (e.g., `item.controller.ts`).
 - **Application**: Use cases and business logic orchestration.
-- **Domain**: Core business entities and logic.
+- **Domain**: Core business entities and logic (e.g., `item.entity.ts`).
 - **Infrastructure**: External implementations (repositories, database access).
+
+### Core Modules
+
+- `auth`: Authentication and authorization.
+- `user`: User profile management.
+- `item`: Listing items, photos, availability, and geolocation.
+- `booking`: Rental request lifecycle (request, approve, return).
+- `wallet`: Balance management, transactions, and payment integration.
+- `message`: In-app chat functionality.
+- `review`: User and item ratings.
 
 ## 🛠 Setup & Installation
 
