@@ -18,6 +18,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'src/common/decorators/public.decorator';
 import type { AuthenticatedRequest } from 'src/common/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/modules/auth/presentation/jwt-auth.guard';
 import { BookingService } from 'src/modules/booking/application/booking.service';
@@ -133,9 +134,10 @@ export class ItemController {
     description: 'Search results retrieved',
     type: ItemsResponseDTO,
   })
+  @Public() // Make public so guests can see items
   @Post('search')
   async searchItems(
-    @Request() req: AuthenticatedRequest,
+    @Request() req: any, // Allow unauthenticated request
     @Body() body: SearchItemsDTO,
   ) {
     const data = await this.itemService.searchItems(body);

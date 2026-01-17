@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { LoggerModule } from 'nestjs-pino';
+import { v4 as uuidv4 } from 'uuid';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
@@ -35,7 +36,21 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
     LoggerModule.forRoot({
       pinoHttp: {
         timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
+        genReqId: (req) => {
+          return req.headers['x-request-id'] || uuidv4();
+        },
+        redact: {
+          paths: [
+            'req.headers.authorization',
+            'req.body.password',
+            'req.body.confirmPassword',
+            'req.body.token',
+            'req.body.newPassword',
+          ],
+          remove: true,
+        },
         customProps: (req: any, res) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+          reqId: req.id,
           client_ip: req.ip || req.socket.remoteAddress,
           http_request: `${req.method} ${req.url} HTTP/${req.httpVersion}`,
           response_status: res.statusCode,
@@ -43,21 +58,14 @@ import { WalletModule } from './modules/wallet/presentation/wallet.module';
           user_agent: req.headers['user-agent'],
         }),
         serializers: {
-          req: () => undefined,
+          req: (req) => ({
+             id: req.id,
+             method: req.method,
+             url: req.url,
+          }),
           res: () => undefined,
           err: () => undefined,
         },
-        // base: undefined is not directly supported in pinoHttp options type in some versions, but we can try. 
-        // Or mixin? 
-        // Actually pino-http options extends pino options. base: null removes pid/hostname.
-        // But with transport, base might be handled differently. 
-        // Let's try to pass base: null (which is the pino way to disable base logs).
-        // syntax: use 'base: null' inside the object if TS allows it.
-        // pinoHttp options usually keys are strictly typed.
-        // Let's rely on formatters logic if base fails? 
-        // But wait, transport doesn't allow formatters.level. 
-        // Let's skip base for now and focus on adding the required fields.
-        
         transport: {
           targets: [
             {

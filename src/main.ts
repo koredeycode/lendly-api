@@ -10,6 +10,11 @@ import { QueueMonitorService } from './modules/queue-monitor/queue-monitor.servi
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
 
